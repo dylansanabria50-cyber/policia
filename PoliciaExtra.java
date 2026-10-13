@@ -1,0 +1,619 @@
+package com.example.policia;
+
+import java.util.UUID;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryObject;
+import org.joml.Vector3f;
+
+// Habilidades "extra" de Policia: Esposas (+ efecto negativo y bloqueo de
+// acciones), Perro K9, Sirena+torreta y Dron de vigilancia.
+public class PoliciaExtra {
+    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create((IForgeRegistry<EntityType<?>>) ForgeRegistries.ENTITY_TYPES, "policia");
+    public static final RegistryObject<EntityType<K9Entity>> K9 = ENTITIES.register("k9", () -> EntityType.Builder.of(K9Entity::new, MobCategory.MISC).sized(0.6f, 0.85f).clientTrackingRange(10).fireImmune().build("policia:k9"));
+    public static final RegistryObject<EntityType<SirenEntity>> SIREN = ENTITIES.register("sirena", () -> EntityType.Builder.of(SirenEntity::new, MobCategory.MISC).sized(1.6f, 1.2f).clientTrackingRange(10).updateInterval(2).fireImmune().build("policia:sirena"));
+    public static final RegistryObject<EntityType<DroneEntity>> DRONE = ENTITIES.register("dron", () -> EntityType.Builder.of(DroneEntity::new, MobCategory.MISC).sized(0.7f, 0.3f).noSummon().clientTrackingRange(10).updateInterval(2).fireImmune().build("policia:dron"));
+    public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create((IForgeRegistry<MobEffect>) ForgeRegistries.MOB_EFFECTS, "policia");
+    public static final RegistryObject<MobEffect> CUFF = EFFECTS.register("esposado", CuffEffect::new);
+    static final int[] CD = new int[]{0, 0, 0, 0, 0, 600, 1200, 800, 1200, 980};
+    static final int CUFF_T = 300;
+    static final int K9_LIFE = 900;
+    static final int SIREN_LIFE = 400;
+    static final int DRONE_LIFE = 900;
+    static final double SIREN_R = 14.0;
+    static final double DRONE_R = 32.0;
+    static final DustParticleOptions CUFF_DUST = new DustParticleOptions(new Vector3f(0.75f, 0.78f, 0.85f), 1.0f);
+
+    public static void attrs(EntityAttributeCreationEvent e) {
+        e.put(K9.get(), Wolf.createAttributes().add(Attributes.MAX_HEALTH, 30.0).add(Attributes.ATTACK_DAMAGE, 8.0).build());
+    }
+
+    static String key(int s) {
+        return "pol_x" + s;
+    }
+
+    static int cd(Player p, int s) {
+        return s >= 5 && s <= 9 ? p.getPersistentData().getInt(PoliciaExtra.key(s)) : 0;
+    }
+
+    static boolean tickCd(ServerPlayer p) {
+        boolean ch = false;
+        CompoundTag d = p.getPersistentData();
+        for (int s = 5; s <= 9; ++s) {
+            int v = d.getInt(PoliciaExtra.key(s));
+            if (v <= 0) continue;
+            d.putInt(PoliciaExtra.key(s), v - 1);
+            if (v != 1) continue;
+            PoliciaMod.msg(p, PoliciaMod.SKILLS[s] + " listo");
+            ch = true;
+        }
+        return ch;
+    }
+
+    static void use(ServerPlayer p, int s) {
+        int c = PoliciaExtra.cd(p, s);
+        if (c > 0) {
+            PoliciaMod.msg(p, PoliciaMod.SKILLS[s] + " en enfriamiento: " + (c + 19) / 20 + " s");
+            return;
+        }
+        if (switch (s) {
+            case 5 -> PoliciaExtra.cuff(p);
+            case 6 -> PoliciaExtra.k9(p);
+            case 7 -> PoliciaExtra.siren(p);
+            case 9 -> PoliciaBubble.use(p);
+            default -> PoliciaExtra.drone(p);
+        }) {
+            p.getPersistentData().putInt(PoliciaExtra.key(s), CD[s]);
+            PoliciaMod.sync(p);
+        }
+    }
+
+    static void poof(Entity e) {
+        Level level = e.level();
+        if (level instanceof ServerLevel) {
+            ServerLevel sl = (ServerLevel) level;
+            sl.sendParticles((ParticleOptions) ParticleTypes.POOF, e.getX(), e.getY() + 0.5, e.getZ(), 12, 0.3, 0.4, 0.3, 0.02);
+        }
+        e.discard();
+    }
+
+    static boolean cuff(ServerPlayer p) {
+        Mob m;
+        Entity entity;
+        Vec3 eye = p.getEyePosition();
+        Vec3 look = p.getLookAngle();
+        Vec3 end = eye.add(look.scale(12.0));
+        AABB box = p.getBoundingBox().expandTowards(look.scale(12.0)).inflate(1.0);
+        EntityHitResult hit = ProjectileUtil.getEntityHitResult(p.level(), p, eye, end, box, en -> en instanceof LivingEntity && en.isAlive() && !en.isSpectator() && en.isPickable() && !(en instanceof PoliciaRefuerzo.AgentEntity) && !(en instanceof K9Entity));
+        if (hit == null || !((entity = hit.getEntity()) instanceof LivingEntity)) {
+            PoliciaMod.msg(p, "Apunta a un objetivo (hasta 12 m)");
+            return false;
+        }
+        LivingEntity t = (LivingEntity) entity;
+        if (p.level().clip(new ClipContext(eye, hit.getLocation(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, p)).getType() != HitResult.Type.MISS) {
+            PoliciaMod.msg(p, "Hay un obstaculo en el camino");
+            return false;
+        }
+        CompoundTag td = t.getPersistentData();
+        td.putInt("pol_cuff", 300);
+        td.putUUID("pol_cuffo", p.getUUID());
+        if (t instanceof Mob && !(m = (Mob) t).isNoAi()) {
+            m.setNoAi(true);
+            td.putBoolean("pol_cuffai", true);
+        }
+        t.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 300, 6, false, false));
+        t.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 300, 4, false, false));
+        t.addEffect(new MobEffectInstance((MobEffect) CUFF.get(), 300, 0, false, false, false));
+        t.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 300, 0, false, false));
+        ServerLevel sl = p.serverLevel();
+        sl.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1.2f, 0.9f);
+        sl.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0f, 1.3f);
+        sl.sendParticles((ParticleOptions) ParticleTypes.CRIT, t.getX(), t.getY() + 0.5, t.getZ(), 14, 0.3, 0.4, 0.3, 0.1);
+        PoliciaMod.msg(p, "Esposado: " + t.getDisplayName().getString() + " (15 s): arrastralo donde quieras");
+        return true;
+    }
+
+    @SubscribeEvent
+    public void cuffTick(LivingEvent.LivingTickEvent e) {
+        double dz;
+        double dx;
+        double dist;
+        ServerLevel sl0;
+        ServerPlayer o;
+        Level level;
+        LivingEntity t = e.getEntity();
+        if (t.level().isClientSide) {
+            return;
+        }
+        CompoundTag d = t.getPersistentData();
+        int c = d.getInt("pol_cuff");
+        if (c <= 0) {
+            return;
+        }
+        d.putInt("pol_cuff", --c);
+        Vec3 v = t.getDeltaMovement();
+        double vy = Math.min(v.y, 0.0);
+        double vx = 0.0;
+        double vz = 0.0;
+        if (d.hasUUID("pol_cuffo") && (level = t.level()) instanceof ServerLevel && (o = (sl0 = (ServerLevel) level).getServer().getPlayerList().getPlayer(d.getUUID("pol_cuffo"))) != null && o != t && o.level() == t.level() && (dist = Math.sqrt((dx = o.getX() - t.getX()) * dx + (dz = o.getZ() - t.getZ()) * dz)) > 2.6 && dist < 40.0) {
+            double sp = Math.min(0.42, (dist - 2.2) * 0.25);
+            vx = dx / dist * sp;
+            vz = dz / dist * sp;
+            if (t.horizontalCollision && t.onGround()) {
+                vy = 0.42;
+            }
+        }
+        t.setDeltaMovement(vx, vy, vz);
+        if (t instanceof ServerPlayer && (vx != 0.0 || vz != 0.0)) {
+            t.hurtMarked = true;
+        }
+        if (c == 0) {
+            t.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+            t.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2, false, true));
+            d.remove("pol_cuffo");
+        }
+        if (c == 0 && d.getBoolean("pol_cuffai") && t instanceof Mob) {
+            Mob m2 = (Mob) t;
+            m2.setNoAi(false);
+            d.remove("pol_cuffai");
+        }
+    }
+
+    @SubscribeEvent
+    public void cuffInspect(PlayerInteractEvent.EntityInteract e) {
+        ServerPlayer tp;
+        ServerPlayer o;
+        block6:
+        {
+            block5:
+            {
+                Player player = e.getEntity();
+                if (!(player instanceof ServerPlayer)) break block5;
+                o = (ServerPlayer) player;
+                player = e.getTarget();
+                if (player instanceof ServerPlayer && o != (tp = (ServerPlayer) player)) break block6;
+            }
+            return;
+        }
+        if (e.getHand() != InteractionHand.MAIN_HAND) {
+            return;
+        }
+        CompoundTag td = tp.getPersistentData();
+        if (td.getInt("pol_cuff") <= 0 || !td.hasUUID("pol_cuffo") || !td.getUUID("pol_cuffo").equals(o.getUUID())) {
+            return;
+        }
+        e.setCanceled(true);
+        o.openMenu((MenuProvider) new SimpleMenuProvider((id, inv, pl) -> new ChestMenu(MenuType.GENERIC_9x4, id, inv, (Container) tp.getInventory(), 4), Component.literal("Inventario de " + tp.getDisplayName().getString())));
+    }
+
+    static boolean cuffed(Entity e) {
+        LivingEntity l;
+        return e instanceof LivingEntity && (l = (LivingEntity) e).getPersistentData().getInt("pol_cuff") > 0;
+    }
+
+    @SubscribeEvent
+    public void cuffedAttack(LivingAttackEvent e) {
+        if (PoliciaExtra.cuffed(e.getSource().getEntity())) {
+            e.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void cuffedHit(AttackEntityEvent e) {
+        if (PoliciaExtra.cuffed(e.getEntity())) {
+            e.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void cuffedUse(PlayerInteractEvent e) {
+        if (PoliciaExtra.cuffed(e.getEntity()) && e.isCancelable()) {
+            e.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void cuffedBreak(BlockEvent.BreakEvent e) {
+        if (PoliciaExtra.cuffed(e.getPlayer())) {
+            e.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void cuffedItem(LivingEntityUseItemEvent.Start e) {
+        if (PoliciaExtra.cuffed(e.getEntity())) {
+            e.setCanceled(true);
+        }
+    }
+
+    static boolean k9(ServerPlayer p) {
+        ServerLevel sl = p.serverLevel();
+        K9Entity w = K9.get().create(sl);
+        if (w == null) {
+            return false;
+        }
+        Vec3 look = p.getLookAngle();
+        w.moveTo(p.getX() + look.x * 1.8, p.getY(), p.getZ() + look.z * 1.8, p.getYRot(), 0.0f);
+        if (!sl.noCollision(w)) {
+            w.moveTo(p.getX(), p.getY(), p.getZ(), p.getYRot(), 0.0f);
+        }
+        w.tame(p);
+        w.getAttribute(Attributes.MAX_HEALTH).setBaseValue(30.0);
+        w.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(8.0);
+        w.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.42);
+        w.setHealth(30.0f);
+        w.setCollarColor(DyeColor.BLUE);
+        w.setOrderedToSit(false);
+        sl.addFreshEntity(w);
+        int n = 0;
+        for (LivingEntity m : sl.getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(24.0), x2 -> x2 instanceof Enemy && x2.isAlive())) {
+            m.addEffect(new MobEffectInstance(MobEffects.GLOWING, 200, 0, false, false));
+            ++n;
+        }
+        sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.WOLF_HOWL, SoundSource.PLAYERS, 1.0f, 1.0f);
+        PoliciaMod.msg(p, "Perro K9 en servicio" + (n > 0 ? ": " + n + " amenazas marcadas" : ""));
+        return true;
+    }
+
+    static boolean siren(ServerPlayer p) {
+        ServerLevel sl = p.serverLevel();
+        SirenEntity s = SIREN.get().create(sl);
+        if (s == null) {
+            return false;
+        }
+        Vec3 look = p.getLookAngle();
+        Vec3 fl = new Vec3(look.x, 0.0, look.z);
+        fl = fl.lengthSqr() < 1.0E-4 ? new Vec3(0.0, 0.0, 1.0) : fl.normalize();
+        s.owner = p.getUUID();
+        s.moveTo(p.getX() + fl.x * 3.0, p.getY() + 0.3, p.getZ() + fl.z * 3.0, p.getYRot(), 0.0f);
+        if (!sl.noCollision(s)) {
+            s.moveTo(p.getX() + fl.x * 3.0, p.getY() + 1.3, p.getZ() + fl.z * 3.0, p.getYRot(), 0.0f);
+        }
+        sl.addFreshEntity(s);
+        sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.8f, 0.8f);
+        PoliciaMod.msg(p, "Patrulla desplegada: los enemigos cercanos huyen (20 s)");
+        return true;
+    }
+
+    static boolean drone(ServerPlayer p) {
+        ServerLevel sl = p.serverLevel();
+        DroneEntity d = DRONE.get().create(sl);
+        if (d == null) {
+            return false;
+        }
+        d.owner = p.getUUID();
+        d.moveTo(p.getX(), p.getY() + 2.0, p.getZ(), p.getYRot(), 0.0f);
+        sl.addFreshEntity(d);
+        sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BAT_TAKEOFF, SoundSource.PLAYERS, 0.8f, 1.8f);
+        PoliciaMod.msg(p, "Dron de vigilancia en el aire (45 s)");
+        return true;
+    }
+
+    public static class K9Entity extends Wolf {
+        int life;
+
+        public K9Entity(EntityType<? extends K9Entity> type, Level level) {
+            super(type, level);
+            this.setPersistenceRequired();
+        }
+
+        @Override
+        protected void registerGoals() {
+            super.registerGoals();
+            this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Monster.class, 10, true, false, t -> t instanceof Enemy));
+        }
+
+        @Override
+        public InteractionResult mobInteract(Player p, InteractionHand h) {
+            return InteractionResult.PASS;
+        }
+
+        @Override
+        public boolean hurt(DamageSource s, float amount) {
+            Entity src = s.getEntity();
+            if (src != null && this.getOwnerUUID() != null && src.getUUID().equals(this.getOwnerUUID())) {
+                return false;
+            }
+            return super.hurt(s, amount);
+        }
+
+        @Override
+        public boolean shouldRenderAtSqrDistance(double d) {
+            return false;
+        }
+
+        @Override
+        public Packet<ClientGamePacketListener> getAddEntityPacket() {
+            return NetworkHooks.getEntitySpawningPacket(this);
+        }
+
+        @Override
+        public void tick() {
+            LivingEntity o;
+            super.tick();
+            if (this.level().isClientSide) {
+                return;
+            }
+            ++this.life;
+            if (this.life > 900) {
+                PoliciaExtra.poof(this);
+                return;
+            }
+            if (!(this.life % 20 != 0 || (o = this.getOwner()) != null && o.isAlive())) {
+                PoliciaExtra.poof(this);
+            }
+        }
+    }
+
+    public static class SirenEntity extends Entity {
+        static final EntityDataAccessor<Float> AIM = SynchedEntityData.defineId(SirenEntity.class, EntityDataSerializers.FLOAT);
+        UUID owner;
+        int life;
+        int lastShot = -100;
+
+        public SirenEntity(EntityType<? extends SirenEntity> type, Level level) {
+            super(type, level);
+            this.noPhysics = true;
+        }
+
+        float aim() {
+            return this.entityData.get(AIM);
+        }
+
+        @Override
+        protected void defineSynchedData() {
+            this.entityData.define(AIM, 0.0f);
+        }
+
+        @Override
+        protected void readAdditionalSaveData(CompoundTag t) {
+        }
+
+        @Override
+        protected void addAdditionalSaveData(CompoundTag t) {
+        }
+
+        @Override
+        public Packet<ClientGamePacketListener> getAddEntityPacket() {
+            return NetworkHooks.getEntitySpawningPacket(this);
+        }
+
+        @Override
+        public boolean isPickable() {
+            return false;
+        }
+
+        @Override
+        public boolean canBeCollidedWith() {
+            return true;
+        }
+
+        @Override
+        public boolean hurt(DamageSource s, float a) {
+            return false;
+        }
+
+        @Override
+        public void tick() {
+            ServerPlayer o;
+            super.tick();
+            if (!this.onGround()) {
+                this.setDeltaMovement(0.0, this.getDeltaMovement().y - 0.08, 0.0);
+            } else {
+                this.setDeltaMovement(Vec3.ZERO);
+            }
+            this.move(MoverType.SELF, this.getDeltaMovement());
+            if (this.level().isClientSide) {
+                return;
+            }
+            ServerLevel sl = (ServerLevel) this.level();
+            ++this.life;
+            ServerPlayer serverPlayer = o = this.owner == null ? null : sl.getServer().getPlayerList().getPlayer(this.owner);
+            if (this.life > 400 || o == null || !o.isAlive() || o.level() != this.level()) {
+                PoliciaExtra.poof(this);
+                return;
+            }
+            if (this.life % 10 == 1) {
+                sl.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 2.0f, this.life / 10 % 2 == 0 ? 1.9f : 1.3f);
+            }
+            if (this.life % 3 == 0) {
+                this.scare(sl);
+            }
+            if (this.life % 16 == 0) {
+                this.shoot(sl, o);
+            }
+            if (this.life - this.lastShot > 24 && this.life % 2 == 0) {
+                this.entityData.set(AIM, (float) (this.life * 7 % 360 - 180));
+            }
+        }
+
+        void scare(ServerLevel sl) {
+            for (Mob m : sl.getEntitiesOfClass(Mob.class, this.getBoundingBox().inflate(14.0), x -> x.isAlive() && x.getMaxHealth() < 150.0f && !(x instanceof PoliciaRefuerzo.AgentEntity) && !(x instanceof K9Entity) && (x instanceof Enemy || x.getTarget() != null && x.getTarget().getUUID().equals(this.owner)))) {
+                Vec3 away = m.position().subtract(this.position()).multiply(1.0, 0.0, 1.0);
+                away = away.lengthSqr() < 0.01 ? new Vec3(1.0, 0.0, 0.0) : away.normalize();
+                m.setTarget(null);
+                Vec3 dest = m.position().add(away.scale(12.0));
+                m.getNavigation().moveTo(dest.x, dest.y, dest.z, 1.5);
+                Vec3 dm = m.getDeltaMovement();
+                if (dm.horizontalDistanceSqr() < 0.09) {
+                    m.setDeltaMovement(dm.x + away.x * 0.12, dm.y, dm.z + away.z * 0.12);
+                }
+                if (this.life % 12 != 0) continue;
+                sl.sendParticles((ParticleOptions) ParticleTypes.SMOKE, m.getX(), m.getY() + (double) m.getBbHeight() + 0.2, m.getZ(), 3, 0.2, 0.1, 0.2, 0.01);
+            }
+        }
+
+        void shoot(ServerLevel sl, ServerPlayer o) {
+            Vec3 from = new Vec3(this.getX(), this.getY() + 1.1, this.getZ());
+            LivingEntity best = null;
+            double bd = 324.0;
+            for (LivingEntity t : sl.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(18.0), x -> x instanceof Enemy && x.isAlive())) {
+                double dd = t.distanceToSqr(this);
+                if (!(dd < bd) || sl.clip(new ClipContext(from, t.getEyePosition(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType() != HitResult.Type.MISS) continue;
+                bd = dd;
+                best = t;
+            }
+            if (best == null) {
+                return;
+            }
+            this.lastShot = this.life;
+            Vec3 to = best.position().add(0.0, (double) best.getBbHeight() * 0.6, 0.0).subtract(from);
+            this.entityData.set(AIM, (float) (Mth.atan2(-to.x, to.z) * 57.29577951308232));
+            Arrow a = new Arrow(EntityType.ARROW, sl);
+            a.setPos(from.x, from.y, from.z);
+            a.setOwner(o);
+            a.setBaseDamage(4.0);
+            a.pickup = AbstractArrow.Pickup.DISALLOWED;
+            a.shoot(to.x, to.y + Math.sqrt(to.x * to.x + to.z * to.z) * 0.05, to.z, 2.6f, 0.6f);
+            sl.addFreshEntity(a);
+            sl.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0f, 1.2f);
+        }
+    }
+
+    public static class DroneEntity extends Entity {
+        UUID owner;
+        int life;
+
+        public DroneEntity(EntityType<? extends DroneEntity> type, Level level) {
+            super(type, level);
+            this.noCulling = true;
+            this.noPhysics = true;
+        }
+
+        @Override
+        protected void defineSynchedData() {
+        }
+
+        @Override
+        protected void readAdditionalSaveData(CompoundTag t) {
+        }
+
+        @Override
+        protected void addAdditionalSaveData(CompoundTag t) {
+        }
+
+        @Override
+        public Packet<ClientGamePacketListener> getAddEntityPacket() {
+            return NetworkHooks.getEntitySpawningPacket(this);
+        }
+
+        @Override
+        public boolean isPickable() {
+            return false;
+        }
+
+        @Override
+        public boolean hurt(DamageSource s, float a) {
+            return false;
+        }
+
+        @Override
+        public void tick() {
+            ServerPlayer o;
+            super.tick();
+            if (this.level().isClientSide) {
+                return;
+            }
+            ServerLevel sl = (ServerLevel) this.level();
+            ++this.life;
+            ServerPlayer serverPlayer = o = this.owner == null ? null : sl.getServer().getPlayerList().getPlayer(this.owner);
+            if (this.life > 900 || o == null || !o.isAlive() || o.level() != this.level()) {
+                PoliciaExtra.poof(this);
+                return;
+            }
+            double ya = Math.toRadians(o.getYRot());
+            double fx = -Math.sin(ya);
+            double fz = Math.cos(ya);
+            double rx = -Math.cos(ya);
+            double rz = -Math.sin(ya);
+            Vec3 tgt = new Vec3(o.getX() + rx * 1.3 - fx * 0.3, o.getY() + 3.0 + Math.sin((double) this.life * 0.1) * 0.15, o.getZ() + rz * 1.3 - fz * 0.3);
+            Vec3 dv = tgt.subtract(this.position());
+            if (dv.lengthSqr() > 400.0) {
+                this.setPos(tgt.x, tgt.y, tgt.z);
+            } else {
+                this.setPos(this.getX() + dv.x * 0.15, this.getY() + dv.y * 0.15, this.getZ() + dv.z * 0.15);
+            }
+            this.setYRot(o.getYRot());
+            if (this.life % 20 == 0) {
+                int n = 0;
+                for (LivingEntity t : sl.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(32.0), x -> {
+                    Mob mm;
+                    return x.isAlive() && (x instanceof Enemy || x instanceof Mob && (mm = (Mob) x).getTarget() != null && mm.getTarget().getUUID().equals(this.owner));
+                })) {
+                    t.addEffect(new MobEffectInstance(MobEffects.GLOWING, 45, 0, false, false));
+                    ++n;
+                }
+                if (this.life % 100 == 0 && n > 0) {
+                    PoliciaMod.msg(o, "Dron: " + n + (n == 1 ? " amenaza detectada" : " amenazas detectadas"));
+                }
+            }
+        }
+    }
+
+    public static class CuffEffect extends MobEffect {
+        public CuffEffect() {
+            super(MobEffectCategory.HARMFUL, 11580604);
+        }
+    }
+}
