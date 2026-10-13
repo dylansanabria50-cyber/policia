@@ -23,3 +23,10 @@ Personaje policia con skin propia y un arbol de habilidades que se desbloquea co
     versionRange="[1.20.1,1.21)"
     ordering="NONE"
     side="BOTH"
+
+[[dependencies.policia]]
+    modId="geckolib"
+    mandatory=true
+    versionRange="[4.0,)"
+    ordering="AFTER"
+    side="BOTH"

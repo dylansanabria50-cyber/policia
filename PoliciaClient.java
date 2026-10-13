@@ -47,6 +47,7 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.RenderArmorEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.event.ViewportEvent;
@@ -108,6 +109,7 @@ public class PoliciaClient {
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::livingPre);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::noClicks);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::screenPre);
+        MinecraftForge.EVENT_BUS.addListener(PoliciaClient::armorPre);
         MinecraftForge.EVENT_BUS.addListener(PoliciaXray::tick);
         MinecraftForge.EVENT_BUS.addListener(PoliciaXray::render);
         MinecraftForge.EVENT_BUS.addListener(PoliciaXray::scroll);
@@ -134,6 +136,7 @@ public class PoliciaClient {
         e.registerEntityRenderer((EntityType) PoliciaMision.VAN.get(), PoliciaMisionRender::new);
         PoliciaExtraRender.register(e);
         e.registerEntityRenderer((EntityType) PoliciaHeli.HELI.get(), PoliciaHeliRender::new);
+        e.registerEntityRenderer((EntityType) PoliciaForja.PROP.get(), PoliciaForjaRender::new);
     }
 
     static void camera(ViewportEvent.ComputeCameraAngles e) {
@@ -230,6 +233,17 @@ public class PoliciaClient {
     static void screenInit(ScreenEvent.Init.Post e) {
         if (e.getScreen() instanceof InventoryScreen) {
             e.addListener((GuiEventListener) new TreeButton());
+            e.addListener((GuiEventListener) new ArmorHideButton());
+        }
+    }
+
+    static void armorPre(RenderArmorEvent.Pre e) {
+        if (!(e.getEntity() instanceof Player p)) {
+            return;
+        }
+        PoliciaMod.Sync s = STATE.get(p.getUUID());
+        if (s != null && s.hideArmor) {
+            e.setCanceled(true);
         }
     }
 
@@ -260,6 +274,12 @@ public class PoliciaClient {
         tb.visible = st != null && st.on;
         tb.setX(maxRight + 2);
         tb.setY(top + 61);
+        for (Object o : inv.children()) {
+            if (o instanceof ArmorHideButton ab) {
+                ab.setX(left + 7);
+                ab.setY(top + 6);
+            }
+        }
     }
 
     static void livingPre(RenderLivingEvent.Pre<?, ?> e) {
@@ -779,6 +799,21 @@ public class PoliciaClient {
         public void renderWidget(GuiGraphics g, int mx, int my, float pt) {
             super.renderWidget(g, mx, my, pt);
             g.renderItem(PoliciaClient.lad() ? new ItemStack((ItemLike) PoliciaPlaca.GUANTE.get()) : (PoliciaClient.alb() ? new ItemStack((ItemLike) Items.WOODEN_PICKAXE) : new ItemStack((ItemLike) PoliciaShield.SHIELD.get())), this.getX() + 2, this.getY() + 1);
+        }
+    }
+
+    static class ArmorHideButton extends Button {
+        ArmorHideButton() {
+            super(0, 0, 20, 18, Component.literal(""), b -> PoliciaClient.send(62), DEFAULT_NARRATION);
+            this.setTooltip(Tooltip.create(Component.literal("Ocultar o mostrar tu armadura puesta")));
+        }
+
+        @Override
+        public void renderWidget(GuiGraphics g, int mx, int my, float pt) {
+            super.renderWidget(g, mx, my, pt);
+            PoliciaMod.Sync st = PoliciaClient.mine();
+            boolean hidden = st != null && st.hideArmor;
+            g.renderItem(new ItemStack((ItemLike) (hidden ? Items.LEATHER_CHESTPLATE : Items.IRON_CHESTPLATE)), this.getX() + 2, this.getY() + 1);
         }
     }
 

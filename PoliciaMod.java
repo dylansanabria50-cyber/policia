@@ -140,6 +140,13 @@ public class PoliciaMod {
     }
 
     public PoliciaMod() {
+        try {
+            software.bernie.geckolib.GeckoLib.initialize();
+        } catch (Throwable ignored) {
+            // GeckoLib no esta instalado: las animaciones del Herrero
+            // quedan sin su prop visual, pero el resto del mod sigue
+            // funcionando normal (ver PoliciaForja.spawn).
+        }
         NET.registerMessage(0, Act.class, Act::enc, Act::dec, Act::handle);
         NET.registerMessage(1, Sync.class, Sync::enc, Sync::dec, Sync::handle);
         MinecraftForge.EVENT_BUS.register(this);
@@ -148,6 +155,7 @@ public class PoliciaMod {
         PoliciaRefuerzo.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaExtra.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaHeli.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+        PoliciaForja.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaPlaca.init();
         PoliciaLadron.init();
         PoliciaBoss.init();
@@ -185,6 +193,7 @@ public class PoliciaMod {
         m.c8 = PoliciaExtra.cd(p, 8);
         m.c9 = PoliciaExtra.cd(p, 9);
         m.jb = "albanil".equals(job(p)) ? 2 : (ID.equals(job(p)) ? 1 : 0);
+        m.hideArmor = p.getPersistentData().getBoolean("pol_hidearmor");
         if ("ladron".equals(job(p))) {
             m.jb = 3;
             m.rl = PoliciaLadron.luck(p);
@@ -253,6 +262,13 @@ public class PoliciaMod {
         }
         if (id == 61) {
             PoliciaRefuerzo.cycle(p);
+            return;
+        }
+        if (id == 62) {
+            boolean hide = !d.getBoolean("pol_hidearmor");
+            d.putBoolean("pol_hidearmor", hide);
+            msg(p, hide ? "Armadura oculta" : "Armadura visible");
+            sync(p);
             return;
         }
         if ("ladron".equals(job(p))) {
@@ -676,7 +692,7 @@ public class PoliciaMod {
                 "alb_lv", "alb_pl", "alb_hl", "alb_ench", "alb_mode", "alb_bank", "alb_lu", "alb_tu",
                 "alb_tinv", "alb_sel", "alb_chest", "alb_inner", "alb_c0", "alb_c1",
                 "pol_mdone", "pol_bdone", "pol_cerebro", "pol_lsu", "pol_lsi", "pol_lun", "pol_lse",
-                "pol_cin0", "pol_cin2", "pol_comp", "pol_party",
+                "pol_cin0", "pol_cin2", "pol_comp", "pol_party", "pol_hidearmor",
                 "her_sel", "her_cd0", "her_cd1", "her_cd2", "her_cd3", "her_cd4", "her_cd5", "her_cd6", "her_cd7", "her_cd8"}) {
             if (!o.contains(k)) continue;
             n.put(k, o.get(k).copy());
@@ -753,6 +769,7 @@ public class PoliciaMod {
         int c8;
         int c9;
         int jb;
+        boolean hideArmor;
 
         Sync() {
         }
@@ -774,6 +791,7 @@ public class PoliciaMod {
             b.writeVarInt(m.c8);
             b.writeVarInt(m.c9);
             b.writeVarInt(m.jb);
+            b.writeBoolean(m.hideArmor);
         }
 
         static Sync dec(FriendlyByteBuf b) {
@@ -794,6 +812,7 @@ public class PoliciaMod {
             m.c8 = b.readVarInt();
             m.c9 = b.readVarInt();
             m.jb = b.readVarInt();
+            m.hideArmor = b.readBoolean();
             return m;
         }
 
