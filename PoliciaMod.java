@@ -156,6 +156,7 @@ public class PoliciaMod {
         PoliciaGrupo.init();
         PoliciaAlbanil.init();
         MinecraftForge.EVENT_BUS.register(new PoliciaAlbanil());
+        PoliciaHerrero.init();
         PoliciaExtra.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaExtra::attrs);
         MinecraftForge.EVENT_BUS.register(new PoliciaExtra());
@@ -220,6 +221,9 @@ public class PoliciaMod {
                 if ("albanil".equals(job(p))) {
                     PoliciaAlbanil.reset(p);
                 }
+                if ("herrero".equals(job(p))) {
+                    PoliciaHerrero.reset(p);
+                }
             }
             d.putInt("pol_tf", 40);
             d.putInt("pol_tfd", on(p) ? 1 : -1);
@@ -256,6 +260,10 @@ public class PoliciaMod {
         }
         if ("albanil".equals(job(p))) {
             PoliciaAlbanil.act(p, id);
+            return;
+        }
+        if ("herrero".equals(job(p))) {
+            PoliciaHerrero.act(p, id);
             return;
         }
         if (id == 30) {
@@ -667,7 +675,8 @@ public class PoliciaMod {
                 "alb_lv", "alb_pl", "alb_hl", "alb_ench", "alb_mode", "alb_bank", "alb_lu", "alb_tu",
                 "alb_tinv", "alb_sel", "alb_chest", "alb_inner", "alb_c0", "alb_c1",
                 "pol_mdone", "pol_bdone", "pol_cerebro", "pol_lsu", "pol_lsi", "pol_lun", "pol_lse",
-                "pol_cin0", "pol_cin2", "pol_comp", "pol_party"}) {
+                "pol_cin0", "pol_cin2", "pol_comp", "pol_party",
+                "her_sel", "her_cd0", "her_cd1", "her_cd2", "her_cd3", "her_cd4", "her_cd5", "her_cd6", "her_cd7", "her_cd8"}) {
             if (!o.contains(k)) continue;
             n.put(k, o.get(k).copy());
         }

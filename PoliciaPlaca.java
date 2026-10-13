@@ -22,6 +22,8 @@ public class PoliciaPlaca {
             () -> new JobBadge(new Item.Properties().stacksTo(1), "albanil", "albanil", "Pulsa B para activar el modo albanil"));
     public static final RegistryObject<Item> GUANTE = PoliciaShield.ITEMS.register("guante_ladron",
             () -> new JobBadge(new Item.Properties().stacksTo(1), "ladron", "ladron", "Pulsa B para activar el modo ladron"));
+    public static final RegistryObject<Item> MARTILLO = PoliciaShield.ITEMS.register("martillo_herrero",
+            () -> new JobBadge(new Item.Properties().stacksTo(1).fireResistant(), "herrero", "herrero legendario", "Pulsa B para activar el modo herrero"));
 
     public static void init() {
     }
