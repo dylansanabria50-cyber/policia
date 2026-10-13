@@ -1,6 +1,5 @@
 package com.example.policia;
 
-import java.util.Set;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -10,48 +9,42 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-// Oficio Herrero Legendario: forja y templa equipo, resiste el fuego de
-// la fragua y golpea con un martillo sismico. Se consigue con el Martillo
-// del Herrero Legendario (vease PoliciaPlaca).
+// Oficio Herrero Legendario: forja y templa equipo, planta yunques que
+// protegen o potencian, y se vincula con un aliado. Se consigue con el
+// Martillo del Herrero Legendario (vease PoliciaPlaca). La ultima
+// habilidad (Analizador del Forjador) es pasiva y vive en PoliciaAnalizador.
 public class PoliciaHerrero {
     static final String JOB = "herrero";
     public static final String[] SKILLS = new String[]{
-            "Mano Firme", "Ojo del Metal", "Resistencia de Fragua", "Martillazo Sismico",
-            "Cadena al Rojo Vivo", "Armadura de Brasas", "Reparacion Maestra", "Templar Equipo",
-            "Forja Legendaria"
+            "Grito del Forjador", "Yunque Portatil", "Marca del Herrero", "Forja Interior",
+            "Faro de Forja", "Vinculo de Acero", "Reparacion Maestra", "Yunque Guardian",
+            "Analizador del Forjador"
     };
     static final int[] THRESH = new int[]{0, 15, 25, 35, 45, 55, 70, 85, 100};
-    static final Set<Block> ORES = Set.of(Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE, Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE,
-            Blocks.DIAMOND_ORE, Blocks.DEEPSLATE_DIAMOND_ORE, Blocks.EMERALD_ORE, Blocks.DEEPSLATE_EMERALD_ORE,
-            Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE, Blocks.REDSTONE_ORE, Blocks.DEEPSLATE_REDSTONE_ORE,
-            Blocks.LAPIS_ORE, Blocks.DEEPSLATE_LAPIS_ORE, Blocks.ANCIENT_DEBRIS);
-    static final UUID TEMPER_DMG = UUID.fromString("9a2f7b10-4c3e-4d55-8f21-6b0a1c2d3e4f");
-    static final UUID TEMPER_ARM = UUID.fromString("b4e8c231-7a5d-4f66-9e32-7c1b2d3e4f50");
+    static final UUID MARK_ARM = UUID.fromString("b4e8c231-7a5d-4f66-9e32-7c1b2d3e4f50");
 
     static void init() {
         MinecraftForge.EVENT_BUS.register((Object) new PoliciaHerrero());
@@ -72,7 +65,7 @@ public class PoliciaHerrero {
     }
 
     static int sel(ServerPlayer p) {
-        return Math.max(0, Math.min(SKILLS.length - 1, p.getPersistentData().getInt("her_sel")));
+        return Math.max(0, Math.min(SKILLS.length - 2, p.getPersistentData().getInt("her_sel")));
     }
 
     static int cd(ServerPlayer p, int i) {
@@ -81,17 +74,17 @@ public class PoliciaHerrero {
 
     static void act(ServerPlayer p, int id) {
         CompoundTag d = p.getPersistentData();
+        int usable = Math.min(unlocked(p), SKILLS.length - 1);
         if (id >= 10 && id < 20) {
             int s = id - 10;
-            if (s >= 0 && s < unlocked(p)) {
+            if (s >= 0 && s < usable) {
                 d.putInt("her_sel", s);
                 PoliciaMod.msg(p, "Habilidad: " + SKILLS[s]);
             }
             return;
         }
         if (id == 2) {
-            int n = unlocked(p);
-            int s = (PoliciaHerrero.sel(p) + 1) % n;
+            int s = (PoliciaHerrero.sel(p) + 1) % usable;
             d.putInt("her_sel", s);
             PoliciaMod.msg(p, "Habilidad: " + SKILLS[s]);
             return;
@@ -104,7 +97,7 @@ public class PoliciaHerrero {
             return;
         }
         int s = PoliciaHerrero.sel(p);
-        if (s >= unlocked(p)) {
+        if (s >= usable) {
             s = 0;
         }
         if (PoliciaHerrero.cd(p, s) > 0) {
@@ -113,47 +106,60 @@ public class PoliciaHerrero {
         }
         switch (s) {
             case 0: {
-                p.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false, true));
-                PoliciaMod.msg(p, "Mano Firme: resistencia durante 15 s");
-                d.putInt("her_cd0", 400);
+                PoliciaHerrero.forgerShout(p);
+                d.putInt("her_cd0", 500);
                 break;
             }
             case 1: {
-                PoliciaHerrero.scanOres(p);
-                d.putInt("her_cd1", 400);
+                if (!PoliciaHerrero.placeAnvil(p, 0)) {
+                    return;
+                }
+                d.putInt("her_cd1", 900);
                 break;
             }
             case 2: {
-                p.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1200, 0, false, false, true));
-                PoliciaMod.msg(p, "Resistencia de Fragua: inmune al fuego 60 s");
-                d.putInt("her_cd2", 1800);
+                if (!PoliciaHerrero.mark(p)) {
+                    PoliciaMod.msg(p, "Marca del Herrero: sin objetivo a la vista");
+                    return;
+                }
+                d.putInt("her_cd2", 400);
                 break;
             }
             case 3: {
-                PoliciaHerrero.hammerSlam(p);
-                d.putInt("her_cd3", 240);
+                p.heal(6.0f);
+                if (p.level() instanceof ServerLevel sl) {
+                    sl.sendParticles((ParticleOptions) ParticleTypes.HEART, p.getX(), p.getY() + 1.4, p.getZ(), 6, 0.3, 0.3, 0.3, 0.02);
+                }
+                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.6f);
+                PoliciaMod.msg(p, "Forja Interior: +3 corazones");
+                d.putInt("her_cd3", 700);
                 break;
             }
             case 4: {
-                if (!PoliciaHerrero.hotChain(p)) {
-                    PoliciaMod.msg(p, "Cadena al Rojo Vivo: sin objetivo a la vista");
+                BlockPos fp = p.blockPosition();
+                if (!PoliciaHerrero.free(p, fp)) {
+                    PoliciaMod.msg(p, "No hay espacio libre para el Faro de Forja");
                     return;
                 }
-                d.putInt("her_cd4", 200);
+                p.level().setBlockAndUpdate(fp, Blocks.CAMPFIRE.defaultBlockState());
+                d.putLong("her_faro_pos", fp.asLong());
+                d.putInt("her_faro_t", 1200);
+                PoliciaMod.msg(p, "Faro de Forja encendido: cura y da inmunidad al fuego cerca suyo");
+                d.putInt("her_cd4", 1000);
                 break;
             }
             case 5: {
-                p.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 200, 0, false, false, true));
-                p.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 200, 0, false, false, true));
-                PoliciaMod.msg(p, "Armadura de Brasas: resistencia e inmunidad al fuego 10 s");
-                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRE_AMBIENT, SoundSource.PLAYERS, 0.8f, 0.8f);
-                d.putInt("her_cd5", 600);
+                if (!PoliciaHerrero.link(p)) {
+                    PoliciaMod.msg(p, "Vinculo de Acero: necesitas otro jugador cerca");
+                    return;
+                }
+                d.putInt("her_cd5", 1200);
                 break;
             }
             case 6: {
                 ItemStack it = p.getMainHandItem();
                 if (it.isEmpty() || !it.isDamageableItem() || it.getDamageValue() <= 0) {
-                    PoliciaMod.msg(p, "Reparacion Maestra: necesitas una herramienta o arma dañada en la mano");
+                    PoliciaMod.msg(p, "Reparacion Maestra: necesitas una herramienta o arma danada en la mano");
                     return;
                 }
                 if (PoliciaMod.xp((Player) p) < 15) {
@@ -162,67 +168,81 @@ public class PoliciaHerrero {
                 }
                 d.putInt("pol_xp", PoliciaMod.xp((Player) p) - 15);
                 it.setDamageValue(0);
-                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.8f, 1.2f);
+                d.putInt("her_rep_t", 1);
                 PoliciaMod.msg(p, "Reparacion Maestra: equipo como nuevo");
                 d.putInt("her_cd6", 1200);
                 break;
             }
             case 7: {
-                PoliciaHerrero.temper(p);
-                d.putInt("her_temper", 600);
-                PoliciaMod.msg(p, "Templar Equipo: +danio y +armadura durante 30 s");
+                if (!PoliciaHerrero.placeAnvil(p, 1)) {
+                    return;
+                }
                 d.putInt("her_cd7", 900);
                 break;
             }
-            case 8: {
-                if (unlocked(p) < SKILLS.length) {
-                    PoliciaMod.msg(p, "Forja Legendaria aun no esta disponible");
-                    return;
-                }
-                p.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 400, 1, false, false, true));
-                p.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 400, 0, false, false, true));
-                p.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 400, 0, false, false, true));
-                p.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 400, 0, false, false, true));
-                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 0.7f, 1.3f);
-                if (p.level() instanceof ServerLevel sl) {
-                    sl.sendParticles((ParticleOptions) ParticleTypes.FLAME, p.getX(), p.getY() + 1.0, p.getZ(), 40, 0.6, 0.8, 0.6, 0.1);
-                }
-                PoliciaMod.msg(p, "Forja Legendaria: avatar de la fragua durante 20 s");
-                d.putInt("her_cd8", 2400);
-                break;
+        }
+    }
+
+    static boolean free(ServerPlayer p, BlockPos bp) {
+        return p.level().getBlockState(bp).isAir() || p.level().getBlockState(bp).canBeReplaced();
+    }
+
+    static void forgerShout(ServerPlayer p) {
+        for (LivingEntity m : p.level().getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(6.0), x -> x != p && x.isAlive())) {
+            m.knockback(1.0f, p.getX() - m.getX(), p.getZ() - m.getZ());
+            m.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 1, false, false, true));
+            if (m instanceof Mob mob && !mob.getMainHandItem().isEmpty()) {
+                ItemStack held = mob.getMainHandItem();
+                mob.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, ItemStack.EMPTY);
+                mob.spawnAtLocation(held);
             }
         }
-    }
-
-    static void scanOres(ServerPlayer p) {
-        int found = 0;
-        BlockPos c = p.blockPosition();
-        ServerLevel sl = p.serverLevel();
-        for (BlockPos bp : BlockPos.betweenClosed(c.offset(-16, -16, -16), c.offset(16, 16, 16))) {
-            if (!ORES.contains(sl.getBlockState(bp).getBlock())) continue;
-            ++found;
-            sl.sendParticles((ParticleOptions) ParticleTypes.END_ROD, (double) bp.getX() + 0.5, (double) bp.getY() + 1.2, (double) bp.getZ() + 0.5, 1, 0.0, 0.0, 0.0, 0.0);
-        }
-        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.8f, 1.2f);
-        PoliciaMod.msg(p, "Ojo del Metal: " + found + " menas detectadas en 16 m");
-    }
-
-    static void hammerSlam(ServerPlayer p) {
-        boolean hit = false;
-        for (LivingEntity m : p.level().getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(4.0), x -> x != p && x.isAlive())) {
-            m.hurt(p.damageSources().playerAttack(p), 6.0f);
-            m.knockback(1.2f, p.getX() - m.getX(), p.getZ() - m.getZ());
-            m.hurtMarked = true;
-            hit = true;
-        }
-        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0f, 0.8f);
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 0.7f, 1.6f);
         if (p.level() instanceof ServerLevel sl) {
-            sl.sendParticles((ParticleOptions) ParticleTypes.CRIT, p.getX(), p.getY() + 0.1, p.getZ(), 20, 1.5, 0.1, 1.5, 0.2);
+            sl.sendParticles((ParticleOptions) ParticleTypes.SONIC_BOOM, p.getX(), p.getY() + 1.0, p.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
         }
-        PoliciaMod.msg(p, hit ? "Martillazo Sismico!" : "Martillazo Sismico (sin objetivos cerca)");
+        PoliciaMod.msg(p, "Grito del Forjador!");
     }
 
-    static boolean hotChain(ServerPlayer p) {
+    static boolean placeAnvil(ServerPlayer p, int type) {
+        CompoundTag d = p.getPersistentData();
+        if (d.getInt("her_anvil_t") > 0) {
+            PoliciaMod.msg(p, "Ya hay un yunque plantado");
+            return false;
+        }
+        BlockPos bp = p.blockPosition().relative(p.getDirection());
+        if (!PoliciaHerrero.free(p, bp)) {
+            bp = p.blockPosition();
+        }
+        if (!PoliciaHerrero.free(p, bp)) {
+            PoliciaMod.msg(p, "No hay espacio libre para el yunque");
+            return false;
+        }
+        p.level().setBlockAndUpdate(bp, Blocks.ANVIL.defaultBlockState());
+        d.putLong("her_anvil_pos", bp.asLong());
+        d.putInt("her_anvil_t", 800);
+        d.putInt("her_anvil_type", type);
+        if (p.level() instanceof ServerLevel sl) {
+            sl.sendParticles((ParticleOptions) ParticleTypes.POOF, p.getX(), p.getY() + 1.6, p.getZ(), 10, 0.2, 0.3, 0.2, 0.05);
+        }
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0f, 0.9f);
+        PoliciaMod.msg(p, type == 0 ? "Yunque Portatil plantado: mas danio cerca suyo" : "Yunque Guardian plantado: intercepta proyectiles cercanos");
+        return true;
+    }
+
+    static void removeAnvil(ServerPlayer p) {
+        CompoundTag d = p.getPersistentData();
+        if (d.getInt("her_anvil_t") <= 0) {
+            return;
+        }
+        BlockPos bp = BlockPos.of(d.getLong("her_anvil_pos"));
+        if (p.level().getBlockState(bp).is(Blocks.ANVIL)) {
+            p.level().setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
+        }
+        d.putInt("her_anvil_t", 0);
+    }
+
+    static boolean mark(ServerPlayer p) {
         Vec3 eye = p.getEyePosition();
         Vec3 end = eye.add(p.getLookAngle().scale(20.0));
         BlockHitResult bh = p.level().clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, (Entity) p));
@@ -241,41 +261,61 @@ public class PoliciaHerrero {
         if (target == null) {
             return false;
         }
-        Vec3 pull = p.position().subtract(target.position()).normalize().scale(1.3);
-        target.setDeltaMovement(pull.x, 0.35, pull.z);
-        target.hurtMarked = true;
-        target.setSecondsOnFire(4);
-        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
+        target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 300, 0, false, true, true));
+        AttributeInstance arm = target.getAttribute(Attributes.ARMOR);
+        if (arm != null) {
+            arm.removeModifier(MARK_ARM);
+            arm.addTransientModifier(new AttributeModifier(MARK_ARM, "her_mark", -4.0, AttributeModifier.Operation.ADDITION));
+        }
+        target.getPersistentData().putInt("her_marked_t", 300);
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.8f, 1.5f);
+        PoliciaMod.msg(p, "Marca del Herrero: " + target.getDisplayName().getString() + " recibira mas danio durante 15 s");
         return true;
     }
 
-    static void temper(ServerPlayer p) {
-        AttributeInstance dmg = p.getAttribute(Attributes.ATTACK_DAMAGE);
-        AttributeInstance arm = p.getAttribute(Attributes.ARMOR);
-        if (dmg != null) {
-            dmg.removeModifier(TEMPER_DMG);
-            dmg.addTransientModifier(new AttributeModifier(TEMPER_DMG, "her_temper_dmg", 2.0, AttributeModifier.Operation.ADDITION));
+    static boolean link(ServerPlayer p) {
+        Player best = null;
+        double bd = 100.0;
+        for (Player o : p.level().players()) {
+            double dist;
+            if (o == p || !((dist = o.distanceToSqr(p)) < bd)) continue;
+            bd = dist;
+            best = o;
         }
-        if (arm != null) {
-            arm.removeModifier(TEMPER_ARM);
-            arm.addTransientModifier(new AttributeModifier(TEMPER_ARM, "her_temper_arm", 3.0, AttributeModifier.Operation.ADDITION));
+        if (best == null || !(best instanceof ServerPlayer)) {
+            return false;
         }
+        ServerPlayer other = (ServerPlayer) best;
+        p.getPersistentData().putUUID("her_link_id", other.getUUID());
+        p.getPersistentData().putInt("her_link_t", 600);
+        other.getPersistentData().putUUID("her_link_id", p.getUUID());
+        other.getPersistentData().putInt("her_link_t", 600);
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 0.8f, 1.1f);
+        PoliciaMod.msg(p, "Vinculo de Acero con " + other.getName().getString());
+        PoliciaMod.msg(other, "Vinculo de Acero con " + p.getName().getString());
+        return true;
     }
 
-    static void endTemper(ServerPlayer p) {
-        AttributeInstance dmg = p.getAttribute(Attributes.ATTACK_DAMAGE);
-        AttributeInstance arm = p.getAttribute(Attributes.ARMOR);
-        if (dmg != null) {
-            dmg.removeModifier(TEMPER_DMG);
+    static void endLink(ServerPlayer p) {
+        CompoundTag d = p.getPersistentData();
+        if (d.getInt("her_link_t") <= 0 && !d.hasUUID("her_link_id")) {
+            return;
         }
-        if (arm != null) {
-            arm.removeModifier(TEMPER_ARM);
-        }
+        d.putInt("her_link_t", 0);
+        d.remove("her_link_id");
     }
 
     static void reset(ServerPlayer p) {
-        PoliciaHerrero.endTemper(p);
-        p.getPersistentData().putInt("her_temper", 0);
+        PoliciaHerrero.removeAnvil(p);
+        PoliciaHerrero.endLink(p);
+        CompoundTag d = p.getPersistentData();
+        if (d.getInt("her_faro_t") > 0 && d.contains("her_faro_pos")) {
+            BlockPos bp = BlockPos.of(d.getLong("her_faro_pos"));
+            if (p.level().getBlockState(bp).is(Blocks.CAMPFIRE)) {
+                p.level().setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
+            }
+        }
+        d.putInt("her_faro_t", 0);
     }
 
     @SubscribeEvent
@@ -289,7 +329,7 @@ public class PoliciaHerrero {
             return;
         }
         CompoundTag d = p.getPersistentData();
-        for (int i = 0; i < SKILLS.length; ++i) {
+        for (int i = 0; i < SKILLS.length - 1; ++i) {
             int c = d.getInt("her_cd" + i);
             if (c <= 0) continue;
             d.putInt("her_cd" + i, --c);
@@ -297,12 +337,91 @@ public class PoliciaHerrero {
                 PoliciaMod.msg(p, SKILLS[i] + " lista");
             }
         }
-        int tp = d.getInt("her_temper");
-        if (tp > 0) {
-            d.putInt("her_temper", --tp);
-            if (tp == 0) {
-                PoliciaHerrero.endTemper(p);
-                PoliciaMod.msg(p, "Templar Equipo termino");
+        int at = d.getInt("her_anvil_t");
+        if (at > 0) {
+            d.putInt("her_anvil_t", --at);
+            BlockPos bp = BlockPos.of(d.getLong("her_anvil_pos"));
+            int type = d.getInt("her_anvil_type");
+            if (type == 0) {
+                if (p.blockPosition().distSqr(bp) < 64.0) {
+                    p.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 30, 0, false, false, false));
+                }
+            } else if (p.level() instanceof ServerLevel sl) {
+                for (Projectile proj : sl.getEntitiesOfClass(Projectile.class, new net.minecraft.world.phys.AABB(bp).inflate(4.0))) {
+                    sl.sendParticles((ParticleOptions) ParticleTypes.CRIT, proj.getX(), proj.getY(), proj.getZ(), 6, 0.1, 0.1, 0.1, 0.05);
+                    sl.playSound(null, proj.getX(), proj.getY(), proj.getZ(), SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 0.6f, 1.4f);
+                    proj.discard();
+                }
+            }
+            if (at == 0) {
+                PoliciaHerrero.removeAnvil(p);
+                PoliciaMod.msg(p, "El yunque se desmorono");
+            }
+        }
+        int ft = d.getInt("her_faro_t");
+        if (ft > 0) {
+            d.putInt("her_faro_t", --ft);
+            if (d.contains("her_faro_pos")) {
+                BlockPos bp = BlockPos.of(d.getLong("her_faro_pos"));
+                if (p.blockPosition().distSqr(bp) < 64.0) {
+                    p.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 30, 0, false, false, false));
+                    p.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 30, 0, false, false, false));
+                }
+                if (ft == 0 && p.level().getBlockState(bp).is(Blocks.CAMPFIRE)) {
+                    p.level().setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
+                    PoliciaMod.msg(p, "El Faro de Forja se apago");
+                }
+            }
+        }
+        int mt = d.getInt("her_marked_t");
+        if (mt > 0) {
+            d.putInt("her_marked_t", --mt);
+        }
+        int lt = d.getInt("her_link_t");
+        if (lt > 0) {
+            d.putInt("her_link_t", --lt);
+            if (d.hasUUID("her_link_id") && p.level() instanceof ServerLevel sl) {
+                Entity other = sl.getEntity(d.getUUID("her_link_id"));
+                if (other != null && p.tickCount % 3 == 0) {
+                    Vec3 a = p.position().add(0.0, 1.0, 0.0);
+                    Vec3 b = other.position().add(0.0, 1.0, 0.0);
+                    Vec3 step = b.subtract(a).scale(1.0 / 6.0);
+                    for (int k = 0; k <= 6; ++k) {
+                        Vec3 pt = a.add(step.scale(k));
+                        sl.sendParticles((ParticleOptions) ParticleTypes.END_ROD, pt.x, pt.y, pt.z, 1, 0.0, 0.0, 0.0, 0.0);
+                    }
+                }
+            }
+            if (lt == 0) {
+                PoliciaHerrero.endLink(p);
+                PoliciaMod.msg(p, "Vinculo de Acero termino");
+            }
+        }
+        int rt = d.getInt("her_rep_t");
+        if (rt > 0) {
+            if (rt == 1 && p.level() instanceof ServerLevel sl) {
+                sl.sendParticles((ParticleOptions) ParticleTypes.POOF, p.getX(), p.getY() + 1.5, p.getZ(), 6, 0.2, 0.3, 0.2, 0.05);
+            }
+            if ((rt == 1 || rt == 7 || rt == 13) && p.level() instanceof ServerLevel) {
+                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.9f, 1.0f + (float) rt * 0.02f);
+                if (p.level() instanceof ServerLevel sl2) {
+                    sl2.sendParticles((ParticleOptions) ParticleTypes.CRIT, p.getX(), p.getY() + 1.0, p.getZ(), 8, 0.2, 0.2, 0.2, 0.1);
+                }
+            }
+            d.putInt("her_rep_t", rt + 1 > 14 ? 0 : rt + 1);
+        }
+    }
+
+    @SubscribeEvent
+    public void damage(LivingDamageEvent e) {
+        LivingEntity hit = e.getEntity();
+        if (!(hit instanceof ServerPlayer p) || !p.getPersistentData().hasUUID("her_link_id") || p.getPersistentData().getInt("her_link_t") <= 0) {
+            return;
+        }
+        if (p.level() instanceof ServerLevel sl) {
+            Entity otherE = sl.getEntity(p.getPersistentData().getUUID("her_link_id"));
+            if (otherE instanceof ServerPlayer other && other.getPersistentData().getInt("her_link_t") > 0) {
+                other.heal(e.getAmount() * 0.3f);
             }
         }
     }

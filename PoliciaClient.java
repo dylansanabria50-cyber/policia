@@ -74,6 +74,7 @@ public class PoliciaClient {
     static final KeyMapping K_BANK = new KeyMapping("Albanil: inventario de los ayudantes", 85, "Policia");
     static final KeyMapping K_ZONE = new KeyMapping("Albanil: elegir area de picado (mantener)", 88, "Policia");
     static final KeyMapping K_REFS = new KeyMapping("Policia: orden a los refuerzos", 82, "Policia");
+    static final KeyMapping K_ANALYZE = new KeyMapping("Herrero: abrir el Analizador del Forjador", 79, "Policia");
     static final ResourceLocation TEX_POL = new ResourceLocation("policia", "textures/entity/policia.png");
     static final ResourceLocation TEX_ALB = new ResourceLocation("policia", "textures/entity/albanil.png");
     static final ResourceLocation TEX_LAD = new ResourceLocation("policia", "textures/entity/ladron.png");
@@ -219,6 +220,7 @@ public class PoliciaClient {
         e.register(K_BANK);
         e.register(K_ZONE);
         e.register(K_REFS);
+        e.register(K_ANALYZE);
     }
 
     static void overlays(RegisterGuiOverlaysEvent e) {
@@ -527,6 +529,10 @@ public class PoliciaClient {
         while (K_BANK.consumeClick()) {
             if (!free || !PoliciaClient.alb()) continue;
             PoliciaClient.send(50);
+        }
+        while (K_ANALYZE.consumeClick()) {
+            if (!free) continue;
+            mc.setScreen(new PoliciaAnalizadorScreen());
         }
         boolean bl2 = zk = K_ZONE.isDown() && free && PoliciaClient.alb() && PoliciaAlbanil.CL.hl >= 1;
         if (zk) {
