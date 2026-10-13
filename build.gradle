@@ -40,24 +40,8 @@ srcDirs = [flatResDir]
 }
 }
 
-repositories {
-maven {
-name = "GeckoLib"
-url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
-content { includeGroup "software.bernie.geckolib" }
-}
-}
-
 dependencies {
-// 47.3.x+ para tener disponible RenderArmorEvent (ocultar armadura). Si tu
-// instalacion usa otro build de Forge 1.20.1, podes bajarlo, pero entonces
-// el boton de ocultar armadura puede no compilar (ver PoliciaClient.armorPre).
 minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
-// Libreria de animaciones usada por el prop del yunque/martillo del
-// Herrero Legendario (vease PoliciaForja). Si esta version ya no existe,
-// cambiala por la ultima "4.4.x-forge-1.20.1" en
-// https://modrinth.com/mod/geckolib/versions
-implementation fg.deobf('software.bernie.geckolib:geckolib-forge-1.20.1:4.4.4')
 }
 
 tasks.named('jar', Jar).configure {

@@ -91,7 +91,7 @@ public class PoliciaBubble {
                 e.discard();
             }
             sl.sendParticles((ParticleOptions) ParticleTypes.CLOUD, st.c.x, st.c.y, st.c.z, 16, 0.6, 0.6, 0.6, 0.03);
-            sl.playSound(null, st.c.x, st.c.y, st.c.z, SoundEvents.ENDERMAN_TELEPORT_EXIT, SoundSource.PLAYERS, 1.0f, 1.5f);
+            sl.playSound(null, st.c.x, st.c.y, st.c.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0f, 1.5f);
         }
         if (o != null) {
             PoliciaMod.msg(o, "La burbuja se disipo");

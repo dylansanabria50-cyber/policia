@@ -26,6 +26,6 @@ public class PoliciaAyudanteRender extends HumanoidMobRenderer<PoliciaAyudante.H
     public void render(PoliciaAyudante.Helper e, float yaw, float pt, PoseStack ps, MultiBufferSource buf, int light) {
         this.model.rightArmPose = HumanoidModel.ArmPose.ITEM;
         this.model.leftArmPose = HumanoidModel.ArmPose.EMPTY;
-        super.render((Mob) e, yaw, pt, ps, buf, light);
+        super.render(e, yaw, pt, ps, buf, light);
     }
 }

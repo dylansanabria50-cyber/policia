@@ -238,7 +238,7 @@ public class PoliciaBoardScreen extends Screen {
         for (int i = 0; i < 7; ++i) {
             if (!this.in(i, (int) mx, (int) my) || !this.enabled(i)) continue;
             PoliciaMod.NET.sendToServer(new PoliciaBoard.Pick(i));
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI((SoundEvent) SoundEvents.UI_BUTTON_CLICK, 1.0f));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f));
             this.onClose();
             return true;
         }

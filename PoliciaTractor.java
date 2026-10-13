@@ -119,7 +119,7 @@ public class PoliciaTractor {
             CompoundTag e = new CompoundTag();
             e.putInt("Slot", i);
             s.save(e);
-            l.add((Object) e);
+            l.add(e);
         }
         p.getPersistentData().put("alb_tinv", (Tag) l);
     }
@@ -317,7 +317,7 @@ public class PoliciaTractor {
         }
 
         @Override
-        protected boolean couldAcceptPassenger(Entity e) {
+        protected boolean canAddPassenger(Entity e) {
             return this.getPassengers().isEmpty();
         }
 
@@ -327,7 +327,7 @@ public class PoliciaTractor {
         }
 
         @Override
-        public void positionRider(Entity e) {
+        public void positionRider(Entity e, Entity.MoveFunction cb) {
         }
 
         @Override

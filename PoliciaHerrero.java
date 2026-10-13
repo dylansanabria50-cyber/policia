@@ -170,9 +170,6 @@ public class PoliciaHerrero {
                 d.putInt("pol_xp", PoliciaMod.xp((Player) p) - 15);
                 it.setDamageValue(0);
                 d.putInt("her_rep_t", 1);
-                if (p.level() instanceof ServerLevel sl) {
-                    PoliciaForja.spawn(sl, p.blockPosition());
-                }
                 PoliciaMod.msg(p, "Reparacion Maestra: equipo como nuevo");
                 d.putInt("her_cd6", 1200);
                 break;
@@ -228,7 +225,6 @@ public class PoliciaHerrero {
         d.putInt("her_anvil_type", type);
         if (p.level() instanceof ServerLevel sl) {
             sl.sendParticles((ParticleOptions) ParticleTypes.POOF, p.getX(), p.getY() + 1.6, p.getZ(), 10, 0.2, 0.3, 0.2, 0.05);
-            PoliciaForja.spawn(sl, bp);
         }
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0f, 0.9f);
         PoliciaMod.msg(p, type == 0 ? "Yunque Portatil plantado: mas danio cerca suyo" : "Yunque Guardian plantado: intercepta proyectiles cercanos");

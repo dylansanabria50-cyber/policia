@@ -44,6 +44,7 @@ import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
@@ -495,7 +496,7 @@ public class PoliciaAlbanil {
     }
 
     static ItemStack makePick(ServerPlayer p) {
-        Map em;
+        Map<Enchantment, Integer> em;
         ItemStack pk = new ItemStack((ItemLike) Items.WOODEN_PICKAXE);
         pk.getOrCreateTag().putBoolean("alb_pick", true);
         pk.getOrCreateTag().putBoolean("Unbreakable", true);
@@ -696,25 +697,25 @@ public class PoliciaAlbanil {
         HashMap<Integer, BlockPos> conts = new HashMap<Integer, BlockPos>();
         BlockPos chest = null;
         for (int y = 0; y < 19; ++y) {
-            for (int z2 = 0; z2 < 23; ++z2) {
+            for (int zz = 0; zz < 23; ++zz) {
                 for (int x = 0; x < 27; ++x) {
                     BlockPos u;
-                    int i = cells[(y * 23 + z2) * 27 + x];
+                    int i = cells[(y * 23 + zz) * 27 + x];
                     if (i < 0) continue;
                     BlockState s = PoliciaRef.state(i).rotate(rot);
-                    BlockPos q = PoliciaAlbanil.rotAt(a, x - 16, z2 - 19, steps);
+                    BlockPos q = PoliciaAlbanil.rotAt(a, x - 16, zz - 19, steps);
                     BlockPos bp = new BlockPos(q.getX(), top + y, q.getZ());
                     if (!PoliciaAlbanil.free(lv, bp)) continue;
                     lv.setBlock(bp, s, 18);
                     out.add(bp.asLong());
                     ids.add(BuiltInRegistries.BLOCK.getId(s.getBlock()));
                     LIVE.add(bp.asLong());
-                    int ci = (y * 23 + z2) * 27 + x;
+                    int ci = (y * 23 + zz) * 27 + x;
                     cix.add(ci);
                     if (lv.getBlockEntity(bp) instanceof Container) {
                         conts.put(ci, bp);
                     }
-                    if (x == 12 && y == 1 && z2 == 10) {
+                    if (x == 12 && y == 1 && zz == 10) {
                         chest = bp;
                     }
                     if (y != 0) continue;
@@ -882,7 +883,7 @@ public class PoliciaAlbanil {
                             c.clearContent();
                         }
                     }
-                    blocks.add((Object) e);
+                    blocks.add(e);
                     clear.add(bp);
                 }
             }
@@ -896,7 +897,7 @@ public class PoliciaAlbanil {
             e.putDouble("dx", ie.getX() - ((double) o.getX() + 0.5));
             e.putDouble("dy", ie.getY() - (double) o.getY());
             e.putDouble("dz", ie.getZ() - ((double) o.getZ() + 0.5));
-            items.add((Object) e);
+            items.add(e);
             ie.discard();
         }
         CompoundTag in = new CompoundTag();
@@ -970,7 +971,7 @@ public class PoliciaAlbanil {
         int[] wc = d.getIntArray("alb_wc");
         ListTag sv = new ListTag();
         for (int n = 0; n < arr.length; ++n) {
-            BlockEntity ct;
+            Container ct;
             long l = arr[n];
             BlockPos bp = BlockPos.of(l);
             LIVE.remove(l);
@@ -995,7 +996,7 @@ public class PoliciaAlbanil {
                                 CompoundTag en = new CompoundTag();
                                 en.putInt("c", wc[n]);
                                 en.put("d", (Tag) cd);
-                                sv.add((Object) en);
+                                sv.add(en);
                             } else {
                                 Containers.dropContents((Level) lv, bp, (Container) ct);
                             }

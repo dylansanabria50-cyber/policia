@@ -24,9 +24,15 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -47,7 +53,6 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.RenderArmorEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.event.ViewportEvent;
@@ -109,12 +114,12 @@ public class PoliciaClient {
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::livingPre);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::noClicks);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::screenPre);
-        MinecraftForge.EVENT_BUS.addListener(PoliciaClient::armorPre);
         MinecraftForge.EVENT_BUS.addListener(PoliciaXray::tick);
         MinecraftForge.EVENT_BUS.addListener(PoliciaXray::render);
         MinecraftForge.EVENT_BUS.addListener(PoliciaXray::scroll);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaClient::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaClient::renderers);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaClient::armorLayers);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaExtraRender::layers);
         MinecraftForge.EVENT_BUS.addListener(PoliciaExtraRender::livingPost);
         MinecraftForge.EVENT_BUS.addListener(PoliciaExtraRender::handFirst);
@@ -136,7 +141,70 @@ public class PoliciaClient {
         e.registerEntityRenderer((EntityType) PoliciaMision.VAN.get(), PoliciaMisionRender::new);
         PoliciaExtraRender.register(e);
         e.registerEntityRenderer((EntityType) PoliciaHeli.HELI.get(), PoliciaHeliRender::new);
-        e.registerEntityRenderer((EntityType) PoliciaForja.PROP.get(), PoliciaForjaRender::new);
+    }
+
+    // Reemplaza la capa de armadura del jugador por una que se puede ocultar
+    // sin tocar skins, otros mods ni el modelo del jugador en si: no cancela
+    // nada del jugador, solo decide si esa capa en particular se dibuja.
+    static Field F_LAYERS;
+    static boolean layersTried;
+
+    static void findLayersField() {
+        if (layersTried) {
+            return;
+        }
+        layersTried = true;
+        try {
+            F_LAYERS = ObfuscationReflectionHelper.findField(LivingEntityRenderer.class, "layers");
+        } catch (Throwable t) {
+            try {
+                F_LAYERS = LivingEntityRenderer.class.getDeclaredField("layers");
+                F_LAYERS.setAccessible(true);
+            } catch (Throwable t2) {
+                F_LAYERS = null;
+            }
+        }
+    }
+
+    static void armorLayers(EntityRenderersEvent.AddLayers e) {
+        PoliciaClient.findLayersField();
+        if (F_LAYERS == null) {
+            return;
+        }
+        for (String skin : e.getSkins()) {
+            Object r = e.getSkin(skin);
+            if (!(r instanceof LivingEntityRenderer)) continue;
+            try {
+                List list = (List) F_LAYERS.get(r);
+                for (int i = 0; i < list.size(); ++i) {
+                    Object layer = list.get(i);
+                    if (layer instanceof HumanoidArmorLayer && !(layer instanceof HideArmorLayer)) {
+                        list.set(i, new HideArmorLayer((RenderLayerParent) r, (RenderLayer) layer));
+                    }
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
+    static class HideArmorLayer extends RenderLayer {
+        final RenderLayer wrapped;
+
+        HideArmorLayer(RenderLayerParent parent, RenderLayer wrapped) {
+            super(parent);
+            this.wrapped = wrapped;
+        }
+
+        @Override
+        public void render(PoseStack ps, MultiBufferSource buf, int light, LivingEntity entity, float limbSwing, float limbSwingAmount, float pt, float ageInTicks, float netHeadYaw, float headPitch) {
+            if (entity instanceof Player p) {
+                PoliciaMod.Sync s = STATE.get(p.getUUID());
+                if (s != null && s.hideArmor) {
+                    return;
+                }
+            }
+            this.wrapped.render(ps, buf, light, entity, limbSwing, limbSwingAmount, pt, ageInTicks, netHeadYaw, headPitch);
+        }
     }
 
     static void camera(ViewportEvent.ComputeCameraAngles e) {
@@ -234,16 +302,6 @@ public class PoliciaClient {
         if (e.getScreen() instanceof InventoryScreen) {
             e.addListener((GuiEventListener) new TreeButton());
             e.addListener((GuiEventListener) new ArmorHideButton());
-        }
-    }
-
-    static void armorPre(RenderArmorEvent.Pre e) {
-        if (!(e.getEntity() instanceof Player p)) {
-            return;
-        }
-        PoliciaMod.Sync s = STATE.get(p.getUUID());
-        if (s != null && s.hideArmor) {
-            e.setCanceled(true);
         }
     }
 
@@ -767,8 +825,8 @@ public class PoliciaClient {
         cs.add(-8331009);
         float sc = 0.75f;
         int wmax = 0;
-        for (String string : ls) {
-            wmax = Math.max(wmax, mc.font.width(string));
+        for (Object string : ls) {
+            wmax = Math.max(wmax, mc.font.width((String) string));
         }
         g.pose().pushPose();
         g.pose().translate((float) (sw - 6) - (float) wmax * sc, 6.0f, 0.0f);

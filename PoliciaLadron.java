@@ -357,7 +357,7 @@ public class PoliciaLadron {
         }
         if (a == 1) {
             p.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 160, 0, false, false));
-            p.addEffect(new MobEffectInstance(MobEffects.SPEED, 160, 1, false, false));
+            p.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 160, 1, false, false));
             for (Mob m : sl.getEntitiesOfClass(Mob.class, p.getBoundingBox().inflate(16.0), x -> x.getTarget() == p)) {
                 m.setTarget(null);
             }
@@ -383,12 +383,12 @@ public class PoliciaLadron {
                 e.addEffect(new MobEffectInstance(MobEffects.GLOWING, 200, 0, false, false));
                 ++n;
             }
-            sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, 0.6f);
+            sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 1.0f, 0.6f);
             PoliciaMod.msg(p, "Instinto: " + n + (n == 1 ? " ser cerca" : " seres cerca") + " (brillan 10 s)");
         } else if (a == 6) {
             p.getPersistentData().putInt("pol_esc", 200);
             p.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 200, 0, false, false));
-            p.addEffect(new MobEffectInstance(MobEffects.SPEED, 200, 0, false, false));
+            p.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 0, false, false));
             for (Mob m : sl.getEntitiesOfClass(Mob.class, p.getBoundingBox().inflate(48.0), x -> x.getTarget() == p)) {
                 m.setTarget(null);
             }

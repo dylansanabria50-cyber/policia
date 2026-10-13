@@ -143,9 +143,6 @@ public class PoliciaMod {
         try {
             software.bernie.geckolib.GeckoLib.initialize();
         } catch (Throwable ignored) {
-            // GeckoLib no esta instalado: las animaciones del Herrero
-            // quedan sin su prop visual, pero el resto del mod sigue
-            // funcionando normal (ver PoliciaForja.spawn).
         }
         NET.registerMessage(0, Act.class, Act::enc, Act::dec, Act::handle);
         NET.registerMessage(1, Sync.class, Sync::enc, Sync::dec, Sync::handle);
@@ -155,7 +152,6 @@ public class PoliciaMod {
         PoliciaRefuerzo.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaExtra.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaHeli.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
-        PoliciaForja.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaPlaca.init();
         PoliciaLadron.init();
         PoliciaBoss.init();

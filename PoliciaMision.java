@@ -571,7 +571,7 @@ public class PoliciaMision {
             }
             if ((dx = (double) p.getX() + 0.5 - pos.x) * dx + (dz = (double) p.getZ() + 0.5 - pos.z) * dz < 25.0 && Math.abs((double) p.getY() - pos.y) < 10.0) {
                 ++m.phase;
-                sl.playSound(null, sp.blockPosition(), SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, 1.2f);
+                sl.playSound(null, sp.blockPosition(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 1.0f, 1.2f);
                 PoliciaMision.spawn(sl, m, 1, PoliciaMision.around(sl, p, 6));
                 PoliciaMision.spawn(sl, m, 1, PoliciaMision.around(sl, p, 6));
                 PoliciaMision.spawn(sl, m, 3, PoliciaMision.around(sl, p, 6));
@@ -651,7 +651,7 @@ public class PoliciaMision {
                 }
                 if (dx * dx + dz * dz < 25.0 && Math.abs((double) p.getY() - pos.y) < 10.0) {
                     ++m.phase;
-                    sl.playSound(null, sp.blockPosition(), SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, 1.2f);
+                    sl.playSound(null, sp.blockPosition(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 1.0f, 1.2f);
                     if (m.phase >= 3) {
                         PoliciaMision.finish(sp, sl, m, 1.0);
                         return;
@@ -810,7 +810,7 @@ public class PoliciaMision {
         s.setHoverName((Component) Component.literal(name));
         ListTag l = new ListTag();
         for (String x : lore) {
-            l.add((Object) StringTag.valueOf(Component.Serializer.toJson((Component) Component.literal(x))));
+            l.add(StringTag.valueOf(Component.Serializer.toJson((Component) Component.literal(x))));
         }
         s.getOrCreateTagElement("display").put("Lore", (Tag) l);
         return s;
@@ -831,7 +831,7 @@ public class PoliciaMision {
 
     static void comisarios(ServerPlayer sp, ServerLevel sl) {
         Bells bells = Bells.get(sl);
-        List found = sl.getPoiManager().findAll(h -> h.is(PoiTypes.MEETING), bp -> true, sp.blockPosition(), 48, PoiManager.Occupancy.ANY).collect(Collectors.toList());
+        List<BlockPos> found = sl.getPoiManager().findAll(h -> h.is(PoiTypes.MEETING), bp -> true, sp.blockPosition(), 48, PoiManager.Occupancy.ANY).collect(Collectors.toList());
         for (BlockPos bell : found) {
             if (bells.set.contains(bell.asLong())) continue;
             bells.set.add(bell.asLong());
@@ -914,21 +914,15 @@ public class PoliciaMision {
 
         @SubscribeEvent
         public void mBrk(BlockEvent.BreakEvent e) {
-            ServerPlayer sp;
-            Player player;
-            block7:
-            {
-                block6:
-                {
-                    player = e.getPlayer();
-                    if (!(player instanceof ServerPlayer)) break block6;
-                    sp = (ServerPlayer) player;
-                    player = e.getLevel();
-                    if (player instanceof ServerLevel) break block7;
-                }
+            Player player = e.getPlayer();
+            if (!(player instanceof ServerPlayer)) {
                 return;
             }
-            ServerLevel sl = (ServerLevel) player;
+            ServerPlayer sp = (ServerPlayer) player;
+            if (!(e.getLevel() instanceof ServerLevel)) {
+                return;
+            }
+            ServerLevel sl = (ServerLevel) e.getLevel();
             M m = ACTIVE.get(sp.getUUID());
             if (m == null || m.type != 7) {
                 return;
@@ -984,8 +978,8 @@ public class PoliciaMision {
 
         protected void defineSynchedData() {
             super.defineSynchedData();
-            this.entityData.define(KIND, (Object) 1);
-            this.entityData.define(CAP, (Object) false);
+            this.entityData.define(KIND, 1);
+            this.entityData.define(CAP, false);
         }
 
         public int kind() {
@@ -997,12 +991,12 @@ public class PoliciaMision {
         }
 
         public void setCaptive(boolean c) {
-            this.entityData.set(CAP, (Object) c);
+            this.entityData.set(CAP, c);
             this.setInvisible(c);
         }
 
         public void setKind(int k) {
-            this.entityData.set(KIND, (Object) k);
+            this.entityData.set(KIND, k);
             if (k < 0 || k > 12) {
                 return;
             }
@@ -1136,7 +1130,7 @@ public class PoliciaMision {
                 if (this.distanceToSqr((Entity) t) > 25.0 && this.random.nextInt(2) == 0) {
                     sl.sendParticles((ParticleOptions) ParticleTypes.REVERSE_PORTAL, this.getX(), this.getY() + 1.0, this.getZ(), 30, 0.3, 0.6, 0.3, 0.3);
                     double ang = this.random.nextDouble() * Math.PI * 2.0;
-                    if (this.teleportTo(t.getX() + Math.cos(ang) * 3.0, t.getY(), t.getZ() + Math.sin(ang) * 3.0)) {
+                    if (this.randomTeleport(t.getX() + Math.cos(ang) * 3.0, t.getY(), t.getZ() + Math.sin(ang) * 3.0, false)) {
                         sl.sendParticles((ParticleOptions) ParticleTypes.REVERSE_PORTAL, this.getX(), this.getY() + 1.0, this.getZ(), 30, 0.3, 0.6, 0.3, 0.3);
                         this.playSound(SoundEvents.ENDERMAN_TELEPORT, 1.0f, 1.0f);
                     }
@@ -1331,8 +1325,8 @@ public class PoliciaMision {
                     return Pj.this.hostile() && super.canUse();
                 }
             });
-            this.targetSelector.addGoal(2, (Goal) new NearestAttackableTargetGoal((Mob) this, Player.class, 10, true, false, le -> this.hostile() && Pj.police(le)));
-            this.targetSelector.addGoal(3, (Goal) new NearestAttackableTargetGoal((Mob) this, PoliciaBoss.BossNpc.class, 10, true, false, le -> {
+            this.targetSelector.addGoal(2, (Goal) new NearestAttackableTargetGoal<Player>(this, Player.class, 10, true, false, le -> this.hostile() && Pj.police(le)));
+            this.targetSelector.addGoal(3, (Goal) new NearestAttackableTargetGoal<PoliciaBoss.BossNpc>(this, PoliciaBoss.BossNpc.class, 10, true, false, le -> {
                 PoliciaBoss.BossNpc bn;
                 return this.hostile() && le instanceof PoliciaBoss.BossNpc && ((bn = (PoliciaBoss.BossNpc) ((Object) le)).kind() == 4 || bn.kind() == 5);
             }));
@@ -1359,7 +1353,7 @@ public class PoliciaMision {
             this.playSound(SoundEvents.ARROW_SHOOT, 1.0f, 1.0f / (this.random.nextFloat() * 0.4f + 0.8f));
         }
 
-        public InteractionResult interact(Player p, InteractionHand h) {
+        protected InteractionResult mobInteract(Player p, InteractionHand h) {
             if (h != InteractionHand.MAIN_HAND) {
                 return InteractionResult.PASS;
             }
@@ -1383,8 +1377,8 @@ public class PoliciaMision {
             return super.isInvulnerableTo(s);
         }
 
-        public boolean canBeLeashed() {
-            return this.kind() != 10 && this.kind() != 12 && !this.captive() && super.canBeLeashed();
+        public boolean canBeLeashed(Player player) {
+            return this.kind() != 10 && this.kind() != 12 && !this.captive() && super.canBeLeashed(player);
         }
 
         public boolean removeWhenFarAway(double d) {

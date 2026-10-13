@@ -222,18 +222,17 @@ public class PoliciaExtra {
 
     @SubscribeEvent
     public void cuffInspect(PlayerInteractEvent.EntityInteract e) {
-        ServerPlayer tp;
-        ServerPlayer o;
-        block6:
-        {
-            block5:
-            {
-                Player player = e.getEntity();
-                if (!(player instanceof ServerPlayer)) break block5;
-                o = (ServerPlayer) player;
-                player = e.getTarget();
-                if (player instanceof ServerPlayer && o != (tp = (ServerPlayer) player)) break block6;
-            }
+        Player player = e.getEntity();
+        if (!(player instanceof ServerPlayer)) {
+            return;
+        }
+        ServerPlayer o = (ServerPlayer) player;
+        Entity target = e.getTarget();
+        if (!(target instanceof ServerPlayer)) {
+            return;
+        }
+        ServerPlayer tp = (ServerPlayer) target;
+        if (o == tp) {
             return;
         }
         if (e.getHand() != InteractionHand.MAIN_HAND) {

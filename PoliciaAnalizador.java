@@ -62,7 +62,7 @@ public class PoliciaAnalizador {
     static final Item[] POOL = new Item[]{
             Items.IRON_INGOT, Items.GOLD_INGOT, Items.COPPER_INGOT, Items.STICK, Items.STRING,
             Items.LEATHER, Items.COAL, Items.REDSTONE, Items.QUARTZ, Items.FLINT, Items.CLAY_BALL,
-            Items.GLASS, Items.WOOL, Items.FEATHER, Items.BONE, Items.GUNPOWDER, Items.SLIME_BALL,
+            Items.GLASS, Items.WHITE_WOOL, Items.FEATHER, Items.BONE, Items.GUNPOWDER, Items.SLIME_BALL,
             Items.DIAMOND, Items.EMERALD, Items.LAPIS_LAZULI, Items.NETHERITE_SCRAP
     };
 

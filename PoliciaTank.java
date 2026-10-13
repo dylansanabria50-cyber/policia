@@ -246,7 +246,7 @@ public class PoliciaTank {
         }
 
         @Override
-        public void positionRider(Entity e) {
+        public void positionRider(Entity e, Entity.MoveFunction cb) {
         }
 
         @Override

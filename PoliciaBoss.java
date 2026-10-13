@@ -245,7 +245,7 @@ public class PoliciaBoss {
         if (lore.length > 0) {
             ListTag l = new ListTag();
             for (String x : lore) {
-                l.add((Object) StringTag.valueOf(Component.Serializer.toJson(Component.literal(x))));
+                l.add(StringTag.valueOf(Component.Serializer.toJson(Component.literal(x))));
             }
             s.getOrCreateTagElement("display").put("Lore", (Tag) l);
         }
@@ -415,7 +415,7 @@ public class PoliciaBoss {
             Entry e = l.get(i);
             ItemStack d = e.give.copy();
             ListTag lore = new ListTag();
-            lore.add((Object) StringTag.valueOf(Component.Serializer.toJson(Component.literal("Precio: " + e.price + " esmeraldas"))));
+            lore.add(StringTag.valueOf(Component.Serializer.toJson(Component.literal("Precio: " + e.price + " esmeraldas"))));
             d.getOrCreateTagElement("display").put("Lore", (Tag) lore);
             c.setItem(i, d);
         }

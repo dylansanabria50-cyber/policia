@@ -36,7 +36,7 @@ public class PoliciaTreeScreen extends Screen {
     protected void init() {
         this.px = (this.width - 460) / 2;
         this.py = (this.height - 340) / 2;
-        this.addRenderableWidget((GuiEventListener) Button.builder(Component.literal("Cerrar"), b -> this.onClose())
+        this.addRenderableWidget(Button.builder(Component.literal("Cerrar"), b -> this.onClose())
                 .bounds(this.px + 460 - 66, this.py + 340 + 4, 60, 20).build());
     }
 

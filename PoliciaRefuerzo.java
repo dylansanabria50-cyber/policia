@@ -86,7 +86,7 @@ public class PoliciaRefuerzo {
         d.putInt("pol_rord", m);
         PoliciaMod.msg(p, "Orden de refuerzos: " + ORDERS[m]);
         // Aproximacion de sonido de confirmacion de orden
-        p.serverLevel().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 0.8f, 1.0f + 0.25f * (float) m);
+        p.serverLevel().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 0.8f, 1.0f + 0.25f * (float) m);
         if (m == 0 && (object = p.level()) instanceof ServerLevel) {
             ServerLevel sl = (ServerLevel) object;
             for (AgentEntity a : sl.getEntitiesOfClass(AgentEntity.class, p.getBoundingBox().inflate(128.0), x -> p.getUUID().equals(x.owner))) {

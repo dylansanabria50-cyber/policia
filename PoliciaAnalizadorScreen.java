@@ -68,7 +68,7 @@ public class PoliciaAnalizadorScreen extends Screen {
     protected void init() {
         this.px = (this.width - 520) / 2;
         this.py = (this.height - 360) / 2;
-        this.addRenderableWidget((GuiEventListener) Button.builder(Component.literal("Cerrar"), b -> this.onClose())
+        this.addRenderableWidget(Button.builder(Component.literal("Cerrar"), b -> this.onClose())
                 .bounds(this.px + 520 - 66, this.py + 360 + 4, 60, 20).build());
         PoliciaMod.NET.sendToServer((Object) new PoliciaAnalizador.Act(4, ""));
     }

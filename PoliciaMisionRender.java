@@ -121,7 +121,7 @@ public class PoliciaMisionRender extends EntityRenderer<PoliciaMision.Pj> {
         VertexConsumer vc = buf.getBuffer(RenderType.entityCutoutNoCull(PoliciaExtraRender.WHITE));
         int k = e.kind();
         if (k != 6 && k != 9) {
-            this.skin.render((Mob) e, yaw, pt, ps, buf, light);
+            this.skin.render(e, yaw, pt, ps, buf, light);
             return;
         }
         float body = Mth.rotLerp(pt, e.yBodyRotO, e.yBodyRot);
@@ -137,7 +137,7 @@ public class PoliciaMisionRender extends EntityRenderer<PoliciaMision.Pj> {
             this.human(ps, vc, e, k, pt, light);
         }
         ps.popPose();
-        super.render((Entity) e, yaw, pt, ps, buf, light);
+        super.render(e, yaw, pt, ps, buf, light);
     }
 
     void human(PoseStack ps, VertexConsumer vc, PoliciaMision.Pj e, int k, float pt, int light) {

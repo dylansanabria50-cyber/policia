@@ -61,7 +61,7 @@ public class PoliciaShield extends ShieldItem {
         static void drawWorld(PoseStack ps, MultiBufferSource buf, int light) {
             Render r = Render.get();
             if (r.model == null) {
-                r.model = new ShieldModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.SHIELD_BASE));
+                r.model = new ShieldModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.SHIELD));
             }
             VertexConsumer vc = buf.getBuffer(RenderType.entitySolid(TEX));
             r.model.plate().render(ps, vc, light, OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -71,7 +71,7 @@ public class PoliciaShield extends ShieldItem {
         @Override
         public void renderByItem(ItemStack stack, ItemDisplayContext ctx, PoseStack ps, MultiBufferSource buf, int light, int overlay) {
             if (this.model == null) {
-                this.model = new ShieldModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.SHIELD_BASE));
+                this.model = new ShieldModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.SHIELD));
             }
             ps.pushPose();
             ps.scale(1.0f, -1.0f, -1.0f);

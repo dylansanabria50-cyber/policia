@@ -26,6 +26,6 @@ public class PoliciaRefuerzoRender extends HumanoidMobRenderer<PoliciaRefuerzo.A
     public void render(PoliciaRefuerzo.AgentEntity e, float yaw, float pt, PoseStack ps, MultiBufferSource buf, int light) {
         this.model.rightArmPose = HumanoidModel.ArmPose.ITEM;
         this.model.leftArmPose = e.isUsingItem() ? HumanoidModel.ArmPose.BLOCK : HumanoidModel.ArmPose.ITEM;
-        super.render((Mob) e, yaw, pt, ps, buf, light);
+        super.render(e, yaw, pt, ps, buf, light);
     }
 }

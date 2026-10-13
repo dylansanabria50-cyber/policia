@@ -180,7 +180,7 @@ public class PoliciaAyudante {
             CompoundTag e = new CompoundTag();
             e.putInt("Slot", i);
             s.save(e);
-            l.add((Object) e);
+            l.add(e);
         }
         p.getPersistentData().put("alb_bank", (Tag) l);
     }
@@ -516,7 +516,7 @@ public class PoliciaAyudante {
             String nm = PoliciaAyudante.esName(key == null ? "mineral" : key.getPath());
             int dist = (int) Math.sqrt(bp.distToCenterSqr(o.getX(), o.getY(), o.getZ()));
             PoliciaMod.msg(o, "Ayudante " + (this.idx + 1) + ": hay " + nm + " en " + bp.getX() + " " + bp.getY() + " " + bp.getZ() + " (a " + dist + " bloques). Y: cavar hacia alli, N: ignorar");
-            o.level().playSound(null, o.getX(), o.getY(), o.getZ(), SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 0.8f, 1.4f);
+            o.level().playSound(null, o.getX(), o.getY(), o.getZ(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 0.8f, 1.4f);
         }
 
         boolean oreStep(ServerPlayer o) {

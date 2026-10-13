@@ -92,7 +92,7 @@ public class PoliciaHeli {
         if (!on) {
             h.clearLight();
         }
-        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.NOTE_BLOCK_HAT, SoundSource.PLAYERS, 1.0f, on ? 1.4f : 0.8f);
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.NOTE_BLOCK_HAT.value(), SoundSource.PLAYERS, 1.0f, on ? 1.4f : 0.8f);
         PoliciaMod.msg(p, on ? "Modo linterna: la luz sigue tu mirada y puedes seguir volando" : "Modo linterna desactivado");
     }
 
@@ -215,7 +215,7 @@ public class PoliciaHeli {
         }
 
         @Override
-        public void positionRider(Entity e) {
+        public void positionRider(Entity e, Entity.MoveFunction cb) {
         }
 
         @Override
