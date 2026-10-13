@@ -109,6 +109,7 @@ public class PoliciaBoss {
         out.accept((ItemLike) PoliciaPlaca.PLACA.get());
         out.accept((ItemLike) PoliciaPlaca.BALDE.get());
         out.accept((ItemLike) PoliciaPlaca.GUANTE.get());
+        out.accept((ItemLike) PoliciaPlaca.MARTILLO.get());
         out.accept((ItemLike) PoliciaShield.SHIELD.get());
         out.accept((ItemLike) VEST.get());
         for (String[] x : sk = new String[][]{{"refuerzo", "Refuerzo"}, {"k9", "Perro K9"}, {"esposas", "Esposas"}, {"sirena", "Sirena y torreta"}, {"dron", "Dron de vigilancia"}, {"burbuja", "Escudo de burbuja"}, {"pico", "Pico de albanil"}, {"muro", "Muro"}, {"refugio", "Refugio"}, {"silbido", "Silbido"}}) {

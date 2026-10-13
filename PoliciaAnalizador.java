@@ -73,7 +73,7 @@ public class PoliciaAnalizador {
     }
 
     static boolean active(ServerPlayer p) {
-        return PoliciaHerrero.isHerrero(p) && PoliciaHerrero.unlocked(p) >= PoliciaHerrero.SKILLS.length;
+        return PoliciaHerrero.isHerrero(p) && PoliciaMod.xp(p) >= PoliciaHerrero.ANALIZADOR_XP;
     }
 
     static class Recipe {

@@ -43,7 +43,8 @@ public class PoliciaHerrero {
             "Faro de Forja", "Vinculo de Acero", "Reparacion Maestra", "Yunque Guardian",
             "Analizador del Forjador"
     };
-    static final int[] THRESH = new int[]{0, 15, 25, 35, 45, 55, 70, 85, 100};
+    static final int[] THRESH = new int[]{0, 15, 25, 35, 45, 55, 70, 85};
+    static final int ANALIZADOR_XP = 35;
     static final UUID MARK_ARM = UUID.fromString("b4e8c231-7a5d-4f66-9e32-7c1b2d3e4f50");
 
     static void init() {
