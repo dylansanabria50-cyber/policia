@@ -25,5 +25,9 @@
  "item.policia.llave_patrullero": "Llave del patrullero",
  "entity.policia.patrullero": "Patrullero",
  "policia.subtitle.sirena": "Sirena de policía",
- "item.policia.dinamita_albanil": "Dinamita de demolición"
+ "item.policia.dinamita_albanil": "Dinamita de demolición",
+ "item.policia.kit_caja_fuerte": "Kit de caja fuerte",
+ "item.policia.placas_refuerzo": "Placas de refuerzo",
+ "item.policia.kit_falsificacion": "Kit de falsificación",
+ "item.policia.mapa_boveda": "Mapa de bóveda"
 }

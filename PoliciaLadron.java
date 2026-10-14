@@ -231,6 +231,10 @@ public class PoliciaLadron {
         d.putInt("pol_wnt", w);
         d.putInt("pol_wnt_t", 1200);
         PoliciaMod.msg(p, "Buscado " + "*".repeat(w) + " (" + why + ")");
+        if (PoliciaMercado.disguised(p)) {
+            PoliciaMod.sync(p);
+            return;
+        }
         for (PoliciaBoss.BossNpc b : p.serverLevel().getEntitiesOfClass(PoliciaBoss.BossNpc.class, p.getBoundingBox().inflate(48.0), x -> x.kind() == 5 && x.isAlive())) {
             b.setTarget(p);
         }

@@ -154,6 +154,8 @@ public class PoliciaMod {
         PoliciaDiario.init();
         PoliciaDemolicion.init();
         PoliciaInspector.init();
+        PoliciaCaja.init();
+        PoliciaMercado.init();
         PoliciaSonido.init(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaLadron.init();
         PoliciaBoss.init();
@@ -201,6 +203,7 @@ public class PoliciaMod {
         m.c9 = PoliciaExtra.cd(p, 9);
         m.jb = "albanil".equals(job(p)) ? 2 : (ID.equals(job(p)) ? 1 : ("herrero".equals(job(p)) ? 4 : 0));
         m.hideArmor = p.getPersistentData().getBoolean("pol_hidearmor");
+        m.fake = PoliciaMercado.disguised(p);
         if ("ladron".equals(job(p))) {
             m.jb = 3;
             m.rl = PoliciaLadron.luck(p);
@@ -788,6 +791,7 @@ public class PoliciaMod {
         int c9;
         int jb;
         boolean hideArmor;
+        boolean fake;
 
         Sync() {
         }
@@ -810,6 +814,7 @@ public class PoliciaMod {
             b.writeVarInt(m.c9);
             b.writeVarInt(m.jb);
             b.writeBoolean(m.hideArmor);
+            b.writeBoolean(m.fake);
         }
 
         static Sync dec(FriendlyByteBuf b) {
@@ -831,6 +836,7 @@ public class PoliciaMod {
             m.c9 = b.readVarInt();
             m.jb = b.readVarInt();
             m.hideArmor = b.readBoolean();
+            m.fake = b.readBoolean();
             return m;
         }
 

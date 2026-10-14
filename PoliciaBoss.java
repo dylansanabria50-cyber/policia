@@ -113,6 +113,10 @@ public class PoliciaBoss {
         out.accept((ItemLike) PoliciaPlano.PLANO.get());
         out.accept((ItemLike) PoliciaPatrullero.KEY.get());
         out.accept((ItemLike) PoliciaDemolicion.DINAMITA.get());
+        out.accept((ItemLike) PoliciaCaja.KIT.get());
+        out.accept((ItemLike) PoliciaCaja.PLACAS.get());
+        out.accept((ItemLike) PoliciaMercado.KIT_FALSO.get());
+        out.accept((ItemLike) PoliciaMercado.MAPA.get());
         out.accept((ItemLike) PoliciaShield.SHIELD.get());
         out.accept((ItemLike) VEST.get());
         for (String[] x : sk = new String[][]{{"refuerzo", "Refuerzo"}, {"k9", "Perro K9"}, {"esposas", "Esposas"}, {"sirena", "Sirena y torreta"}, {"dron", "Dron de vigilancia"}, {"burbuja", "Escudo de burbuja"}, {"pico", "Pico de albañil"}, {"muro", "Muro"}, {"refugio", "Refugio"}, {"silbido", "Silbido"}}) {
@@ -476,6 +480,7 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.COAL_BLOCK, 4), 4));
             l.add(new Entry(new ItemStack((ItemLike) Items.LAVA_BUCKET), 4));
             l.add(new Entry(new ItemStack((ItemLike) Items.ANVIL), 6));
+            l.add(new Entry(new ItemStack((ItemLike) PoliciaCaja.PLACAS.get()), 4));
             l.add(new Entry(new ItemStack((ItemLike) Items.SMITHING_TABLE), 3));
             l.add(new Entry(new ItemStack((ItemLike) Items.GRINDSTONE), 3));
             l.add(new Entry(new ItemStack((ItemLike) Items.BLAST_FURNACE), 5));
@@ -525,6 +530,7 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.STONE_PICKAXE), 3));
             l.add(new Entry(new ItemStack((ItemLike) PoliciaPlano.PLANO.get()), 3));
             l.add(new Entry(new ItemStack((ItemLike) PoliciaDemolicion.DINAMITA.get(), 2), 3));
+            l.add(new Entry(new ItemStack((ItemLike) PoliciaCaja.KIT.get()), 5));
             for (int pk = 0; pk < PoliciaPlano.PREFAB.length; ++pk) {
                 l.add(new Entry(PoliciaPlano.prefab(pk), PoliciaPlano.PREFAB_PRICE[pk]));
             }
@@ -538,6 +544,7 @@ public class PoliciaBoss {
             l.add(new Entry(PotionUtils.setPotion(new ItemStack((ItemLike) Items.POTION), Potions.INVISIBILITY), 10));
             l.add(new Entry(new ItemStack((ItemLike) Items.FIREWORK_ROCKET, 2), 2));
             l.add(new Entry(new ItemStack((ItemLike) Items.BUNDLE), 6));
+            l.add(new Entry(new ItemStack((ItemLike) PoliciaMercado.KIT_FALSO.get()), 12));
             l.add(new Entry(new ItemStack((ItemLike) Items.GUNPOWDER, 8), 3));
             l.add(new Entry(PoliciaBoss.single("silbido", "Silbido"), 8));
             l.add(new Entry(PoliciaBoss.single("l_carterismo", "Carterismo maestro", "Tu próximo carterismo en 60 s no falla"), 6));
@@ -789,7 +796,7 @@ public class PoliciaBoss {
                 }
             });
             this.targetSelector.addGoal(2, (Goal) new NearestAttackableTargetGoal((Mob) this, Player.class, 10, true, false, pl -> this.kind() == 4 && !"ladron".equals(PoliciaMod.job((Player) pl))));
-            this.targetSelector.addGoal(2, (Goal) new NearestAttackableTargetGoal((Mob) this, Player.class, 5, true, false, pl -> this.kind() == 5 && !((Player) pl).isCreative() && PoliciaLadron.wanted((Player) pl) > 0 && ((Player) pl).getPersistentData().getInt("pol_esc") <= 0));
+            this.targetSelector.addGoal(2, (Goal) new NearestAttackableTargetGoal((Mob) this, Player.class, 5, true, false, pl -> this.kind() == 5 && !((Player) pl).isCreative() && PoliciaLadron.wanted((Player) pl) > 0 && ((Player) pl).getPersistentData().getInt("pol_esc") <= 0 && !PoliciaMercado.disguised((Player) pl)));
             this.goalSelector.addGoal(3, new Goal() {
                 Villager tv;
                 int t = 0;

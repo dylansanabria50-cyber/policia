@@ -57,7 +57,7 @@ public class PoliciaRastreo {
             double bd = Double.MAX_VALUE;
             double[] bp = null;
             for (ServerPlayer th : srv.getPlayerList().getPlayers()) {
-                if (th == cop || !"ladron".equals(PoliciaMod.job(th)) || th.level() != cop.level() || th.isSpectator()) continue;
+                if (th == cop || !"ladron".equals(PoliciaMod.job(th)) || th.level() != cop.level() || th.isSpectator() || PoliciaMercado.disguised(th)) continue;
                 int st = PoliciaLadron.wanted(th);
                 if (st <= 0) continue;
                 double[] ap = PoliciaRastreo.approx(th, st);

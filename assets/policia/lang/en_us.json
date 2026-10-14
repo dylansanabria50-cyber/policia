@@ -25,5 +25,9 @@
  "item.policia.llave_patrullero": "Patrol Car Key",
  "entity.policia.patrullero": "Patrol Car",
  "policia.subtitle.sirena": "Police siren",
- "item.policia.dinamita_albanil": "Demolition Dynamite"
+ "item.policia.dinamita_albanil": "Demolition Dynamite",
+ "item.policia.kit_caja_fuerte": "Safe Kit",
+ "item.policia.placas_refuerzo": "Reinforcement Plates",
+ "item.policia.kit_falsificacion": "Forgery Kit",
+ "item.policia.mapa_boveda": "Vault Map"
 }

@@ -53,7 +53,7 @@ public class PoliciaGolpe {
         }
         long left = d.getLong("gh_cd") - p.serverLevel().getGameTime();
         String[] lore = k == 1
-                ? new String[]{"Aparece una bóveda llena en el casino (2.º sótano).", "Al abrirla suena la alarma y llegan agentes:", "escapá a " + ESCAPE[1] + " bloques en 3 minutos.", "Botín: diamantes, oro y esmeraldas", "Recompensa extra: " + XP[1] + " XP y " + EM[1] + " esmeraldas", left > 0 ? "Disponible en " + (left / 1200L + 1L) + " min" : "Clic: aceptar el golpe"}
+                ? new String[]{"Aparece una bóveda llena en el casino (2.º sótano).", "Es una caja fuerte: forzala (agachado + clic).", "Al abrirla suena la alarma y llegan agentes:", "escapá a " + ESCAPE[1] + " bloques en 3 minutos.", "Botín: diamantes, oro y esmeraldas", "Recompensa extra: " + XP[1] + " XP y " + EM[1] + " esmeraldas", left > 0 ? "Disponible en " + (left / 1200L + 1L) + " min" : "Clic: aceptar el golpe"}
                 : new String[]{"Robale los bolsillos al Perista del casino.", "Da la alarma: escapá a " + ESCAPE[2] + " bloques en 2:30.", "Botín: diamantes, esmeraldas y chatarra de netherita", "Recompensa extra: " + XP[2] + " XP y " + EM[2] + " esmeraldas", left > 0 ? "Disponible en " + (left / 1200L + 1L) + " min" : "Clic: aceptar el golpe"};
         return PoliciaBoss.named(k == 1 ? Items.GOLD_BLOCK : Items.DIAMOND, "GOLPE GRANDE: " + NAME[k], lore);
     }
@@ -100,7 +100,8 @@ public class PoliciaGolpe {
                 }
             }
             d.putLong("gh_v", v.asLong());
-            p.sendSystemMessage(Component.literal("§6<Jefe de ladrones> La bóveda del casino está en el segundo sótano (" + v.getX() + ", " + v.getY() + ", " + v.getZ() + "). Cuando la abras va a sonar la alarma: agarrá todo y corré."));
+            PoliciaCaja.make(sl, v, PoliciaCaja.NOBODY, 2);
+            p.sendSystemMessage(Component.literal("§6<Jefe de ladrones> La bóveda del casino está en el segundo sótano (" + v.getX() + ", " + v.getY() + ", " + v.getZ() + "). Es una caja fuerte: agachate y hacé clic derecho para forzar la combinación. Cuando la abras va a sonar la alarma: agarrá todo y corré."));
         } else {
             p.sendSystemMessage(Component.literal("§6<Jefe de ladrones> El Perista guarda lo mejor en los bolsillos. Está en el último sótano del casino (" + site.getX() + ", " + site.getZ() + "). Acercate por detrás, agachado, y clic derecho."));
         }
@@ -168,6 +169,14 @@ public class PoliciaGolpe {
             PoliciaMod.sync(p);
         } else {
             PoliciaGolpe.title(p, "§cGolpe fallido", "§7" + why);
+        }
+    }
+
+    // La bóveda es una caja fuerte: la alarma suena al forzarla.
+    static void vaultOpened(ServerPlayer p, BlockPos pos) {
+        CompoundTag d = p.getPersistentData();
+        if (PoliciaGolpe.kind(p) == 1 && d.getInt("gh_ph") == 1 && pos.asLong() == d.getLong("gh_v")) {
+            PoliciaGolpe.alarm(p, pos);
         }
     }
 

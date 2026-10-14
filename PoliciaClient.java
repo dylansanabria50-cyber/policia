@@ -712,8 +712,8 @@ public class PoliciaClient {
         if (mc.getEntityRenderDispatcher().distanceToSqr(p) > 4096.0) {
             return;
         }
-        String text = JOB_TAG[s.jb];
-        int color = s.jb == 4 ? 0xFFFFD24A : 0xFFFFFFFF;
+        String text = s.fake ? JOB_TAG[1] : JOB_TAG[s.jb];
+        int color = s.jb == 4 && !s.fake ? 0xFFFFD24A : 0xFFFFFFFF;
         PoseStack ps = e.getPoseStack();
         ps.pushPose();
         // El nombre va a la altura del jugador + 0.5; el oficio, una linea arriba.
