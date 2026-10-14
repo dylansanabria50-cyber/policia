@@ -210,7 +210,20 @@ public class PoliciaAnalizadorScreen extends Screen {
             case 4 -> "Junta " + need + " de " + tn + " (se gastan al terminar)";
             case 5 -> "Pesca " + need + " veces";
             case 6 -> "Coloca " + need + " bloques";
-            default -> "Nada bajo el agua " + need / 20 + " s";
+            case 7 -> "Nada bajo el agua " + need / 20 + " s";
+            case 8 -> "Tala " + need + " troncos";
+            case 9 -> "Cosecha " + need + " cultivos maduros";
+            case 10 -> "Cria " + need + " animales";
+            case 11 -> "Comercia " + need + " veces con aldeanos";
+            case 12 -> "Funde " + need + " items en un horno";
+            case 13 -> "Craftea " + need + " objetos en la mesa";
+            case 14 -> "Domestica " + need + " animales";
+            case 15 -> "Subi hasta la altura 120";
+            case 16 -> "Baja hasta la altura -30";
+            case 17 -> "Come " + need + " veces";
+            case 18 -> "Dormi en una cama hasta la manana";
+            case 19 -> "Mata " + need + " monstruos con arco o ballesta";
+            default -> "Salta " + need + " veces";
         };
     }
 

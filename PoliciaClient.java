@@ -147,22 +147,32 @@ public class PoliciaClient {
     // sin tocar skins, otros mods ni el modelo del jugador en si: no cancela
     // nada del jugador, solo decide si esa capa en particular se dibuja.
     static Field F_LAYERS;
+    static Field F_RMODEL;
     static boolean layersTried;
 
+    // Busca los campos "layers" y "model" de LivingEntityRenderer por su
+    // TIPO y no por nombre: en el juego real (fuera del entorno de
+    // desarrollo) los nombres internos estan ofuscados, asi que buscarlos
+    // por nombre fallaba en silencio.
     static void findLayersField() {
         if (layersTried) {
             return;
         }
         layersTried = true;
         try {
-            F_LAYERS = ObfuscationReflectionHelper.findField(LivingEntityRenderer.class, "layers");
-        } catch (Throwable t) {
-            try {
-                F_LAYERS = LivingEntityRenderer.class.getDeclaredField("layers");
-                F_LAYERS.setAccessible(true);
-            } catch (Throwable t2) {
-                F_LAYERS = null;
+            for (Field f : LivingEntityRenderer.class.getDeclaredFields()) {
+                if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                if (F_LAYERS == null && List.class.isAssignableFrom(f.getType())) {
+                    f.setAccessible(true);
+                    F_LAYERS = f;
+                } else if (F_RMODEL == null && net.minecraft.client.model.EntityModel.class.isAssignableFrom(f.getType())) {
+                    f.setAccessible(true);
+                    F_RMODEL = f;
+                }
             }
+        } catch (Throwable t) {
+            F_LAYERS = null;
+            F_RMODEL = null;
         }
     }
 
@@ -182,6 +192,19 @@ public class PoliciaClient {
                         list.set(i, new HideArmorLayer((RenderLayerParent) r, (RenderLayer) layer));
                     }
                 }
+            } catch (Throwable ignored) {
+            }
+            // Animacion del Herrero: modelo de jugador que puede mover los
+            // brazos durante Yunque/Reparacion, mas la capa que dibuja el
+            // yunque y el martillo. Si algo falla, el jugador se ve normal.
+            try {
+                if (F_RMODEL != null && !(F_RMODEL.get(r) instanceof PoliciaHerreroAnim.AnimModel)) {
+                    boolean slim = "slim".equals(skin);
+                    net.minecraft.client.model.geom.ModelPart root = e.getContext().bakeLayer(slim ? net.minecraft.client.model.geom.ModelLayers.PLAYER_SLIM : net.minecraft.client.model.geom.ModelLayers.PLAYER);
+                    F_RMODEL.set(r, new PoliciaHerreroAnim.AnimModel(root, slim));
+                }
+                List list = (List) F_LAYERS.get(r);
+                list.add(new PoliciaHerreroAnim.AnimLayer((RenderLayerParent) r));
             } catch (Throwable ignored) {
             }
         }

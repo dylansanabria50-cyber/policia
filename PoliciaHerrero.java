@@ -51,6 +51,7 @@ public class PoliciaHerrero {
 
     static void init() {
         PoliciaMod.NET.registerMessage(8, HerSync.class, HerSync::enc, HerSync::dec, HerSync::handle);
+        PoliciaMod.NET.registerMessage(9, HerAnim.class, HerAnim::enc, HerAnim::dec, HerAnim::handle);
         MinecraftForge.EVENT_BUS.register((Object) new PoliciaHerrero());
     }
 
@@ -68,6 +69,41 @@ public class PoliciaHerrero {
         m.faroT = d.getInt("her_faro_t");
         m.linkT = d.getInt("her_link_t");
         PoliciaMod.NET.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p), (Object) m);
+    }
+
+    // Animacion del personaje (yunque sacado de la espalda / golpes con el
+    // martillo). Se manda a todos los que ven al jugador; el cliente la
+    // dibuja en PoliciaHerreroAnim. kind 0 = plantar yunque, 1 = reparar.
+    static final int ANIM_PLACE = 18;
+    static final int ANIM_REPAIR = 44;
+
+    static void anim(ServerPlayer p, int kind) {
+        PoliciaMod.NET.send(net.minecraftforge.network.PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> p), (Object) new HerAnim(p.getId(), kind));
+        p.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, kind == 1 ? ANIM_REPAIR : ANIM_PLACE, 3, false, false, false));
+    }
+
+    public static class HerAnim {
+        final int entity;
+        final int kind;
+
+        HerAnim(int entity, int kind) {
+            this.entity = entity;
+            this.kind = kind;
+        }
+
+        static void enc(HerAnim m, net.minecraft.network.FriendlyByteBuf b) {
+            b.writeVarInt(m.entity);
+            b.writeVarInt(m.kind);
+        }
+
+        static HerAnim dec(net.minecraft.network.FriendlyByteBuf b) {
+            return new HerAnim(b.readVarInt(), b.readVarInt());
+        }
+
+        static void handle(HerAnim m, java.util.function.Supplier<net.minecraftforge.network.NetworkEvent.Context> c) {
+            c.get().enqueueWork(() -> net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> PoliciaHerreroAnim.start(m.entity, m.kind)));
+            c.get().setPacketHandled(true);
+        }
     }
 
     public static class HerSync {
@@ -226,9 +262,14 @@ public class PoliciaHerrero {
                     PoliciaMod.msg(p, "Reparacion Maestra: necesitas una herramienta o arma danada en la mano");
                     return;
                 }
-                it.setDamageValue(0);
+                if (d.getInt("her_rep_t") > 0 || d.getInt("her_anvil_wait") > 0) {
+                    PoliciaMod.msg(p, "Termina lo que estas forjando primero");
+                    return;
+                }
+                d.putInt("her_rep_slot", p.getInventory().selected);
                 d.putInt("her_rep_t", 1);
-                PoliciaMod.msg(p, "Reparacion Maestra: equipo como nuevo");
+                PoliciaHerrero.anim(p, 1);
+                PoliciaMod.msg(p, "Reparacion Maestra: sacas el yunque y empezas a forjar...");
                 d.putInt("her_cd6", 1200);
                 break;
             }
@@ -265,8 +306,12 @@ public class PoliciaHerrero {
 
     static boolean placeAnvil(ServerPlayer p, int type) {
         CompoundTag d = p.getPersistentData();
-        if (d.getInt("her_anvil_t") > 0) {
+        if (d.getInt("her_anvil_t") > 0 || d.getInt("her_anvil_wait") > 0) {
             PoliciaMod.msg(p, "Ya hay un yunque plantado");
+            return false;
+        }
+        if (d.getInt("her_rep_t") > 0) {
+            PoliciaMod.msg(p, "Termina lo que estas forjando primero");
             return false;
         }
         BlockPos bp = p.blockPosition().relative(p.getDirection());
@@ -277,16 +322,31 @@ public class PoliciaHerrero {
             PoliciaMod.msg(p, "No hay espacio libre para el yunque");
             return false;
         }
-        p.level().setBlockAndUpdate(bp, Blocks.ANVIL.defaultBlockState());
+        // El bloque aparece cuando la animacion lo apoya en el piso.
         d.putLong("her_anvil_pos", bp.asLong());
-        d.putInt("her_anvil_t", 800);
         d.putInt("her_anvil_type", type);
-        if (p.level() instanceof ServerLevel sl) {
-            sl.sendParticles((ParticleOptions) ParticleTypes.POOF, p.getX(), p.getY() + 1.6, p.getZ(), 10, 0.2, 0.3, 0.2, 0.05);
-        }
-        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0f, 0.9f);
-        PoliciaMod.msg(p, type == 0 ? "Yunque Portatil plantado: mas danio cerca suyo" : "Yunque Guardian plantado: intercepta proyectiles cercanos");
+        d.putInt("her_anvil_wait", 15);
+        PoliciaHerrero.anim(p, 0);
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ARMOR_EQUIP_IRON, SoundSource.PLAYERS, 1.0f, 0.7f);
         return true;
+    }
+
+    static void plantAnvil(ServerPlayer p) {
+        CompoundTag d = p.getPersistentData();
+        BlockPos bp = BlockPos.of(d.getLong("her_anvil_pos"));
+        int type = d.getInt("her_anvil_type");
+        if (!PoliciaHerrero.free(p, bp)) {
+            PoliciaMod.msg(p, "No hay espacio libre para el yunque");
+            d.putInt("her_cd" + (type == 0 ? 1 : 7), 0);
+            return;
+        }
+        p.level().setBlockAndUpdate(bp, Blocks.ANVIL.defaultBlockState().setValue(net.minecraft.world.level.block.AnvilBlock.FACING, p.getDirection().getClockWise()));
+        d.putInt("her_anvil_t", 800);
+        if (p.level() instanceof ServerLevel sl) {
+            sl.sendParticles((ParticleOptions) ParticleTypes.POOF, bp.getX() + 0.5, bp.getY() + 0.2, bp.getZ() + 0.5, 12, 0.3, 0.1, 0.3, 0.03);
+        }
+        p.level().playSound(null, bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0f, 0.9f);
+        PoliciaMod.msg(p, type == 0 ? "Yunque Portatil plantado: mas danio cerca suyo" : "Yunque Guardian plantado: intercepta proyectiles cercanos");
     }
 
     static void removeAnvil(ServerPlayer p) {
@@ -365,6 +425,8 @@ public class PoliciaHerrero {
     }
 
     static void reset(ServerPlayer p) {
+        p.getPersistentData().putInt("her_anvil_wait", 0);
+        p.getPersistentData().putInt("her_rep_t", 0);
         PoliciaHerrero.removeAnvil(p);
         PoliciaHerrero.endLink(p);
         CompoundTag d = p.getPersistentData();
@@ -397,6 +459,13 @@ public class PoliciaHerrero {
             d.putInt("her_cd" + i, --c);
             if (c == 0) {
                 PoliciaMod.msg(p, SKILLS[i] + " lista");
+            }
+        }
+        int aw = d.getInt("her_anvil_wait");
+        if (aw > 0) {
+            d.putInt("her_anvil_wait", --aw);
+            if (aw == 0) {
+                PoliciaHerrero.plantAnvil(p);
             }
         }
         int at = d.getInt("her_anvil_t");
@@ -461,16 +530,37 @@ public class PoliciaHerrero {
         }
         int rt = d.getInt("her_rep_t");
         if (rt > 0) {
-            if (rt == 1 && p.level() instanceof ServerLevel sl) {
-                sl.sendParticles((ParticleOptions) ParticleTypes.POOF, p.getX(), p.getY() + 1.5, p.getZ(), 6, 0.2, 0.3, 0.2, 0.05);
+            Vec3 f = Vec3.directionFromRotation(0.0f, p.getYRot()).scale(0.9);
+            double ax = p.getX() + f.x;
+            double ay = p.getY() + 0.6;
+            double az = p.getZ() + f.z;
+            if (rt == 15 && p.level() instanceof ServerLevel sl) {
+                sl.sendParticles((ParticleOptions) ParticleTypes.POOF, ax, p.getY() + 0.1, az, 8, 0.25, 0.05, 0.25, 0.02);
+                p.level().playSound(null, ax, ay, az, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.6f, 1.2f);
             }
-            if ((rt == 1 || rt == 7 || rt == 13) && p.level() instanceof ServerLevel) {
-                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.9f, 1.0f + (float) rt * 0.02f);
-                if (p.level() instanceof ServerLevel sl2) {
-                    sl2.sendParticles((ParticleOptions) ParticleTypes.CRIT, p.getX(), p.getY() + 1.0, p.getZ(), 8, 0.2, 0.2, 0.2, 0.1);
+            // Golpes del martillo: coinciden con la bajada del brazo en la
+            // animacion (ticks 23, 32 y 41).
+            if ((rt == 23 || rt == 32 || rt == 41) && p.level() instanceof ServerLevel sl) {
+                p.level().playSound(null, ax, ay, az, SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.9f, 0.9f + (float) rt * 0.01f);
+                sl.sendParticles((ParticleOptions) ParticleTypes.CRIT, ax, ay, az, 10, 0.15, 0.1, 0.15, 0.25);
+                sl.sendParticles((ParticleOptions) ParticleTypes.LAVA, ax, ay, az, 2, 0.1, 0.05, 0.1, 0.0);
+            }
+            if (rt >= ANIM_REPAIR) {
+                d.putInt("her_rep_t", 0);
+                ItemStack it = p.getInventory().getItem(d.getInt("her_rep_slot"));
+                if (!it.isEmpty() && it.isDamageableItem() && it.getDamageValue() > 0) {
+                    it.setDamageValue(0);
+                    PoliciaMod.msg(p, "Reparacion Maestra: " + it.getHoverName().getString() + " como nuevo");
+                    p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.8f);
+                } else {
+                    PoliciaMod.msg(p, "Reparacion Maestra: ya no tenias la herramienta en ese lugar");
                 }
+                if (p.level() instanceof ServerLevel sl) {
+                    sl.sendParticles((ParticleOptions) ParticleTypes.POOF, ax, ay, az, 10, 0.25, 0.2, 0.25, 0.03);
+                }
+            } else {
+                d.putInt("her_rep_t", rt + 1);
             }
-            d.putInt("her_rep_t", rt + 1 > 14 ? 0 : rt + 1);
         }
     }
 

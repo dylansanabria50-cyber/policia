@@ -47,9 +47,13 @@ public class PoliciaAnalizador {
     // 8 tipos de mision genericos, elegidos segun el item a analizar.
     static final String[] QUEST_NAMES = new String[]{
             "Minar menas", "Cazar monstruos", "Caminar", "Sobrevivir sin heridas",
-            "Reunir materiales", "Pescar", "Construir", "Nadar"
+            "Reunir materiales", "Pescar", "Construir", "Nadar",
+            "Talar arboles", "Cosechar cultivos", "Criar animales", "Comerciar con aldeanos",
+            "Fundir en el horno", "Craftear objetos", "Domesticar animales", "Escalar las alturas",
+            "Bajar a las profundidades", "Comer", "Dormir una noche", "Punteria con arco", "Saltar"
     };
-    static final int[] QUEST_NEED = new int[]{12, 8, 500, 1200, 10, 5, 20, 600};
+    static final int[] QUEST_NEED = new int[]{12, 8, 500, 1200, 10, 5, 20, 600,
+            16, 12, 3, 3, 16, 10, 2, 1, 1, 10, 1, 5, 100};
     static final Block[] QUEST_ORES = new Block[]{
             net.minecraft.world.level.block.Blocks.IRON_ORE, net.minecraft.world.level.block.Blocks.GOLD_ORE,
             net.minecraft.world.level.block.Blocks.DIAMOND_ORE, net.minecraft.world.level.block.Blocks.COPPER_ORE,
@@ -451,6 +455,8 @@ public class PoliciaAnalizador {
                 if (p.isUnderWater()) {
                     PoliciaAnalizador.questStep(p, 1);
                 }
+            } else if (type == 15 && p.getY() >= 120.0 || type == 16 && p.getY() <= -30.0) {
+                PoliciaAnalizador.questProgress(p, 1);
             } else if (type == 4 && p.tickCount % 10 == 0) {
                 int have = PoliciaAnalizador.count(p.getInventory(), d.getString("her_an_qtarget"));
                 int need = d.getInt("her_an_qneed");
@@ -462,21 +468,96 @@ public class PoliciaAnalizador {
         }
     }
 
-    @SubscribeEvent
-    public void breakBlock(BlockEvent.BreakEvent e) {
-        ServerPlayer p;
-        Player player = e.getPlayer();
-        if (!(player instanceof ServerPlayer) || !PoliciaAnalizador.active(p = (ServerPlayer) player)) {
-            return;
+    // Jugador con mision de analisis en curso del tipo dado (o null).
+    static ServerPlayer quester(Object ent, int type) {
+        if (!(ent instanceof ServerPlayer p) || !PoliciaAnalizador.active(p)) {
+            return null;
         }
         CompoundTag d = p.getPersistentData();
-        if (d.getInt("her_an_qtype") != 0 || d.getString("her_an_qitem").isEmpty()) {
-            return;
+        if (d.getString("her_an_qitem").isEmpty() || d.getInt("her_an_qtype") != type) {
+            return null;
         }
-        if (!BuiltInRegistries.BLOCK.getKey(e.getState().getBlock()).toString().equals(d.getString("her_an_qtarget"))) {
-            return;
+        return p;
+    }
+
+    @SubscribeEvent
+    public void breakBlock(BlockEvent.BreakEvent e) {
+        ServerPlayer p = PoliciaAnalizador.quester(e.getPlayer(), 0);
+        if (p != null && BuiltInRegistries.BLOCK.getKey(e.getState().getBlock()).toString().equals(p.getPersistentData().getString("her_an_qtarget"))) {
+            PoliciaAnalizador.questProgress(p, 1);
         }
-        PoliciaAnalizador.questProgress(p, 1);
+        p = PoliciaAnalizador.quester(e.getPlayer(), 8);
+        if (p != null && e.getState().is(net.minecraft.tags.BlockTags.LOGS)) {
+            PoliciaAnalizador.questProgress(p, 1);
+        }
+        p = PoliciaAnalizador.quester(e.getPlayer(), 9);
+        if (p != null && e.getState().getBlock() instanceof net.minecraft.world.level.block.CropBlock crop && crop.isMaxAge(e.getState())) {
+            PoliciaAnalizador.questProgress(p, 1);
+        }
+    }
+
+    @SubscribeEvent
+    public void breed(net.minecraftforge.event.entity.living.BabyEntitySpawnEvent e) {
+        ServerPlayer p = PoliciaAnalizador.quester(e.getCausedByPlayer(), 10);
+        if (p != null) {
+            PoliciaAnalizador.questProgress(p, 1);
+        }
+    }
+
+    @SubscribeEvent
+    public void trade(net.minecraftforge.event.entity.player.TradeWithVillagerEvent e) {
+        ServerPlayer p = PoliciaAnalizador.quester(e.getEntity(), 11);
+        if (p != null) {
+            PoliciaAnalizador.questProgress(p, 1);
+        }
+    }
+
+    @SubscribeEvent
+    public void smelted(net.minecraftforge.event.entity.player.PlayerEvent.ItemSmeltedEvent e) {
+        ServerPlayer p = PoliciaAnalizador.quester(e.getEntity(), 12);
+        if (p != null) {
+            PoliciaAnalizador.questProgress(p, Math.max(1, e.getSmelting().getCount()));
+        }
+    }
+
+    @SubscribeEvent
+    public void crafted(net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent e) {
+        ServerPlayer p = PoliciaAnalizador.quester(e.getEntity(), 13);
+        if (p != null) {
+            PoliciaAnalizador.questProgress(p, 1);
+        }
+    }
+
+    @SubscribeEvent
+    public void tamed(net.minecraftforge.event.entity.living.AnimalTameEvent e) {
+        ServerPlayer p = PoliciaAnalizador.quester(e.getTamer(), 14);
+        if (p != null) {
+            PoliciaAnalizador.questProgress(p, 1);
+        }
+    }
+
+    @SubscribeEvent
+    public void ate(net.minecraftforge.event.entity.living.LivingEntityUseItemEvent.Finish e) {
+        ServerPlayer p = PoliciaAnalizador.quester(e.getEntity(), 17);
+        if (p != null && e.getItem().isEdible()) {
+            PoliciaAnalizador.questProgress(p, 1);
+        }
+    }
+
+    @SubscribeEvent
+    public void slept(net.minecraftforge.event.entity.player.PlayerWakeUpEvent e) {
+        ServerPlayer p = PoliciaAnalizador.quester(e.getEntity(), 18);
+        if (p != null && !e.wakeImmediately()) {
+            PoliciaAnalizador.questProgress(p, 1);
+        }
+    }
+
+    @SubscribeEvent
+    public void jumped(net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent e) {
+        ServerPlayer p = PoliciaAnalizador.quester(e.getEntity(), 20);
+        if (p != null) {
+            PoliciaAnalizador.questProgress(p, 1);
+        }
     }
 
     @SubscribeEvent
@@ -504,17 +585,15 @@ public class PoliciaAnalizador {
     @SubscribeEvent
     public void kill(LivingDeathEvent e) {
         LivingEntity dead = e.getEntity();
-        if (!(dead.getLastHurtByMob() instanceof ServerPlayer p) || !PoliciaAnalizador.active(p)) {
-            return;
+        Object killer = e.getSource().getEntity() != null ? e.getSource().getEntity() : dead.getLastHurtByMob();
+        ServerPlayer p = PoliciaAnalizador.quester(killer, 1);
+        if (p != null && BuiltInRegistries.ENTITY_TYPE.getKey(dead.getType()).toString().equals(p.getPersistentData().getString("her_an_qtarget"))) {
+            PoliciaAnalizador.questProgress(p, 1);
         }
-        CompoundTag d = p.getPersistentData();
-        if (d.getInt("her_an_qtype") != 1 || d.getString("her_an_qitem").isEmpty()) {
-            return;
+        p = PoliciaAnalizador.quester(killer, 19);
+        if (p != null && dead instanceof Mob && e.getSource().getDirectEntity() instanceof net.minecraft.world.entity.projectile.AbstractArrow) {
+            PoliciaAnalizador.questProgress(p, 1);
         }
-        if (!BuiltInRegistries.ENTITY_TYPE.getKey(dead.getType()).toString().equals(d.getString("her_an_qtarget"))) {
-            return;
-        }
-        PoliciaAnalizador.questProgress(p, 1);
     }
 
     public static class State {
