@@ -1,1 +1,25 @@
-{"item.policia.escudo_policial": "Escudo balístico", "item.policia.placa_policia": "Placa de policía", "item.policia.balde_albanil": "Balde de albañil", "item.policia.guante_ladron": "Guante de ladrón", "item.policia.chaleco_antibalas": "Chaleco antibalas", "item.policia.habilidad_unica": "Habilidad de un solo uso", "entity.policia.jefe_oficio": "Jefe de oficio", "item.policia.plano_albanil": "Plano de albañil"}
+{
+ "item.policia.escudo_policial": "Escudo balístico",
+ "item.policia.placa_policia": "Placa de policía",
+ "item.policia.balde_albanil": "Balde de albañil",
+ "item.policia.guante_ladron": "Guante de ladrón",
+ "item.policia.chaleco_antibalas": "Chaleco antibalas",
+ "item.policia.habilidad_unica": "Habilidad de un solo uso",
+ "item.policia.plano_albanil": "Plano de albañil",
+ "item.policia.martillo_herrero": "Martillo del herrero legendario",
+ "entity.policia.jefe_oficio": "Jefe de oficio",
+ "entity.policia.agente": "Agente",
+ "entity.policia.ayudante": "Ayudante",
+ "entity.policia.bandido": "Bandido",
+ "entity.policia.burbuja": "Escudo de burbuja",
+ "entity.policia.comisario": "Comisario",
+ "entity.policia.dron": "Dron de vigilancia",
+ "entity.policia.furgoneta": "Furgoneta",
+ "entity.policia.helicoptero": "Helicóptero",
+ "entity.policia.k9": "Perro K9",
+ "entity.policia.sirena": "Sirena y torreta",
+ "entity.policia.tanque": "Tanque",
+ "entity.policia.tractor": "Tractor",
+ "effect.policia.esposado": "Esposado",
+ "itemGroup.policia.oficios": "Oficios"
+}

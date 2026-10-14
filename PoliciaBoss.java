@@ -385,7 +385,15 @@ public class PoliciaBoss {
         if (mine) {
             c.setItem(22, j == 0 ? PoliciaBoss.named(Items.BELL, "Misiones", "Las misiones de patrulla las da", "el Comisario, junto a la campana de la aldea") : PoliciaBoss.named(Items.MAP, "Misiones", "Trabajos del oficio con recompensa"));
         }
+        boolean smith = "herrero".equals(cur) && j < 3;
+        if (smith) {
+            c.setItem(22, PoliciaEncargo.card(sp, j));
+        }
         PoliciaBoss.openMenu3(sp, NAMES[k], c, (p, slot) -> {
+            if (slot == 22 && smith) {
+                PoliciaEncargo.deliver(p, j, NAMES[k]);
+                return;
+            }
             if (slot == 11) {
                 p.closeContainer();
                 PoliciaJefe.talk(p, b);
@@ -513,6 +521,9 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.SCAFFOLDING, 8), 5));
             l.add(new Entry(new ItemStack((ItemLike) Items.STONE_PICKAXE), 3));
             l.add(new Entry(new ItemStack((ItemLike) PoliciaPlano.PLANO.get()), 3));
+            for (int pk = 0; pk < PoliciaPlano.PREFAB.length; ++pk) {
+                l.add(new Entry(PoliciaPlano.prefab(pk), PoliciaPlano.PREFAB_PRICE[pk]));
+            }
             l.add(new Entry(PoliciaBoss.single("pico", "Pico de albañil"), 8));
             l.add(new Entry(PoliciaBoss.single("muro", "Muro"), 6));
             l.add(new Entry(PoliciaBoss.single("refugio", "Refugio"), 14));
@@ -628,6 +639,8 @@ public class PoliciaBoss {
             c.setItem(i, PoliciaBoss.pane());
         }
         c.setItem(22, PoliciaBoss.named(Items.EMERALD, "VENDER", "Pon lo robado arriba y pulsa aquí", "Te pago en esmeraldas"));
+        int[] hoy = PoliciaLadron.today();
+        c.setItem(18, PoliciaBoss.named(Items.CLOCK, "Hoy pago más por:", PoliciaLadron.RARE[hoy[0]] + " (x2)", PoliciaLadron.RARE[hoy[1]] + " (x2)", PoliciaLadron.RARE[hoy[2]] + " (x3)", "Mañana cambian los precios"));
         sp.openMenu((MenuProvider) new SimpleMenuProvider((id, inv, pl) -> new Sell(id, inv, c, sp), Component.literal("Perista")));
     }
 

@@ -341,12 +341,175 @@ public class PoliciaPlano {
             JOBS.remove(p.getUUID());
             // actualizar formas y conexiones una vez terminada
             for (BlockPos bp : j.pos) {
-                lv.blockUpdated(bp, lv.getBlockState(bp).getBlock());
+                BlockState cur = lv.getBlockState(bp);
+                BlockState up = Block.updateFromNeighbourShapes(cur, lv, bp);
+                if (up != cur && !up.isAir()) {
+                    lv.setBlock(bp, up, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+                }
             }
             p.sendSystemMessage(Component.literal("§a¡Construcción terminada! " + j.placed + " bloques colocados"));
             lv.playSound(null, p.getX(), p.getY(), p.getZ(), net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8f, 1.2f);
             PoliciaMod.sync(p);
         }
+    }
+
+    // ---------------- Planos ya hechos (catálogo del Capataz) ----------------
+    static final String[] PREFAB = new String[]{"Casa pequeña", "Torre de vigilancia", "Granja", "Puente"};
+    static final int[] PREFAB_PRICE = new int[]{5, 6, 4, 3};
+
+    static class Bld {
+        final Map<BlockPos, BlockState> m = new java.util.LinkedHashMap<BlockPos, BlockState>();
+
+        void set(int x, int y, int z, BlockState s) {
+            this.m.put(new BlockPos(x, y, z), s);
+        }
+
+        void set(int x, int y, int z, Block b) {
+            this.set(x, y, z, b.defaultBlockState());
+        }
+
+        void box(int x0, int y0, int z0, int x1, int y1, int z1, Block b) {
+            for (int x = x0; x <= x1; ++x) for (int y = y0; y <= y1; ++y) for (int z = z0; z <= z1; ++z) this.set(x, y, z, b);
+        }
+
+        void door(int x, int y, int z, Direction f) {
+            BlockState d = net.minecraft.world.level.block.Blocks.OAK_DOOR.defaultBlockState().setValue(net.minecraft.world.level.block.DoorBlock.FACING, f);
+            this.set(x, y, z, d.setValue(net.minecraft.world.level.block.DoorBlock.HALF, DoubleBlockHalf.LOWER));
+            this.set(x, y + 1, z, d.setValue(net.minecraft.world.level.block.DoorBlock.HALF, DoubleBlockHalf.UPPER));
+        }
+    }
+
+    static Bld prefabBlocks(int k) {
+        net.minecraft.world.level.block.Block air = net.minecraft.world.level.block.Blocks.AIR;
+        Bld b = new Bld();
+        if (k == 0) {
+            b.box(0, 0, 0, 6, 0, 6, net.minecraft.world.level.block.Blocks.OAK_PLANKS);
+            for (int y = 1; y <= 3; ++y) {
+                for (int i = 0; i <= 6; ++i) {
+                    b.set(i, y, 0, net.minecraft.world.level.block.Blocks.COBBLESTONE);
+                    b.set(i, y, 6, net.minecraft.world.level.block.Blocks.COBBLESTONE);
+                    b.set(0, y, i, net.minecraft.world.level.block.Blocks.COBBLESTONE);
+                    b.set(6, y, i, net.minecraft.world.level.block.Blocks.COBBLESTONE);
+                }
+            }
+            for (int[] w : new int[][]{{1, 0}, {5, 0}, {0, 3}, {6, 3}, {3, 6}}) {
+                b.set(w[0], 2, w[1], net.minecraft.world.level.block.Blocks.GLASS);
+            }
+            b.m.remove(new BlockPos(3, 1, 0));
+            b.m.remove(new BlockPos(3, 2, 0));
+            b.door(3, 1, 0, Direction.SOUTH);
+            b.box(0, 4, 0, 6, 4, 6, net.minecraft.world.level.block.Blocks.SPRUCE_PLANKS);
+            b.box(1, 5, 1, 5, 5, 5, net.minecraft.world.level.block.Blocks.SPRUCE_SLAB);
+            BlockState bed = net.minecraft.world.level.block.Blocks.RED_BED.defaultBlockState().setValue(net.minecraft.world.level.block.BedBlock.FACING, Direction.SOUTH);
+            b.set(4, 1, 4, bed.setValue(net.minecraft.world.level.block.BedBlock.PART, BedPart.FOOT));
+            b.set(4, 1, 5, bed.setValue(net.minecraft.world.level.block.BedBlock.PART, BedPart.HEAD));
+            b.set(1, 1, 5, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
+            b.set(5, 1, 1, net.minecraft.world.level.block.Blocks.CHEST);
+            b.set(1, 1, 1, net.minecraft.world.level.block.Blocks.TORCH);
+            b.set(2, 1, 5, net.minecraft.world.level.block.Blocks.FURNACE);
+        } else if (k == 1) {
+            b.box(0, 0, 0, 4, 0, 4, net.minecraft.world.level.block.Blocks.STONE_BRICKS);
+            for (int y = 1; y <= 9; ++y) {
+                for (int i = 0; i <= 4; ++i) {
+                    b.set(i, y, 0, net.minecraft.world.level.block.Blocks.STONE_BRICKS);
+                    b.set(i, y, 4, net.minecraft.world.level.block.Blocks.STONE_BRICKS);
+                    b.set(0, y, i, net.minecraft.world.level.block.Blocks.STONE_BRICKS);
+                    b.set(4, y, i, net.minecraft.world.level.block.Blocks.STONE_BRICKS);
+                }
+            }
+            b.m.remove(new BlockPos(2, 1, 0));
+            b.m.remove(new BlockPos(2, 2, 0));
+            b.door(2, 1, 0, Direction.SOUTH);
+            b.set(2, 5, 0, net.minecraft.world.level.block.Blocks.GLASS);
+            b.set(0, 6, 2, net.minecraft.world.level.block.Blocks.GLASS);
+            b.set(4, 6, 2, net.minecraft.world.level.block.Blocks.GLASS);
+            b.box(0, 10, 0, 4, 10, 4, net.minecraft.world.level.block.Blocks.SPRUCE_PLANKS);
+            BlockState lad = net.minecraft.world.level.block.Blocks.LADDER.defaultBlockState().setValue(net.minecraft.world.level.block.LadderBlock.FACING, Direction.NORTH);
+            for (int y = 1; y <= 10; ++y) {
+                b.set(2, y, 3, lad);
+            }
+            for (int i = 0; i <= 4; ++i) {
+                b.set(i, 11, 0, net.minecraft.world.level.block.Blocks.SPRUCE_FENCE);
+                b.set(i, 11, 4, net.minecraft.world.level.block.Blocks.SPRUCE_FENCE);
+                b.set(0, 11, i, net.minecraft.world.level.block.Blocks.SPRUCE_FENCE);
+                b.set(4, 11, i, net.minecraft.world.level.block.Blocks.SPRUCE_FENCE);
+            }
+            for (int[] c : new int[][]{{0, 0}, {4, 0}, {0, 4}, {4, 4}}) {
+                b.set(c[0], 12, c[1], net.minecraft.world.level.block.Blocks.LANTERN);
+            }
+        } else if (k == 2) {
+            for (int x = 1; x <= 7; ++x) {
+                for (int z = 1; z <= 7; ++z) {
+                    if (x == 4 && z == 4) {
+                        b.set(x, 0, z, net.minecraft.world.level.block.Blocks.WATER);
+                        continue;
+                    }
+                    b.set(x, 0, z, net.minecraft.world.level.block.Blocks.FARMLAND);
+                    b.set(x, 1, z, net.minecraft.world.level.block.Blocks.WHEAT);
+                }
+            }
+            for (int i = 0; i <= 8; ++i) {
+                b.set(i, 1, 0, net.minecraft.world.level.block.Blocks.OAK_FENCE);
+                b.set(i, 1, 8, net.minecraft.world.level.block.Blocks.OAK_FENCE);
+                b.set(0, 1, i, net.minecraft.world.level.block.Blocks.OAK_FENCE);
+                b.set(8, 1, i, net.minecraft.world.level.block.Blocks.OAK_FENCE);
+            }
+            b.set(4, 1, 0, net.minecraft.world.level.block.Blocks.OAK_FENCE_GATE.defaultBlockState().setValue(net.minecraft.world.level.block.FenceGateBlock.FACING, Direction.SOUTH));
+            b.set(0, 2, 0, net.minecraft.world.level.block.Blocks.TORCH);
+            b.set(8, 2, 0, net.minecraft.world.level.block.Blocks.TORCH);
+            b.set(0, 2, 8, net.minecraft.world.level.block.Blocks.TORCH);
+            b.set(8, 2, 8, net.minecraft.world.level.block.Blocks.TORCH);
+        } else {
+            b.box(0, 0, 0, 2, 0, 12, net.minecraft.world.level.block.Blocks.OAK_PLANKS);
+            for (int z = 0; z <= 12; ++z) {
+                b.set(0, 1, z, net.minecraft.world.level.block.Blocks.OAK_FENCE);
+                b.set(2, 1, z, net.minecraft.world.level.block.Blocks.OAK_FENCE);
+            }
+            for (int z : new int[]{0, 6, 12}) {
+                b.set(0, 2, z, net.minecraft.world.level.block.Blocks.LANTERN);
+                b.set(2, 2, z, net.minecraft.world.level.block.Blocks.LANTERN);
+            }
+        }
+        return b;
+    }
+
+    static ItemStack prefab(int k) {
+        Bld b = PoliciaPlano.prefabBlocks(k);
+        ItemStack it = new ItemStack((net.minecraft.world.level.ItemLike) PLANO.get());
+        CompoundTag t = it.getOrCreateTag();
+        ListTag pal = new ListTag();
+        Map<BlockState, Integer> idx = new HashMap<BlockState, Integer>();
+        ArrayList<Integer> data = new ArrayList<Integer>();
+        int mx = 0;
+        int my = 0;
+        int mz = 0;
+        for (Map.Entry<BlockPos, BlockState> e : b.m.entrySet()) {
+            BlockState s = e.getValue();
+            Integer i = idx.get(s);
+            if (i == null) {
+                i = pal.size();
+                idx.put(s, i);
+                pal.add(NbtUtils.writeBlockState(s));
+            }
+            BlockPos p = e.getKey();
+            data.add(p.getX());
+            data.add(p.getY());
+            data.add(p.getZ());
+            data.add(i);
+            mx = Math.max(mx, p.getX());
+            my = Math.max(my, p.getY());
+            mz = Math.max(mz, p.getZ());
+        }
+        t.put("pal", pal);
+        t.putIntArray("b", data);
+        t.putInt("n", b.m.size());
+        t.putInt("sx", mx + 1);
+        t.putInt("sy", my + 1);
+        t.putInt("sz", mz + 1);
+        // se construye alejándose de vos, con la entrada de tu lado
+        t.putInt("f", Direction.SOUTH.get2DDataValue());
+        it.setHoverName(Component.literal("Plano: " + PREFAB[k]));
+        return it;
     }
 
     static Direction dir(int v) {

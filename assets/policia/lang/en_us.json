@@ -1,1 +1,25 @@
-{"item.policia.escudo_policial": "Ballistic Shield", "item.policia.placa_policia": "Police Badge", "item.policia.balde_albanil": "Mason Bucket", "item.policia.guante_ladron": "Thief glove", "item.policia.chaleco_antibalas": "Chaleco antibalas", "item.policia.habilidad_unica": "Habilidad de un solo uso", "entity.policia.jefe_oficio": "Jefe de oficio", "item.policia.plano_albanil": "Mason Blueprint"}
+{
+ "item.policia.escudo_policial": "Ballistic Shield",
+ "item.policia.placa_policia": "Police Badge",
+ "item.policia.balde_albanil": "Mason's Bucket",
+ "item.policia.guante_ladron": "Thief's Glove",
+ "item.policia.chaleco_antibalas": "Bulletproof Vest",
+ "item.policia.habilidad_unica": "Single-Use Skill",
+ "item.policia.plano_albanil": "Mason's Blueprint",
+ "item.policia.martillo_herrero": "Legendary Blacksmith's Hammer",
+ "entity.policia.jefe_oficio": "Guild Boss",
+ "entity.policia.agente": "Officer",
+ "entity.policia.ayudante": "Helper",
+ "entity.policia.bandido": "Bandit",
+ "entity.policia.burbuja": "Bubble Shield",
+ "entity.policia.comisario": "Commissioner",
+ "entity.policia.dron": "Surveillance Drone",
+ "entity.policia.furgoneta": "Van",
+ "entity.policia.helicoptero": "Helicopter",
+ "entity.policia.k9": "K9 Dog",
+ "entity.policia.sirena": "Siren Turret",
+ "entity.policia.tanque": "Tank",
+ "entity.policia.tractor": "Tractor",
+ "effect.policia.esposado": "Handcuffed",
+ "itemGroup.policia.oficios": "Jobs"
+}

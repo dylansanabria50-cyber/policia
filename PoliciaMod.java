@@ -164,6 +164,8 @@ public class PoliciaMod {
         PoliciaServicio.init();
         PoliciaGolpe.init();
         PoliciaDado.init();
+        PoliciaRastreo.init();
+        PoliciaPedido.init();
         PoliciaEventos.init();
         PoliciaAnalizador.init();
         PoliciaExtra.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -702,7 +704,7 @@ public class PoliciaMod {
                 "pol_mdone", "pol_bdone", "pol_cerebro", "pol_lsu", "pol_lsi", "pol_lun", "pol_lse",
                 "pol_cin0", "pol_cin2", "pol_comp", "pol_party", "pol_hidearmor",
                 "her_sel", "her_cd0", "her_cd1", "her_cd2", "her_cd3", "her_cd4", "her_cd5", "her_cd6", "her_cd7", "her_cd8",
-                "her_an_known", "her_an_qitem", "her_an_qtype", "her_an_qprog", "her_an_qneed", "her_an_qtarget", "pol_chosen", "jm_id", "jm_prog", "jm_acc", "gh_cd"}) {
+                "her_an_known", "her_an_qitem", "her_an_qtype", "her_an_qprog", "her_an_qneed", "her_an_qtarget", "pol_chosen", "jm_id", "jm_prog", "jm_acc", "gh_cd", "enc_d0", "enc_d1", "enc_d2", "ord_cd", "ord_k", "ord_x", "ord_y", "ord_z", "ord_t", "ord_n", "ord_door", "ord_fence", "ord_gate", "ord_crop", "ord_stone", "ord_light", "ord_ymin", "ord_ymax"}) {
             if (!o.contains(k)) continue;
             n.put(k, o.get(k).copy());
         }

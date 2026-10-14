@@ -270,6 +270,51 @@ public class PoliciaLadron {
         PoliciaLadron.crime(p, 1, door ? "puerta forzada" : "cofre forzado");
     }
 
+    // Categorías de objetos raros. Cada día el Perista paga más por tres.
+    static final String[] RARE = new String[]{"Diamantes", "Oro", "Netherita", "Libros encantados", "Objetos encantados", "Discos de música", "Tótems", "Armaduras de caballo", "Perlas de ender", "Lapislázuli", "Amatistas", "Cabezas"};
+    static final int[] RARE_MUL = new int[]{2, 2, 3};
+
+    static int rareCat(ItemStack s) {
+        String id = BuiltInRegistries.ITEM.getKey(s.getItem()).getPath();
+        if (id.contains("netherite")) return 2;
+        if (id.contains("diamond")) return 0;
+        if (id.equals("enchanted_book")) return 3;
+        if (id.contains("music_disc")) return 5;
+        if (id.contains("totem")) return 6;
+        if (id.contains("horse_armor")) return 7;
+        if (id.contains("ender_pearl") || id.contains("ender_eye")) return 8;
+        if (id.contains("lapis")) return 9;
+        if (id.contains("amethyst")) return 10;
+        if (id.contains("skull") || id.endsWith("_head")) return 11;
+        if (s.isEnchanted()) return 4;
+        if (id.contains("gold")) return 1;
+        return -1;
+    }
+
+    static long day() {
+        net.minecraft.server.MinecraftServer srv = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        return srv == null ? 0L : srv.overworld().getDayTime() / 24000L;
+    }
+
+    // Las tres categorías destacadas de hoy (la última paga x3).
+    static int[] today() {
+        java.util.Random r = new java.util.Random(day() * 7919L + 13L);
+        java.util.List<Integer> l = new java.util.ArrayList<Integer>();
+        for (int i = 0; i < RARE.length; ++i) l.add(i);
+        java.util.Collections.shuffle(l, r);
+        return new int[]{l.get(0), l.get(1), l.get(2)};
+    }
+
+    static int dayMul(ItemStack s) {
+        int c = PoliciaLadron.rareCat(s);
+        if (c < 0) return 1;
+        int[] t = PoliciaLadron.today();
+        for (int i = 0; i < t.length; ++i) {
+            if (t[i] == c) return RARE_MUL[i];
+        }
+        return 1;
+    }
+
     static int price(ItemStack s) {
         int pr;
         String id = BuiltInRegistries.ITEM.getKey(s.getItem()).getPath();
@@ -278,18 +323,30 @@ public class PoliciaLadron {
             base = 20;
         } else if (id.contains("diamond")) {
             base = 10;
-        } else if (id.contains("gold")) {
-            base = 5;
-        } else if (id.contains("iron")) {
-            base = 2;
+        } else if (id.contains("totem")) {
+            base = 15;
         } else if (id.equals("enchanted_book")) {
             base = 8;
+        } else if (id.contains("skull") || id.endsWith("_head")) {
+            base = 8;
+        } else if (id.contains("music_disc") || id.contains("horse_armor")) {
+            base = 6;
+        } else if (id.contains("gold")) {
+            base = 5;
+        } else if (id.contains("ender_pearl") || id.contains("ender_eye")) {
+            base = 3;
+        } else if (id.contains("iron")) {
+            base = 2;
+        } else if (s.getRarity() == net.minecraft.world.item.Rarity.EPIC) {
+            base = 12;
+        } else if (s.getRarity() == net.minecraft.world.item.Rarity.RARE) {
+            base = 6;
         }
-        int n = pr = s.getMaxStackSize() == 1 ? Math.max(3, base * 2) : Math.max(1, Math.max(1, base) * s.getCount() / 8);
+        pr = s.getMaxStackSize() == 1 ? Math.max(3, base * 2) : Math.max(1, Math.max(1, base) * s.getCount() / 8);
         if (s.isEnchanted()) {
             pr += 4;
         }
-        return pr;
+        return pr * PoliciaLadron.dayMul(s);
     }
 
     static void say(ServerPlayer sp, String s) {
