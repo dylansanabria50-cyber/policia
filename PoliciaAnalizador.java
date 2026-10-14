@@ -190,26 +190,57 @@ public class PoliciaAnalizador {
         PoliciaAnalizador.send(p);
     }
 
-    static void startQuest(ServerPlayer p, String itemId) {
-        CompoundTag d = p.getPersistentData();
-        if (PoliciaAnalizador.known(p, itemId) || !d.getString("her_an_qitem").isEmpty()) {
-            return;
-        }
+    // Mision que corresponde a cada item: siempre la misma para el mismo item
+    // (el cliente la usa para mostrarla antes de pedirla). Devuelve
+    // {tipo, objetivo} donde objetivo es una mena, un mob o un material.
+    static String[] questFor(String itemId) {
         int type = Math.abs(itemId.hashCode()) % QUEST_NAMES.length;
         Random r = new Random(itemId.hashCode());
+        String target = "";
+        if (type == 0) {
+            target = BuiltInRegistries.BLOCK.getKey(QUEST_ORES[r.nextInt(QUEST_ORES.length)]).toString();
+        } else if (type == 1) {
+            target = BuiltInRegistries.ENTITY_TYPE.getKey(QUEST_MOBS[r.nextInt(QUEST_MOBS.length)]).toString();
+        } else if (type == 4) {
+            target = BuiltInRegistries.ITEM.getKey(POOL[r.nextInt(POOL.length)]).toString();
+        }
+        return new String[]{String.valueOf(type), target};
+    }
+
+    static void startQuest(ServerPlayer p, String itemId) {
+        CompoundTag d = p.getPersistentData();
+        if (PoliciaAnalizador.known(p, itemId)) {
+            PoliciaMod.msg(p, "Ese item ya esta analizado");
+            return;
+        }
+        String cur = d.getString("her_an_qitem");
+        if (!cur.isEmpty()) {
+            PoliciaMod.msg(p, "Ya tenes una mision de analisis en curso: cancelala en el Analizador (O) para pedir otra");
+            return;
+        }
+        String[] q = PoliciaAnalizador.questFor(itemId);
+        int type = Integer.parseInt(q[0]);
         d.putString("her_an_qitem", itemId);
         d.putInt("her_an_qtype", type);
         d.putInt("her_an_qprog", 0);
         d.putInt("her_an_qneed", QUEST_NEED[type]);
-        if (type == 0) {
-            d.putString("her_an_qtarget", BuiltInRegistries.BLOCK.getKey(QUEST_ORES[r.nextInt(QUEST_ORES.length)]).toString());
-        } else if (type == 1) {
-            d.putString("her_an_qtarget", BuiltInRegistries.ENTITY_TYPE.getKey(QUEST_MOBS[r.nextInt(QUEST_MOBS.length)]).toString());
-        } else {
-            d.putString("her_an_qtarget", "");
-        }
+        d.putString("her_an_qtarget", q[1]);
         d.putInt("her_an_qhp", (int) p.getHealth());
+        d.putDouble("her_an_qx", p.getX());
+        d.putDouble("her_an_qz", p.getZ());
         PoliciaMod.msg(p, "Mision de analisis: " + QUEST_NAMES[type] + " (" + QUEST_NEED[type] + ")");
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1.0f, 1.0f);
+        PoliciaAnalizador.send(p);
+    }
+
+    static void cancelQuest(ServerPlayer p) {
+        CompoundTag d = p.getPersistentData();
+        if (d.getString("her_an_qitem").isEmpty()) {
+            return;
+        }
+        d.putString("her_an_qitem", "");
+        d.putInt("her_an_qprog", 0);
+        PoliciaMod.msg(p, "Mision de analisis cancelada");
         PoliciaAnalizador.send(p);
     }
 
@@ -222,6 +253,9 @@ public class PoliciaAnalizador {
         int prog = Math.min(d.getInt("her_an_qneed"), d.getInt("her_an_qprog") + amount);
         d.putInt("her_an_qprog", prog);
         if (prog >= d.getInt("her_an_qneed")) {
+            if (d.getInt("her_an_qtype") == 4) {
+                PoliciaAnalizador.remove(p.getInventory(), d.getString("her_an_qtarget"), d.getInt("her_an_qneed"));
+            }
             d.putString("her_an_qitem", "");
             PoliciaAnalizador.learn(p, item);
             PoliciaMod.msg(p, "Mision de analisis completa!");
@@ -229,8 +263,27 @@ public class PoliciaAnalizador {
         PoliciaAnalizador.send(p);
     }
 
+    // Igual que questProgress pero solo avisa al cliente cada 20 pasos, para
+    // las misiones que avanzan cada tick.
+    static void questStep(ServerPlayer p, int amount) {
+        CompoundTag d = p.getPersistentData();
+        int before = d.getInt("her_an_qprog");
+        int need = d.getInt("her_an_qneed");
+        int prog = Math.min(need, before + amount);
+        if (prog >= need || prog / 20 != before / 20) {
+            d.putInt("her_an_qprog", before);
+            PoliciaAnalizador.questProgress(p, amount);
+        } else {
+            d.putInt("her_an_qprog", prog);
+        }
+    }
+
     static void act(ServerPlayer p, int kind, String item) {
         if (!PoliciaAnalizador.active(p)) {
+            if (kind != 4) {
+                PoliciaMod.msg(p, "El Analizador del Forjador se desbloquea con " + PoliciaHerrero.ANALIZADOR_XP + " XP siendo herrero");
+            }
+            PoliciaAnalizador.send(p);
             return;
         }
         CompoundTag d = p.getPersistentData();
@@ -241,6 +294,10 @@ public class PoliciaAnalizador {
         }
         if (kind == 0) {
             PoliciaAnalizador.startQuest(p, item);
+            return;
+        }
+        if (kind == 5) {
+            PoliciaAnalizador.cancelQuest(p);
             return;
         }
         if (kind == 1) {
@@ -283,6 +340,7 @@ public class PoliciaAnalizador {
             }
             p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.8f, 1.1f);
             PoliciaMod.msg(p, "Crafteado: " + out.getHoverName().getString());
+            PoliciaAnalizador.send(p);
         }
     }
 
@@ -372,25 +430,32 @@ public class PoliciaAnalizador {
                 double dx = p.getX() - d.getDouble("her_an_qx");
                 double dz = p.getZ() - d.getDouble("her_an_qz");
                 double dist = Math.sqrt(dx * dx + dz * dz);
-                if (dist > 0.01) {
-                    PoliciaAnalizador.questProgress(p, (int) dist);
+                // Cuenta bloques enteros recorridos; el resto queda para
+                // el siguiente tick (asi no se pierde distancia ni se
+                // completa de golpe si el punto de partida era 0,0).
+                if (dist >= 1.0 && dist < 50.0) {
+                    PoliciaAnalizador.questStep(p, (int) dist);
+                    d.putDouble("her_an_qx", p.getX());
+                    d.putDouble("her_an_qz", p.getZ());
+                } else if (dist >= 50.0) {
+                    d.putDouble("her_an_qx", p.getX());
+                    d.putDouble("her_an_qz", p.getZ());
                 }
-                d.putDouble("her_an_qx", p.getX());
-                d.putDouble("her_an_qz", p.getZ());
             } else if (type == 3) {
                 if (p.getHealth() < d.getInt("her_an_qhp")) {
                     d.putInt("her_an_qprog", 0);
                 }
                 d.putInt("her_an_qhp", (int) p.getHealth());
-                PoliciaAnalizador.questProgress(p, 1);
+                PoliciaAnalizador.questStep(p, 1);
             } else if (type == 7) {
                 if (p.isUnderWater()) {
-                    PoliciaAnalizador.questProgress(p, 1);
+                    PoliciaAnalizador.questStep(p, 1);
                 }
-            } else if (type == 4) {
-                int have = PoliciaAnalizador.count(p.getInventory(), qi);
-                d.putInt("her_an_qprog", Math.min(d.getInt("her_an_qneed"), have));
-                if (have >= d.getInt("her_an_qneed")) {
+            } else if (type == 4 && p.tickCount % 10 == 0) {
+                int have = PoliciaAnalizador.count(p.getInventory(), d.getString("her_an_qtarget"));
+                int need = d.getInt("her_an_qneed");
+                if (Math.min(need, have) != d.getInt("her_an_qprog")) {
+                    d.putInt("her_an_qprog", Math.min(need, have));
                     PoliciaAnalizador.questProgress(p, 0);
                 }
             }
@@ -482,6 +547,13 @@ public class PoliciaAnalizador {
                 m.known.add(b.readUtf());
             }
             m.recipeBlob = new StringBuilder(b.readUtf());
+            for (String entry : m.recipeBlob.toString().split(";")) {
+                String head = entry.split(",")[0];
+                int c = head.lastIndexOf(':');
+                if (c > 0 && head.substring(c + 1).equals("1")) {
+                    m.confirmed.add(head.substring(0, c));
+                }
+            }
             m.questItem = b.readUtf();
             m.questType = b.readVarInt();
             m.questProg = b.readVarInt();

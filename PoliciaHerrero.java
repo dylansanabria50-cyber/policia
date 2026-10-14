@@ -226,11 +226,6 @@ public class PoliciaHerrero {
                     PoliciaMod.msg(p, "Reparacion Maestra: necesitas una herramienta o arma danada en la mano");
                     return;
                 }
-                if (PoliciaMod.xp((Player) p) < 15) {
-                    PoliciaMod.msg(p, "Necesitas 15 XP para Reparacion Maestra");
-                    return;
-                }
-                d.putInt("pol_xp", PoliciaMod.xp((Player) p) - 15);
                 it.setDamageValue(0);
                 d.putInt("her_rep_t", 1);
                 PoliciaMod.msg(p, "Reparacion Maestra: equipo como nuevo");

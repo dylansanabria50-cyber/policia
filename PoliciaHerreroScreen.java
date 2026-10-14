@@ -10,10 +10,6 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.ItemLike;
 
 // Pantalla de habilidades del Herrero Legendario (se abre con el boton del
 // inventario, igual que la de los otros oficios) y su HUD de arriba a la
@@ -22,10 +18,50 @@ import net.minecraft.world.level.ItemLike;
 public class PoliciaHerreroScreen extends Screen {
     static final int PW = 460;
     static final int PH = 340;
-    static final Item[] ICON = new Item[]{
-            Items.GOAT_HORN, Items.ANVIL, Items.SPECTRAL_ARROW, Items.GOLDEN_APPLE, Items.CAMPFIRE,
-            Items.CHAIN, Items.SMITHING_TABLE, Items.SHIELD, Items.SPYGLASS
+
+    // Iconos dibujados a mano (16x16), uno por habilidad, como los del
+    // arbol de policia. Cada fila es {x, y, ancho, alto, color}.
+    static final int SKIN = 0xFFC68642, DARK = 0xFF2A2A2E, GRAY = 0xFF8A8A92, GRAY_L = 0xFFB8B8C0, GRAY_D = 0xFF55555D;
+    static final int WOOD = 0xFF6B4423, WOOD_L = 0xFF8B5A2B, FIRE = 0xFFFF8C1A, FIRE_L = 0xFFFFB347, YEL = 0xFFFFE066;
+    static final int[][][] ICONS = new int[][][]{
+            // 0 Grito del Forjador: cabeza con la boca abierta y ondas de sonido
+            {{1, 2, 7, 2, 0xFF4A2F1B}, {1, 3, 7, 8, SKIN}, {5, 5, 1, 1, DARK}, {5, 8, 3, 3, 0xFF6B0F0F}, {1, 11, 5, 3, 0xFF5A3A22},
+             {9, 6, 1, 4, YEL}, {11, 4, 1, 8, YEL}, {13, 2, 1, 12, 0xFFFFF4C2}},
+            // 1 Yunque Portatil: yunque con flecha (se lleva y se planta)
+            {{0, 5, 3, 1, GRAY}, {1, 4, 11, 3, GRAY}, {1, 4, 11, 1, GRAY_L}, {4, 7, 5, 3, GRAY_D}, {2, 10, 9, 3, GRAY}, {2, 12, 9, 1, DARK},
+             {13, 0, 2, 6, 0xFF4CC84C}, {12, 1, 4, 1, 0xFF4CC84C}, {11, 2, 6, 1, 0xFF4CC84C}},
+            // 2 Marca del Herrero: mira roja
+            {{3, 3, 10, 1, 0xFFE03030}, {3, 12, 10, 1, 0xFFE03030}, {3, 3, 1, 10, 0xFFE03030}, {12, 3, 1, 10, 0xFFE03030},
+             {7, 0, 2, 3, 0xFFE03030}, {7, 13, 2, 3, 0xFFE03030}, {0, 7, 3, 2, 0xFFE03030}, {13, 7, 3, 2, 0xFFE03030}, {7, 7, 2, 2, 0xFFFF6060}},
+            // 3 Forja Interior: corazon con una llama adentro
+            {{3, 3, 3, 1, 0xFFD92B2B}, {10, 3, 3, 1, 0xFFD92B2B}, {2, 4, 12, 3, 0xFFD92B2B}, {3, 7, 10, 1, 0xFFD92B2B}, {4, 8, 8, 1, 0xFFD92B2B},
+             {5, 9, 6, 1, 0xFFD92B2B}, {6, 10, 4, 1, 0xFFD92B2B}, {7, 11, 2, 1, 0xFFD92B2B}, {3, 4, 2, 1, 0xFFFF8080},
+             {7, 5, 2, 4, FIRE}, {7, 4, 1, 1, YEL}, {7, 7, 2, 1, YEL}},
+            // 4 Faro de Forja: fogata
+            {{1, 13, 14, 2, WOOD}, {3, 11, 10, 2, WOOD_L}, {5, 5, 6, 6, FIRE}, {6, 3, 4, 3, FIRE_L}, {7, 1, 2, 2, YEL}, {7, 7, 2, 4, YEL},
+             {2, 4, 1, 1, YEL}, {13, 3, 1, 1, YEL}},
+            // 5 Vinculo de Acero: dos eslabones de cadena enganchados
+            {{1, 2, 8, 2, GRAY}, {1, 6, 8, 2, GRAY_D}, {1, 2, 2, 6, GRAY}, {7, 2, 2, 6, GRAY_D}, {1, 2, 8, 1, GRAY_L},
+             {6, 6, 8, 2, GRAY}, {6, 11, 8, 2, GRAY_D}, {6, 6, 2, 7, GRAY}, {12, 6, 2, 7, GRAY_D}, {6, 6, 8, 1, GRAY_L},
+             {7, 5, 2, 3, GRAY_D}},
+            // 6 Reparacion Maestra: martillo golpeando el yunque, con chispas
+            {{2, 11, 12, 2, GRAY}, {2, 11, 12, 1, GRAY_L}, {6, 13, 4, 1, GRAY_D}, {4, 14, 8, 2, GRAY},
+             {8, 1, 6, 3, GRAY_D}, {8, 1, 6, 1, GRAY_L}, {7, 4, 2, 2, WOOD_L}, {6, 6, 2, 2, WOOD_L}, {5, 8, 2, 2, WOOD},
+             {11, 7, 1, 1, YEL}, {13, 9, 1, 1, YEL}, {12, 6, 1, 1, FIRE_L}, {2, 8, 1, 1, YEL}, {3, 6, 1, 1, FIRE_L}},
+            // 7 Yunque Guardian: escudo con un yunque
+            {{2, 1, 12, 9, 0xFF4A6FA5}, {3, 10, 10, 2, 0xFF4A6FA5}, {5, 12, 6, 2, 0xFF4A6FA5}, {7, 14, 2, 1, 0xFF4A6FA5}, {2, 1, 12, 1, 0xFF8FB3E0},
+             {2, 1, 1, 9, 0xFF8FB3E0}, {4, 4, 8, 2, GRAY_L}, {6, 6, 4, 2, GRAY}, {5, 8, 6, 2, GRAY}},
+            // 8 Analizador del Forjador: lupa
+            {{4, 1, 5, 2, 0xFFD4AF37}, {4, 8, 5, 2, 0xFFD4AF37}, {2, 3, 2, 5, 0xFFD4AF37}, {9, 3, 2, 5, 0xFFD4AF37}, {4, 3, 5, 5, 0xFF9FD8F0},
+             {5, 4, 1, 1, 0xFFFFFFFF}, {10, 9, 2, 2, 0xFF5A3A22}, {11, 10, 2, 2, 0xFF5A3A22}, {12, 11, 2, 2, 0xFF5A3A22}, {13, 12, 2, 2, 0xFF5A3A22}}
     };
+
+    static void drawIcon(GuiGraphics g, int i, int x, int y) {
+        for (int[] r : ICONS[i]) {
+            g.fill(x + r[0], y + r[1], x + r[0] + r[2], y + r[1] + r[3], r[4]);
+        }
+    }
+
     int px;
     int py;
 
@@ -130,7 +166,7 @@ public class PoliciaHerreroScreen extends Screen {
             int border = hover ? -5728 : (chosen ? -1523648 : -9745908);
             g.fill(nx - 1, y - 1, nx + 25, y + 25, border);
             g.fill(nx, y, nx + 24, y + 24, op ? -3632612 : -7707118);
-            g.renderItem(new ItemStack((ItemLike) ICON[i]), nx + 4, y + 4);
+            PoliciaHerreroScreen.drawIcon(g, i, nx + 4, y + 4);
             if (!op) {
                 g.fill(nx, y, nx + 24, y + 24, 0x77000000);
             }
