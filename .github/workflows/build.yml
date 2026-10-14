@@ -38,6 +38,7 @@ jobs:
       # sin tener que iniciar sesion en GitHub).
       - name: Publicar log
         if: always()
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -45,22 +46,26 @@ jobs:
           echo "resultado: ${{ steps.compilar.outcome }}" >> build-log.txt
           echo "----" >> build-log.txt
           cat build.log >> build-log.txt 2>/dev/null || true
-          gh release view ultima-log >/dev/null 2>&1 || gh release create ultima-log --title "Log de la ultima compilacion" --notes "Se actualiza en cada push." --prerelease --target "${GITHUB_SHA}"
-          gh release upload ultima-log build-log.txt --clobber
+          for i in 1 2 3 4 5; do
+            gh release view ultima-log >/dev/null 2>&1 || gh release create ultima-log --title "Log de la ultima compilacion" --notes "Se actualiza en cada push." --prerelease --target "${GITHUB_SHA}" || true
+            gh release upload ultima-log build-log.txt --clobber && break
+            sleep 5
+          done
 
       - name: Publicar jar
-        if: success()
+        if: steps.compilar.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete ultima --yes --cleanup-tag || true
+          sleep 3
           gh release create ultima build/libs/policia-1.0.0.jar \
             --title "Ultima version compilada" \
             --notes "Compilado automaticamente desde ${GITHUB_SHA}. Descarga policia-1.0.0.jar y ponelo en la carpeta mods (Forge 1.20.1)." \
             --target "${GITHUB_SHA}" --latest
 
       - uses: actions/upload-artifact@v4
-        if: success()
+        if: steps.compilar.outcome == 'success'
         with:
           name: policia-jar
           path: build/libs/policia-1.0.0.jar
