@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -113,7 +114,7 @@ public class PoliciaPedido {
         if (e.getLevel().isClientSide || e.getHand() != InteractionHand.MAIN_HAND || !(e.getEntity() instanceof ServerPlayer p) || !(e.getTarget() instanceof Villager v)) {
             return;
         }
-        if (!p.isShiftKeyDown() || !"albanil".equals(PoliciaMod.job(p)) || v.isBaby()) {
+        if (!p.isShiftKeyDown() || !"albanil".equals(PoliciaMod.job(p)) || v.isBaby() || v.getPersistentData().hasUUID("insp_for") || v.getPersistentData().hasUUID("ev_for")) {
             return;
         }
         e.setCanceled(true);
@@ -147,8 +148,13 @@ public class PoliciaPedido {
                 }
             }
         }
+        c.setItem(22, PoliciaPedido.reformCard(sp, v));
         PoliciaBoss.openMenu3(sp, "Pedidos del aldeano", c, (p, slot) -> {
             CompoundTag dd = p.getPersistentData();
+            if (slot == 22) {
+                PoliciaPedido.reformClick(p, v);
+                return;
+            }
             int kk = dd.getInt("ord_k");
             if (kk > 0) {
                 if (slot == 15) {
@@ -166,7 +172,7 @@ public class PoliciaPedido {
                     PoliciaPedido.clear(dd);
                     dd.putLong("ord_cd", p.serverLevel().getGameTime() + 2400L);
                     dd.putInt("pol_xp", PoliciaMod.xp(p) + XP[kk]);
-                    PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, EM[kk]));
+                    PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, PoliciaEstacion.scale(p.serverLevel(), "albanil", EM[kk])));
                     p.level().playSound(null, v.getX(), v.getY(), v.getZ(), SoundEvents.VILLAGER_CELEBRATE, SoundSource.NEUTRAL, 1.0f, 1.0f);
                     p.sendSystemMessage(Component.literal("§a<Aldeano> ¡Quedó hermoso! Acá tenés " + EM[kk] + " esmeraldas. (+" + XP[kk] + " XP)"));
                     PoliciaMod.sync(p);
@@ -193,12 +199,98 @@ public class PoliciaPedido {
         });
     }
 
+    // ---------------- Reforma de la casa de un aldeano ----------------
+    static final int REF_NEED = 40;
+    static final int REF_R = 8;
+
+    static BlockPos bed(Villager v) {
+        return v.getBrain().getMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.HOME).map(gp -> gp.pos()).orElse(null);
+    }
+
+    static ItemStack reformCard(ServerPlayer p, Villager v) {
+        CompoundTag d = p.getPersistentData();
+        if (d.hasUUID("ref_v")) {
+            boolean here = d.getUUID("ref_v").equals(v.getUUID());
+            int n = d.getInt("ref_n");
+            if (!here) {
+                return PoliciaBoss.named(Items.OAK_STAIRS, "Reforma en curso", "Estás reformando la casa de otro aldeano", "Clic: abandonar esa reforma");
+            }
+            return n >= REF_NEED ? PoliciaBoss.named(Items.EMERALD, "¡Mostrarle la reforma!", "Sube de nivel en su próximo intercambio", "y te hace descuento para siempre")
+                    : PoliciaBoss.named(Items.CLOCK, "Reformando su casa", "Bloques colocados cerca de su cama: " + n + "/" + REF_NEED, "Tiempo: " + d.getInt("ref_t") / 1200 + " min");
+        }
+        if (PoliciaPedido.bed(v) == null) {
+            return PoliciaBoss.named(Items.BARRIER, "Reformar su casa", "Este aldeano no tiene casa (cama)");
+        }
+        if (v.getPersistentData().getBoolean("ref_done")) {
+            return PoliciaBoss.named(Items.LIME_DYE, "Casa ya reformada", "Este aldeano ya tiene su casa nueva");
+        }
+        return PoliciaBoss.named(Items.OAK_STAIRS, "Reformar su casa", "Colocá " + REF_NEED + " bloques a menos de " + REF_R + " de su cama", "Premio: sube de nivel, descuentos para siempre,", "6 esmeraldas y 6 XP", "Clic para aceptar");
+    }
+
+    static void reformClick(ServerPlayer p, Villager v) {
+        p.closeContainer();
+        CompoundTag d = p.getPersistentData();
+        if (d.hasUUID("ref_v")) {
+            if (!d.getUUID("ref_v").equals(v.getUUID())) {
+                PoliciaPedido.reformClear(d);
+                PoliciaMod.msg(p, "Abandonaste la otra reforma");
+                return;
+            }
+            if (d.getInt("ref_n") < REF_NEED) {
+                PoliciaMod.msg(p, "Todavía falta: " + d.getInt("ref_n") + "/" + REF_NEED + " bloques cerca de su cama");
+                return;
+            }
+            PoliciaPedido.reformClear(d);
+            v.getPersistentData().putBoolean("ref_done", true);
+            v.getGossips().add(p.getUUID(), net.minecraft.world.entity.ai.gossip.GossipType.MAJOR_POSITIVE, 20);
+            int lv = v.getVillagerData().getLevel();
+            if (lv < 5) {
+                int[] need = new int[]{0, 10, 70, 150, 250};
+                v.setVillagerXp(Math.max(v.getVillagerXp(), need[lv]));
+            }
+            ServerLevel sl = p.serverLevel();
+            int em = PoliciaEstacion.scale(sl, "albanil", 6);
+            PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, em));
+            d.putInt("pol_xp", PoliciaMod.xp(p) + 6);
+            sl.playSound(null, v.getX(), v.getY(), v.getZ(), SoundEvents.VILLAGER_CELEBRATE, SoundSource.NEUTRAL, 1.0f, 1.0f);
+            sl.sendParticles(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, v.getX(), v.getY() + 1.5, v.getZ(), 15, 0.4, 0.4, 0.4, 0.0);
+            p.sendSystemMessage(Component.literal("§a<Aldeano> ¡Mi casa quedó preciosa! Desde ahora te hago descuento, y en mi próximo intercambio subo de nivel. (+" + em + " esmeraldas, +6 XP)"));
+            PoliciaDiario.add(sl, "El albañil " + p.getName().getString() + " reformó la casa de un aldeano");
+            PoliciaMod.sync(p);
+            return;
+        }
+        BlockPos b = PoliciaPedido.bed(v);
+        if (b == null || v.getPersistentData().getBoolean("ref_done")) {
+            return;
+        }
+        d.putUUID("ref_v", v.getUUID());
+        d.putLong("ref_b", b.asLong());
+        d.putInt("ref_n", 0);
+        d.putInt("ref_t", 12000);
+        p.sendSystemMessage(Component.literal("§6<Aldeano> ¡Gracias! Mi cama está en " + b.getX() + ", " + b.getY() + ", " + b.getZ() + ". Agrandá y mejorá la casa (" + REF_NEED + " bloques). Tenés 10 minutos."));
+    }
+
+    static void reformClear(CompoundTag d) {
+        for (String k : new String[]{"ref_v", "ref_b", "ref_n", "ref_t"}) {
+            d.remove(k);
+        }
+    }
+
     @SubscribeEvent
     public void place(BlockEvent.EntityPlaceEvent e) {
         if (!(e.getEntity() instanceof ServerPlayer p)) {
             return;
         }
         CompoundTag d = p.getPersistentData();
+        if (d.hasUUID("ref_v") && BlockPos.of(d.getLong("ref_b")).distSqr(e.getPos()) <= REF_R * REF_R) {
+            int rn = d.getInt("ref_n") + 1;
+            d.putInt("ref_n", rn);
+            if (rn == REF_NEED) {
+                p.sendSystemMessage(Component.literal("§a¡Reforma terminada! Agachate y hablale al aldeano para mostrársela."));
+            } else if (rn % 10 == 0) {
+                PoliciaMod.msg(p, "Reforma: " + rn + "/" + REF_NEED);
+            }
+        }
         int k = d.getInt("ord_k");
         if (k == 0) {
             return;
@@ -240,6 +332,14 @@ public class PoliciaPedido {
             return;
         }
         CompoundTag d = p.getPersistentData();
+        if (d.hasUUID("ref_v")) {
+            int rt = d.getInt("ref_t") - 20;
+            d.putInt("ref_t", rt);
+            if (rt <= 0) {
+                PoliciaPedido.reformClear(d);
+                PoliciaMod.msg(p, "§cSe venció el plazo de la reforma");
+            }
+        }
         if (d.getInt("ord_k") == 0) {
             return;
         }

@@ -112,6 +112,7 @@ public class PoliciaBoss {
         out.accept((ItemLike) PoliciaPlaca.MARTILLO.get());
         out.accept((ItemLike) PoliciaPlano.PLANO.get());
         out.accept((ItemLike) PoliciaPatrullero.KEY.get());
+        out.accept((ItemLike) PoliciaDemolicion.DINAMITA.get());
         out.accept((ItemLike) PoliciaShield.SHIELD.get());
         out.accept((ItemLike) VEST.get());
         for (String[] x : sk = new String[][]{{"refuerzo", "Refuerzo"}, {"k9", "Perro K9"}, {"esposas", "Esposas"}, {"sirena", "Sirena y torreta"}, {"dron", "Dron de vigilancia"}, {"burbuja", "Escudo de burbuja"}, {"pico", "Pico de albañil"}, {"muro", "Muro"}, {"refugio", "Refugio"}, {"silbido", "Silbido"}}) {
@@ -523,6 +524,7 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.SCAFFOLDING, 8), 5));
             l.add(new Entry(new ItemStack((ItemLike) Items.STONE_PICKAXE), 3));
             l.add(new Entry(new ItemStack((ItemLike) PoliciaPlano.PLANO.get()), 3));
+            l.add(new Entry(new ItemStack((ItemLike) PoliciaDemolicion.DINAMITA.get(), 2), 3));
             for (int pk = 0; pk < PoliciaPlano.PREFAB.length; ++pk) {
                 l.add(new Entry(PoliciaPlano.prefab(pk), PoliciaPlano.PREFAB_PRICE[pk]));
             }

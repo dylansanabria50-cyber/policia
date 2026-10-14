@@ -152,6 +152,8 @@ public class PoliciaMod {
         PoliciaPlano.init();
         PoliciaPatrullero.init();
         PoliciaDiario.init();
+        PoliciaDemolicion.init();
+        PoliciaInspector.init();
         PoliciaSonido.init(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaLadron.init();
         PoliciaBoss.init();

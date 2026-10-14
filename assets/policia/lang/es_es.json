@@ -24,5 +24,6 @@
  "itemGroup.policia.oficios": "Oficios",
  "item.policia.llave_patrullero": "Llave del patrullero",
  "entity.policia.patrullero": "Patrullero",
- "policia.subtitle.sirena": "Sirena de policía"
+ "policia.subtitle.sirena": "Sirena de policía",
+ "item.policia.dinamita_albanil": "Dinamita de demolición"
 }

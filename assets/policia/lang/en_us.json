@@ -24,5 +24,6 @@
  "itemGroup.policia.oficios": "Jobs",
  "item.policia.llave_patrullero": "Patrol Car Key",
  "entity.policia.patrullero": "Patrol Car",
- "policia.subtitle.sirena": "Police siren"
+ "policia.subtitle.sirena": "Police siren",
+ "item.policia.dinamita_albanil": "Demolition Dynamite"
 }
