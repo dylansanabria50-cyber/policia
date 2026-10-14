@@ -328,6 +328,13 @@ public class PoliciaTractor {
 
         @Override
         public void positionRider(Entity e, Entity.MoveFunction cb) {
+            if (!this.hasPassenger(e)) {
+                return;
+            }
+            // asiento de la cabina: un poco detrás del centro
+            double rad = Math.toRadians(this.getYRot());
+            double back = -0.25;
+            cb.accept(e, this.getX() - Math.sin(rad) * back, this.getY() + this.getPassengersRidingOffset() + e.getMyRidingOffset(), this.getZ() + Math.cos(rad) * back);
         }
 
         @Override

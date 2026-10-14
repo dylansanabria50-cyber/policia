@@ -216,6 +216,7 @@ public class PoliciaHeli {
 
         @Override
         public void positionRider(Entity e, Entity.MoveFunction cb) {
+            super.positionRider(e, cb);
         }
 
         @Override

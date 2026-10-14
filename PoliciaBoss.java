@@ -847,7 +847,7 @@ public class PoliciaBoss {
 
         @Override
         public boolean shouldRenderAtSqrDistance(double d) {
-            return false;
+            return d < 16384.0;
         }
 
         @Override
