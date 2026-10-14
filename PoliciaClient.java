@@ -338,6 +338,7 @@ public class PoliciaClient {
     static void overlays(RegisterGuiOverlaysEvent e) {
         e.registerAboveAll("policia", PoliciaClient::hud);
         e.registerAboveAll("policia_forja", PoliciaHerreroAnim::forgeHud);
+        e.registerAboveAll("policia_dado", PoliciaDadoScreen::hud);
     }
 
     static void screenInit(ScreenEvent.Init.Post e) {

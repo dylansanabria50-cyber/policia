@@ -163,6 +163,7 @@ public class PoliciaMod {
         PoliciaPasivas.init();
         PoliciaServicio.init();
         PoliciaGolpe.init();
+        PoliciaDado.init();
         PoliciaEventos.init();
         PoliciaAnalizador.init();
         PoliciaExtra.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());

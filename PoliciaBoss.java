@@ -256,7 +256,7 @@ public class PoliciaBoss {
                     return PoliciaBoss.tmpSkill(p, "pol_tmp_pick", 1200, "Carterismo maestro: tu próximo carterismo en 60 s sale sí o sí");
                 }
                 case "l_suerte": {
-                    return PoliciaBoss.tmpSkill(p, "pol_tmp_luck", 1200, "Suerte máxima (55%) durante 60 s");
+                    return PoliciaBoss.tmpSkill(p, "pol_tmp_luck", 1200, "Suerte máxima durante 60 s: el dado se inclina al 6");
                 }
                 case "l_ganzua": {
                     return PoliciaBoss.tmpSkill(p, "pol_tmp_lock", 1200, "Ganzúa: podés forzar cerraduras (agachado + clic derecho) durante 60 s");
@@ -526,7 +526,7 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.GUNPOWDER, 8), 3));
             l.add(new Entry(PoliciaBoss.single("silbido", "Silbido"), 8));
             l.add(new Entry(PoliciaBoss.single("l_carterismo", "Carterismo maestro", "Tu próximo carterismo en 60 s no falla"), 6));
-            l.add(new Entry(PoliciaBoss.single("l_suerte", "Suerte", "60 s con la suerte al máximo (55%)"), 10));
+            l.add(new Entry(PoliciaBoss.single("l_suerte", "Suerte", "60 s con la Suerte al máximo (dado inclinado al 6)"), 10));
             l.add(new Entry(PoliciaBoss.single("l_humo", "Humo", "Invisible y rápido 8 s, los enemigos te pierden"), 8));
             l.add(new Entry(PoliciaBoss.single("l_salto", "Salto", "Impulso hacia adelante con caída lenta"), 6));
             l.add(new Entry(PoliciaBoss.single("l_instinto", "Instinto", "Los seres cercanos brillan 10 s"), 8));

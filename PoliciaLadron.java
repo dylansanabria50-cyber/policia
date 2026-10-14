@@ -189,7 +189,7 @@ public class PoliciaLadron {
         if (id == 80) {
             int lv = PoliciaLadron.luck(p);
             if (lv >= 4) {
-                PoliciaMod.msg(p, "Suerte ya está al nivel máximo (" + CHANCE[4] + "%)");
+                PoliciaMod.msg(p, "Suerte ya está al nivel máximo");
                 return;
             }
             int cost = 10 * (lv + 1);
@@ -199,7 +199,7 @@ public class PoliciaLadron {
             }
             d.putInt("pol_xp", PoliciaMod.xp(p) - cost);
             d.putInt("pol_lsu", lv + 1);
-            PoliciaMod.msg(p, "Suerte " + (lv + 1) + ": carterismo al " + CHANCE[lv + 1] + "%");
+            PoliciaMod.msg(p, "Suerte " + (lv + 1) + ": +" + (lv + 1) * 7 + "% de que el dado caiga en 6");
             p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.8f, 1.4f);
             PoliciaMod.sync(p);
             return;
@@ -512,10 +512,18 @@ public class PoliciaLadron {
         if (p.distanceToSqr((Entity) t) > 9.0) {
             return;
         }
+        if (PoliciaDado.PENDING.containsKey(p.getUUID())) {
+            return;
+        }
         boolean sure = p.getPersistentData().getInt("pol_tmp_pick") > 0;
-        int chance = sure ? 100 : CHANCE[PoliciaLadron.luck(p)];
-        if (p.getRandom().nextInt(100) >= chance) {
-            PoliciaMod.msg(p, "Te descubrieron! (" + chance + "% de éxito)");
+        PoliciaDado.roll(p, t, sure, PoliciaLadron.luck(p));
+    }
+
+    // Resultado del dado del carterismo (6 = robo, 1-4 = te descubren).
+    static void pickResult(ServerPlayer p, LivingEntity t, boolean ok, boolean sure, int last) {
+        ServerLevel sl = p.serverLevel();
+        if (!ok) {
+            PoliciaMod.msg(p, "¡Sacaste un " + last + "! Te descubrieron");
             if (t instanceof AbstractVillager) {
                 PoliciaLadron.crime(p, 1, "te vieron");
             }
@@ -549,7 +557,7 @@ public class PoliciaLadron {
             p.openMenu((MenuProvider) new SimpleMenuProvider((id, inv, pl) -> new ChestMenu(MenuType.GENERIC_9x3, id, inv, (Container) c, 3), (Component) title));
         }
         p.getPersistentData().putInt("pol_xp", PoliciaMod.xp(p) + 2);
-        PoliciaMod.msg(p, "Carterismo exitoso (" + chance + "%)");
+        PoliciaMod.msg(p, "¡Sacaste un 6! Carterismo exitoso");
         if (PoliciaMod.on(p) && p.getRandom().nextInt(100) < 30) {
             // Pasiva Mano rapida.
             PoliciaBoss.give(p, new ItemStack(Items.EMERALD));
