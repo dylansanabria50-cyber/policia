@@ -149,6 +149,7 @@ public class PoliciaMod {
         PoliciaExtra.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaHeli.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaPlaca.init();
+        PoliciaPlano.init();
         PoliciaLadron.init();
         PoliciaBoss.init();
         PoliciaStruct.init();

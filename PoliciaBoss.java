@@ -110,6 +110,7 @@ public class PoliciaBoss {
         out.accept((ItemLike) PoliciaPlaca.BALDE.get());
         out.accept((ItemLike) PoliciaPlaca.GUANTE.get());
         out.accept((ItemLike) PoliciaPlaca.MARTILLO.get());
+        out.accept((ItemLike) PoliciaPlano.PLANO.get());
         out.accept((ItemLike) PoliciaShield.SHIELD.get());
         out.accept((ItemLike) VEST.get());
         for (String[] x : sk = new String[][]{{"refuerzo", "Refuerzo"}, {"k9", "Perro K9"}, {"esposas", "Esposas"}, {"sirena", "Sirena y torreta"}, {"dron", "Dron de vigilancia"}, {"burbuja", "Escudo de burbuja"}, {"pico", "Pico de albanil"}, {"muro", "Muro"}, {"refugio", "Refugio"}, {"silbido", "Silbido"}}) {
@@ -511,6 +512,7 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.SAND, 64), 4));
             l.add(new Entry(new ItemStack((ItemLike) Items.SCAFFOLDING, 8), 5));
             l.add(new Entry(new ItemStack((ItemLike) Items.STONE_PICKAXE), 3));
+            l.add(new Entry(new ItemStack((ItemLike) PoliciaPlano.PLANO.get()), 3));
             l.add(new Entry(PoliciaBoss.single("pico", "Pico de albanil"), 8));
             l.add(new Entry(PoliciaBoss.single("muro", "Muro"), 6));
             l.add(new Entry(PoliciaBoss.single("refugio", "Refugio"), 14));
