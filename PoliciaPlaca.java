@@ -49,14 +49,8 @@ public class PoliciaPlaca {
                     PoliciaMod.msg(sp, cur.equals(this.job) ? "Ya eres " + this.label + ": la placa no sirve de nada" : "Ya tienes un oficio (" + cur + "): solo se puede tener uno");
                     return InteractionResultHolder.fail(st);
                 }
-                sp.getPersistentData().putString("pol_job", this.job);
                 st.shrink(1);
-                level.playSound(null, sp.getX(), sp.getY(), sp.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0f, 0.8f);
-                level.playSound(null, sp.getX(), sp.getY(), sp.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.5f, 1.6f);
-                sp.serverLevel().sendParticles((ParticleOptions) ParticleTypes.HAPPY_VILLAGER, sp.getX(), sp.getY() + 1.0, sp.getZ(), 24, 0.6, 0.8, 0.6, 0.05);
-                PoliciaMod.msg(sp, "Ahora eres " + this.label + ". " + this.hint);
-                PoliciaMod.sync(sp);
-                PoliciaBook.give(sp, this.job);
+                PoliciaOficio.assign(sp, this.job, this.label, this.hint);
             }
             return InteractionResultHolder.sidedSuccess(st, level.isClientSide);
         }

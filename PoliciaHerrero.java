@@ -287,8 +287,36 @@ public class PoliciaHerrero {
         return p.level().getBlockState(bp).isAir() || p.level().getBlockState(bp).canBeReplaced();
     }
 
+    static final double SHOUT_R = 6.0;
+
+    // Ondas de sonido del Grito: tres anillos que salen del jugador y se
+    // abren hasta el radio donde hace efecto (6 bloques).
+    static void shoutWaves(ServerPlayer p, ServerLevel sl, int t) {
+        CompoundTag d = p.getPersistentData();
+        double cx = d.getDouble("her_grito_x");
+        double cy = d.getDouble("her_grito_y");
+        double cz = d.getDouble("her_grito_z");
+        net.minecraft.core.particles.DustParticleOptions dust = new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(1.0f, 0.78f, 0.35f), 1.3f);
+        net.minecraft.core.particles.DustParticleOptions edge = new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(1.0f, 0.95f, 0.75f), 0.9f);
+        for (int w = 0; w < 3; ++w) {
+            int start = w * 5;
+            if (t < start) continue;
+            double r = Math.min(SHOUT_R, (double) (t - start) * 0.75 + 0.5);
+            if ((double) (t - start) * 0.75 + 0.5 > SHOUT_R + 0.8) continue;
+            int pts = 10 + (int) (r * 9.0);
+            double y = cy + 1.0 - (double) w * 0.35;
+            for (int i = 0; i < pts; ++i) {
+                double a = Math.PI * 2.0 * (double) i / (double) pts;
+                sl.sendParticles(r >= SHOUT_R ? edge : dust, cx + Math.cos(a) * r, y, cz + Math.sin(a) * r, 1, 0.0, 0.0, 0.0, 0.0);
+            }
+        }
+        if (t == 1) {
+            sl.sendParticles((ParticleOptions) ParticleTypes.SONIC_BOOM, cx, cy + 1.0, cz, 1, 0.0, 0.0, 0.0, 0.0);
+        }
+    }
+
     static void forgerShout(ServerPlayer p) {
-        for (LivingEntity m : p.level().getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(6.0), x -> x != p && x.isAlive())) {
+        for (LivingEntity m : p.level().getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(SHOUT_R), x -> x != p && x.isAlive() && x.distanceTo(p) <= SHOUT_R + 0.5)) {
             m.knockback(1.0f, p.getX() - m.getX(), p.getZ() - m.getZ());
             m.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 1, false, false, true));
             if (m instanceof Mob mob && !mob.getMainHandItem().isEmpty()) {
@@ -298,9 +326,12 @@ public class PoliciaHerrero {
             }
         }
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 0.7f, 1.6f);
-        if (p.level() instanceof ServerLevel sl) {
-            sl.sendParticles((ParticleOptions) ParticleTypes.SONIC_BOOM, p.getX(), p.getY() + 1.0, p.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
-        }
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.5f, 1.4f);
+        CompoundTag d = p.getPersistentData();
+        d.putInt("her_grito_t", 1);
+        d.putDouble("her_grito_x", p.getX());
+        d.putDouble("her_grito_y", p.getY());
+        d.putDouble("her_grito_z", p.getZ());
         PoliciaMod.msg(p, "Grito del Forjador!");
     }
 
@@ -342,6 +373,9 @@ public class PoliciaHerrero {
         }
         p.level().setBlockAndUpdate(bp, Blocks.ANVIL.defaultBlockState().setValue(net.minecraft.world.level.block.AnvilBlock.FACING, p.getDirection().getClockWise()));
         d.putInt("her_anvil_t", 800);
+        d.putBoolean("her_anvil_on", true);
+        d.putString("her_anvil_dim", p.serverLevel().dimension().location().toString());
+        ANVILS.add(PoliciaHerrero.anvilKey(d.getString("her_anvil_dim"), bp));
         if (p.level() instanceof ServerLevel sl) {
             sl.sendParticles((ParticleOptions) ParticleTypes.POOF, bp.getX() + 0.5, bp.getY() + 0.2, bp.getZ() + 0.5, 12, 0.3, 0.1, 0.3, 0.03);
         }
@@ -349,16 +383,49 @@ public class PoliciaHerrero {
         PoliciaMod.msg(p, type == 0 ? "Yunque Portatil plantado: mas danio cerca suyo" : "Yunque Guardian plantado: intercepta proyectiles cercanos");
     }
 
+    // Yunques del herrero plantados ahora mismo ("dimension|pos"): no se
+    // pueden romper para llevarselos, desaparecen solos al terminar.
+    static final java.util.Set<String> ANVILS = new java.util.HashSet<String>();
+
+    static String anvilKey(String dim, BlockPos bp) {
+        return dim + "|" + bp.asLong();
+    }
+
     static void removeAnvil(ServerPlayer p) {
         CompoundTag d = p.getPersistentData();
-        if (d.getInt("her_anvil_t") <= 0) {
+        d.putInt("her_anvil_t", 0);
+        if (!d.getBoolean("her_anvil_on")) {
             return;
         }
+        d.putBoolean("her_anvil_on", false);
         BlockPos bp = BlockPos.of(d.getLong("her_anvil_pos"));
-        if (p.level().getBlockState(bp).is(Blocks.ANVIL)) {
-            p.level().setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
+        String dim = d.getString("her_anvil_dim");
+        ANVILS.remove(PoliciaHerrero.anvilKey(dim, bp));
+        ServerLevel lv = null;
+        try {
+            lv = p.server.getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, new net.minecraft.resources.ResourceLocation(dim)));
+        } catch (Exception ignored) {
         }
-        d.putInt("her_anvil_t", 0);
+        if (lv == null) {
+            lv = p.serverLevel();
+        }
+        if (lv.getBlockState(bp).is(net.minecraft.tags.BlockTags.ANVIL)) {
+            lv.setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
+            lv.sendParticles((ParticleOptions) ParticleTypes.POOF, bp.getX() + 0.5, bp.getY() + 0.4, bp.getZ() + 0.5, 12, 0.3, 0.2, 0.3, 0.02);
+        }
+    }
+
+    @SubscribeEvent
+    public void noBreakAnvil(net.minecraftforge.event.level.BlockEvent.BreakEvent e) {
+        if (!(e.getLevel() instanceof ServerLevel sl)) {
+            return;
+        }
+        if (ANVILS.contains(PoliciaHerrero.anvilKey(sl.dimension().location().toString(), e.getPos()))) {
+            e.setCanceled(true);
+            if (e.getPlayer() instanceof ServerPlayer sp) {
+                PoliciaMod.msg(sp, "Es un yunque de herrero: desaparece solo cuando termina la habilidad");
+            }
+        }
     }
 
     static boolean mark(ServerPlayer p) {
@@ -461,12 +528,22 @@ public class PoliciaHerrero {
                 PoliciaMod.msg(p, SKILLS[i] + " lista");
             }
         }
+        int gt = d.getInt("her_grito_t");
+        if (gt > 0) {
+            if (p.level() instanceof ServerLevel gsl) {
+                PoliciaHerrero.shoutWaves(p, gsl, gt);
+            }
+            d.putInt("her_grito_t", gt >= 20 ? 0 : gt + 1);
+        }
         int aw = d.getInt("her_anvil_wait");
         if (aw > 0) {
             d.putInt("her_anvil_wait", --aw);
             if (aw == 0) {
                 PoliciaHerrero.plantAnvil(p);
             }
+        }
+        if (d.getBoolean("her_anvil_on") && d.getInt("her_anvil_t") <= 0) {
+            PoliciaHerrero.removeAnvil(p);
         }
         int at = d.getInt("her_anvil_t");
         if (at > 0) {

@@ -603,6 +603,10 @@ public class PoliciaClient {
             MORPH.clear();
             return;
         }
+        if (PoliciaOficioScreen.pending && mc.screen == null && mc.level != null) {
+            PoliciaOficioScreen.pending = false;
+            mc.setScreen(new PoliciaOficioScreen());
+        }
         PoliciaClient.applySkin(mc);
         boolean bl = free = mc.screen == null;
         while (K_FORM.consumeClick()) {

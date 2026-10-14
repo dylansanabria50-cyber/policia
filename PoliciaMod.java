@@ -157,6 +157,7 @@ public class PoliciaMod {
         PoliciaAlbanil.init();
         MinecraftForge.EVENT_BUS.register(new PoliciaAlbanil());
         PoliciaHerrero.init();
+        PoliciaOficio.init();
         PoliciaAnalizador.init();
         PoliciaExtra.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaExtra::attrs);
@@ -216,7 +217,7 @@ public class PoliciaMod {
         CompoundTag d = p.getPersistentData();
         if (id == 0) {
             if (!on(p) && job(p).isEmpty()) {
-                msg(p, "Necesitas un oficio: craftea una Placa de policia, un Balde de albanil o un Guante de ladron y usalo");
+                msg(p, "Estas desempleado: no tenes ningun oficio");
                 return;
             }
             d.putBoolean("pol_on", !on(p));
@@ -264,6 +265,10 @@ public class PoliciaMod {
             d.putBoolean("pol_hidearmor", hide);
             msg(p, hide ? "Armadura oculta" : "Armadura visible");
             sync(p);
+            return;
+        }
+        if (id >= 70 && id <= 74) {
+            PoliciaOficio.choose(p, id - 70);
             return;
         }
         if ("ladron".equals(job(p))) {
@@ -620,6 +625,7 @@ public class PoliciaMod {
         }
         if (change || p.tickCount % 40 == 0) {
             sync(p);
+            PoliciaOficio.login(p);
         }
     }
 
@@ -688,7 +694,8 @@ public class PoliciaMod {
                 "alb_tinv", "alb_sel", "alb_chest", "alb_inner", "alb_c0", "alb_c1",
                 "pol_mdone", "pol_bdone", "pol_cerebro", "pol_lsu", "pol_lsi", "pol_lun", "pol_lse",
                 "pol_cin0", "pol_cin2", "pol_comp", "pol_party", "pol_hidearmor",
-                "her_sel", "her_cd0", "her_cd1", "her_cd2", "her_cd3", "her_cd4", "her_cd5", "her_cd6", "her_cd7", "her_cd8"}) {
+                "her_sel", "her_cd0", "her_cd1", "her_cd2", "her_cd3", "her_cd4", "her_cd5", "her_cd6", "her_cd7", "her_cd8",
+                "her_an_known", "her_an_qitem", "her_an_qtype", "her_an_qprog", "her_an_qneed", "her_an_qtarget", "pol_chosen"}) {
             if (!o.contains(k)) continue;
             n.put(k, o.get(k).copy());
         }
