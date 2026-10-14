@@ -316,7 +316,7 @@ public class PoliciaHerreroAnim {
         }
         int cx = x0 + (int) (Mth.clamp((t - from) / (to - from), 0.0f, 1.0f) * (float) w);
         g.fill(cx - 1, y0 - 3, cx + 2, y0 + 13, 0xFF9FD8F0);
-        String txt = "Forja: apreta J cuando el martillo golpea";
+        String txt = "Forja: apretá J cuando el martillo golpea";
         g.drawString(mc.font, txt, sw / 2 - mc.font.width(txt) / 2, y0 + 15, 0xFFFFE08A, true);
     }
 }

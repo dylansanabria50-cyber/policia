@@ -17,11 +17,11 @@ import net.minecraftforge.registries.RegistryObject;
 // albanil y Guante de ladron.
 public class PoliciaPlaca {
     public static final RegistryObject<Item> PLACA = PoliciaShield.ITEMS.register("placa_policia",
-            () -> new JobBadge(new Item.Properties().stacksTo(1), "policia", "policia", "Pulsa B para activar el modo policia"));
+            () -> new JobBadge(new Item.Properties().stacksTo(1), "policia", "policía", "Pulsa B para activar el modo policía"));
     public static final RegistryObject<Item> BALDE = PoliciaShield.ITEMS.register("balde_albanil",
-            () -> new JobBadge(new Item.Properties().stacksTo(1), "albanil", "albanil", "Pulsa B para activar el modo albanil"));
+            () -> new JobBadge(new Item.Properties().stacksTo(1), "albanil", "albañil", "Pulsa B para activar el modo albañil"));
     public static final RegistryObject<Item> GUANTE = PoliciaShield.ITEMS.register("guante_ladron",
-            () -> new JobBadge(new Item.Properties().stacksTo(1), "ladron", "ladron", "Pulsa B para activar el modo ladron"));
+            () -> new JobBadge(new Item.Properties().stacksTo(1), "ladron", "ladrón", "Pulsa B para activar el modo ladrón"));
     public static final RegistryObject<Item> MARTILLO = PoliciaShield.ITEMS.register("martillo_herrero",
             () -> new JobBadge(new Item.Properties().stacksTo(1).fireResistant(), "herrero", "herrero legendario", "Pulsa B para activar el modo herrero"));
 

@@ -34,7 +34,7 @@ public class PoliciaGrupoHud {
             String line;
             int[] p = t.pos.get(i);
             if (p[4] < 0) {
-                line = t.names.get(i) + " (otra dimension)";
+                line = t.names.get(i) + " (otra dimensión)";
             } else {
                 double dx = (double) p[0] + 0.5 - me.getX();
                 double dz = (double) p[2] + 0.5 - me.getZ();

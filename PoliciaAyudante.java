@@ -205,14 +205,14 @@ public class PoliciaAyudante {
             any = true;
             if (yes) {
                 h.ore = h.offer;
-                PoliciaMod.msg(p, "Ayudante " + (h.idx + 1) + ": voy a cavar hacia alli");
+                PoliciaMod.msg(p, "Ayudante " + (h.idx + 1) + ": voy a cavar hacia allí");
             } else {
                 h.bad.add(h.offer.asLong());
             }
             h.offer = null;
         }
         if (!any) {
-            PoliciaMod.msg(p, "Ningun ayudante te esta preguntando");
+            PoliciaMod.msg(p, "Ningún ayudante te está preguntando");
         }
     }
 
@@ -224,7 +224,7 @@ public class PoliciaAyudante {
             return;
         }
         if (d.getInt("alb_ht") > 0) {
-            PoliciaMod.msg(p, "Tus ayudantes ya estan en el campo");
+            PoliciaMod.msg(p, "Tus ayudantes ya están en el campo");
             return;
         }
         if (d.getInt("alb_hcd") > 0) {
@@ -455,7 +455,7 @@ public class PoliciaAyudante {
                 if (this.warn-- <= 0) {
                     this.warn = 6;
                     if (this.idx == 0) {
-                        PoliciaMod.msg(o, "Ayudantes: manten X para elegir el area donde picar");
+                        PoliciaMod.msg(o, "Ayudantes: mantené X para elegir el área donde picar");
                     }
                 }
                 return false;
@@ -515,7 +515,7 @@ public class PoliciaAyudante {
             ResourceLocation key = ForgeRegistries.BLOCKS.getKey(st.getBlock());
             String nm = PoliciaAyudante.esName(key == null ? "mineral" : key.getPath());
             int dist = (int) Math.sqrt(bp.distToCenterSqr(o.getX(), o.getY(), o.getZ()));
-            PoliciaMod.msg(o, "Ayudante " + (this.idx + 1) + ": hay " + nm + " en " + bp.getX() + " " + bp.getY() + " " + bp.getZ() + " (a " + dist + " bloques). Y: cavar hacia alli, N: ignorar");
+            PoliciaMod.msg(o, "Ayudante " + (this.idx + 1) + ": hay " + nm + " en " + bp.getX() + " " + bp.getY() + " " + bp.getZ() + " (a " + dist + " bloques). Y: cavar hacia allí, N: ignorar");
             o.level().playSound(null, o.getX(), o.getY(), o.getZ(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 0.8f, 1.4f);
         }
 

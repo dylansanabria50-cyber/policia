@@ -68,7 +68,7 @@ public class PoliciaLadron {
     static final double WHISTLE_R = 12.0;
     static final Map<Mob, Dis> DIS = new WeakHashMap<Mob, Dis>();
     static final Map<UUID, SimpleContainer> LOOT = new HashMap<UUID, SimpleContainer>();
-    static final String[] AN = new String[]{"Silbido", "Humo", "Salto", "Instinto", "Polvo", "Ganzua", "Escape"};
+    static final String[] AN = new String[]{"Silbido", "Humo", "Salto", "Instinto", "Polvo", "Ganzúa", "Escape"};
     static final int[] ACD = new int[]{300, 600, 240, 500, 400, 0, 1800};
     static final Item[] OI = new Item[]{Items.ENDER_PEARL, Items.SADDLE, Items.SPYGLASS, Items.TNT, Items.ARROW, Items.STRING};
     static final int[] OC = new int[]{2, 1, 1, 8, 32, 16};
@@ -118,7 +118,7 @@ public class PoliciaLadron {
             return false;
         }
         if (!PoliciaMod.on(p)) {
-            PoliciaMod.msg(p, "Activa el modo ladron (B) primero");
+            PoliciaMod.msg(p, "Activa el modo ladrón (B) primero");
             return false;
         }
         return true;
@@ -155,7 +155,7 @@ public class PoliciaLadron {
                 PoliciaMod.sync(p);
                 return;
             }
-            PoliciaMod.msg(p, "Todavia no tienes habilidades que elegir");
+            PoliciaMod.msg(p, "Todavía no tienes habilidades que elegir");
             return;
         }
         if (id >= 82 && id <= 87) {
@@ -181,7 +181,7 @@ public class PoliciaLadron {
             if (a != 5) {
                 d.putInt("pol_lse", a);
             }
-            PoliciaMod.msg(p, a == 5 ? "Habilidad desbloqueada: Ganzua (agachate y clic derecho en un cofre con llave o puerta de hierro de una aldea)" : "Habilidad desbloqueada: " + AN[a] + " (elegida; K cambia, J usa)");
+            PoliciaMod.msg(p, a == 5 ? "Habilidad desbloqueada: Ganzúa (agachate y clic derecho en un cofre con llave o puerta de hierro de una aldea)" : "Habilidad desbloqueada: " + AN[a] + " (elegida; K cambia, J usa)");
             p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.8f, 1.3f);
             PoliciaMod.sync(p);
             return;
@@ -189,7 +189,7 @@ public class PoliciaLadron {
         if (id == 80) {
             int lv = PoliciaLadron.luck(p);
             if (lv >= 4) {
-                PoliciaMod.msg(p, "Suerte ya esta al nivel maximo (" + CHANCE[4] + "%)");
+                PoliciaMod.msg(p, "Suerte ya está al nivel máximo (" + CHANCE[4] + "%)");
                 return;
             }
             int cost = 10 * (lv + 1);
@@ -251,7 +251,7 @@ public class PoliciaLadron {
         int chance = 50 + 10 * PoliciaLadron.luck(p);
         if (p.getRandom().nextInt(100) >= chance) {
             sl.playSound(null, bp, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 3.0f, 0.7f);
-            PoliciaMod.msg(p, "Se rompio la ganzua y salto la alarma! (" + chance + "% de exito)");
+            PoliciaMod.msg(p, "Se rompió la ganzúa y salto la alarma! (" + chance + "% de éxito)");
             PoliciaLadron.crime(p, 2, "alarma");
             return;
         }
@@ -265,7 +265,7 @@ public class PoliciaLadron {
         }
         p.getPersistentData().putInt("pol_xp", PoliciaMod.xp(p) + 3);
         sl.playSound(null, bp, SoundEvents.ARMOR_EQUIP_IRON, SoundSource.BLOCKS, 1.0f, 1.4f);
-        PoliciaMod.msg(p, "Ganzua: abierto (" + chance + "%)");
+        PoliciaMod.msg(p, "Ganzúa: abierto (" + chance + "%)");
         PoliciaJefe.add(p, "lock", 1);
         PoliciaLadron.crime(p, 1, door ? "puerta forzada" : "cofre forzado");
     }
@@ -328,7 +328,7 @@ public class PoliciaLadron {
         if (!sh) {
             idx = (idx + 1) % OI.length;
             md.putInt("mk_i", idx);
-            PoliciaLadron.say(sp, "Oferta: " + OC[idx] + " x " + new ItemStack((ItemLike) OI[idx]).getHoverName().getString() + " por " + OP[idx] + " esmeraldas. Agachate y clic con la mano vacia para comprar. Clic con un objeto para venderlo (agachado, un ladron cobra XP).");
+            PoliciaLadron.say(sp, "Oferta: " + OC[idx] + " x " + new ItemStack((ItemLike) OI[idx]).getHoverName().getString() + " por " + OP[idx] + " esmeraldas. Agachate y clic con la mano vacía para comprar. Clic con un objeto para venderlo (agachado, un ladrón cobra XP).");
             return;
         }
         int have = 0;
@@ -398,7 +398,7 @@ public class PoliciaLadron {
             }
             sl.sendParticles((ParticleOptions) ParticleTypes.LARGE_SMOKE, p.getX(), p.getY() + 1.0, p.getZ(), 40, 0.5, 0.8, 0.5, 0.02);
             sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0f, 0.7f);
-            PoliciaMod.msg(p, "Escape: 10 s sin cometer delitos y la policia te pierde");
+            PoliciaMod.msg(p, "Escape: 10 s sin cometer delitos y la policía te pierde");
         } else {
             int n = 0;
             for (Mob m : sl.getEntitiesOfClass(Mob.class, p.getBoundingBox().inflate(6.0), x -> x.isAlive() && !(x instanceof AbstractVillager))) {
@@ -445,7 +445,7 @@ public class PoliciaLadron {
         sl.playSound(null, p.getX(), p.getY(), p.getZ(), (SoundEvent) SoundEvents.NOTE_BLOCK_FLUTE.value(), SoundSource.PLAYERS, 1.2f, 1.6f);
         sl.sendParticles((ParticleOptions) ParticleTypes.NOTE, p.getX(), p.getY() + 2.1, p.getZ(), 5, 0.4, 0.2, 0.4, 1.0);
         p.getPersistentData().putInt("pol_lcd", 300);
-        PoliciaMod.msg(p, n > 0 ? "Silbido: " + n + (n == 1 ? " objetivo mira" : " objetivos miran") + " para otro lado" : "Silbido: no habia nadie cerca");
+        PoliciaMod.msg(p, n > 0 ? "Silbido: " + n + (n == 1 ? " objetivo mira" : " objetivos miran") + " para otro lado" : "Silbido: no había nadie cerca");
         PoliciaMod.sync(p);
     }
 
@@ -506,7 +506,7 @@ public class PoliciaLadron {
         boolean dist = t instanceof Mob && DIS.containsKey(dm = (Mob) t);
         double d = dist ? 0.4 : -0.35;
         if (dot > d) {
-            PoliciaMod.msg(p, "Ponte detras de tu objetivo (silbido ayuda)");
+            PoliciaMod.msg(p, "Ponte detrás de tu objetivo (silbido ayuda)");
             return;
         }
         if (p.distanceToSqr((Entity) t) > 9.0) {
@@ -515,14 +515,14 @@ public class PoliciaLadron {
         boolean sure = p.getPersistentData().getInt("pol_tmp_pick") > 0;
         int chance = sure ? 100 : CHANCE[PoliciaLadron.luck(p)];
         if (p.getRandom().nextInt(100) >= chance) {
-            PoliciaMod.msg(p, "Te descubrieron! (" + chance + "% de exito)");
+            PoliciaMod.msg(p, "Te descubrieron! (" + chance + "% de éxito)");
             if (t instanceof AbstractVillager) {
                 PoliciaLadron.crime(p, 1, "te vieron");
             }
             sl.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.VILLAGER_NO, SoundSource.NEUTRAL, 1.0f, 1.0f);
             if (t instanceof ServerPlayer) {
                 ServerPlayer victim = (ServerPlayer) t;
-                PoliciaMod.msg(victim, "Alguien intento robarte!");
+                PoliciaMod.msg(victim, "Alguien intentó robarte!");
             } else if (t instanceof Mob) {
                 Mob fm = (Mob) t;
                 if (!(t instanceof AbstractVillager)) {
@@ -553,7 +553,7 @@ public class PoliciaLadron {
         if (PoliciaMod.on(p) && p.getRandom().nextInt(100) < 30) {
             // Pasiva Mano rapida.
             PoliciaBoss.give(p, new ItemStack(Items.EMERALD));
-            PoliciaMod.msg(p, "Mano rapida: te llevaste una esmeralda extra");
+            PoliciaMod.msg(p, "Mano rápida: te llevaste una esmeralda extra");
         }
         if (sure) {
             p.getPersistentData().putInt("pol_tmp_pick", 0);
@@ -632,7 +632,7 @@ public class PoliciaLadron {
             }
             e.setCanceled(true);
             e.setCancellationResult(InteractionResult.FAIL);
-            PoliciaMod.msg(p, can ? "Cofre con llave: agachate y usa la ganzua (clic derecho)" : "Cofre con llave: la policia vigila esta aldea. Solo un ladron con Ganzua puede abrirlo");
+            PoliciaMod.msg(p, can ? "Cofre con llave: agachate y usa la ganzúa (clic derecho)" : "Cofre con llave: la policía vigila esta aldea. Solo un ladrón con Ganzúa puede abrirlo");
         }
 
         @SubscribeEvent
@@ -682,7 +682,7 @@ public class PoliciaLadron {
                         }
                         if (es == 1) {
                             dd.putInt("pol_wnt", 0);
-                            PoliciaMod.msg(serverPlayer, "Despistaste a la policia");
+                            PoliciaMod.msg(serverPlayer, "Despistaste a la policía");
                             sy = true;
                         }
                     } else {
@@ -692,7 +692,7 @@ public class PoliciaLadron {
                             wt = 1200;
                             sy = true;
                             if (w == 1) {
-                                PoliciaMod.msg(serverPlayer, "Ya no te busca la policia");
+                                PoliciaMod.msg(serverPlayer, "Ya no te busca la policía");
                             }
                         }
                         dd.putInt("pol_wnt_t", wt);

@@ -39,8 +39,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public class PoliciaHerrero {
     static final String JOB = "herrero";
     public static final String[] SKILLS = new String[]{
-            "Grito del Forjador", "Yunque Portatil", "Marca del Herrero", "Forja Interior",
-            "Faro de Forja", "Vinculo de Acero", "Reparacion Maestra", "Yunque Guardian",
+            "Grito del Forjador", "Yunque Portátil", "Marca del Herrero", "Forja Interior",
+            "Faro de Forja", "Vínculo de Acero", "Reparación Maestra", "Yunque Guardián",
             "Analizador del Forjador"
     };
     static final int[] THRESH = new int[]{0, 15, 25, 35, 45, 55, 70, 85};
@@ -372,11 +372,11 @@ public class PoliciaHerrero {
             }
             case 5: {
                 if (d.getInt("her_link_t") > 0) {
-                    PoliciaMod.msg(p, "El Vinculo de Acero sigue activo: " + (d.getInt("her_link_t") + 19) / 20 + " s");
+                    PoliciaMod.msg(p, "El Vínculo de Acero sigue activo: " + (d.getInt("her_link_t") + 19) / 20 + " s");
                     return false;
                 }
                 if (!PoliciaHerrero.link(p)) {
-                    PoliciaMod.msg(p, "Vinculo de Acero: necesitas otro jugador cerca");
+                    PoliciaMod.msg(p, "Vínculo de Acero: necesitas otro jugador cerca");
                     return false;
                 }
                 return true;
@@ -385,7 +385,7 @@ public class PoliciaHerrero {
                 boolean off = !PoliciaHerrero.repairable(p.getMainHandItem()) && PoliciaHerrero.repairable(p.getOffhandItem());
                 ItemStack it = off ? p.getOffhandItem() : p.getMainHandItem();
                 if (!PoliciaHerrero.repairable(it)) {
-                    PoliciaMod.msg(p, "Reparacion Maestra: necesitas en la mano algo gastado (o con costo de yunque) para reparar");
+                    PoliciaMod.msg(p, "Reparación Maestra: necesitas en la mano algo gastado (o con costo de yunque) para reparar");
                     return false;
                 }
                 d.putBoolean("her_rep_off", off);
@@ -398,7 +398,7 @@ public class PoliciaHerrero {
                 d.putInt("her_rep_tried", 0);
                 d.putInt("her_rep_t", 1);
                 PoliciaHerrero.anim(p, 1);
-                PoliciaMod.msg(p, "Reparacion Maestra: sacas el yunque y empezas a forjar...");
+                PoliciaMod.msg(p, "Reparación Maestra: sacas el yunque y empezás a forjar...");
                 return true;
             }
             case 7: {
@@ -523,7 +523,7 @@ public class PoliciaHerrero {
             sl.sendParticles((ParticleOptions) ParticleTypes.POOF, bp.getX() + 0.5, bp.getY() + 0.2, bp.getZ() + 0.5, 12, 0.3, 0.1, 0.3, 0.03);
         }
         p.level().playSound(null, bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0f, 0.9f);
-        PoliciaMod.msg(p, type == 0 ? "Yunque Portatil plantado: mas danio cerca suyo" : "Yunque Guardian plantado: intercepta proyectiles cercanos");
+        PoliciaMod.msg(p, type == 0 ? "Yunque Portátil plantado: más daño cerca suyo" : "Yunque Guardián plantado: intercepta proyectiles cercanos");
     }
 
     // Yunques del herrero plantados ahora mismo ("dimension|pos"): no se
@@ -599,7 +599,7 @@ public class PoliciaHerrero {
         }
         target.getPersistentData().putInt("her_marked_t", 300);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.8f, 1.5f);
-        PoliciaMod.msg(p, "Marca del Herrero: " + target.getDisplayName().getString() + " recibira mas danio durante 15 s");
+        PoliciaMod.msg(p, "Marca del Herrero: " + target.getDisplayName().getString() + " recibirá más daño durante 15 s");
         return true;
     }
 
@@ -621,8 +621,8 @@ public class PoliciaHerrero {
         other.getPersistentData().putUUID("her_link_id", p.getUUID());
         other.getPersistentData().putInt("her_link_t", 600);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 0.8f, 1.1f);
-        PoliciaMod.msg(p, "Vinculo de Acero con " + other.getName().getString());
-        PoliciaMod.msg(other, "Vinculo de Acero con " + p.getName().getString());
+        PoliciaMod.msg(p, "Vínculo de Acero con " + other.getName().getString());
+        PoliciaMod.msg(other, "Vínculo de Acero con " + p.getName().getString());
         return true;
     }
 
@@ -731,7 +731,7 @@ public class PoliciaHerrero {
             }
             if (at == 0) {
                 PoliciaHerrero.removeAnvil(p);
-                PoliciaMod.msg(p, "El yunque se desmorono");
+                PoliciaMod.msg(p, "El yunque se desmoronó");
             }
         }
         int ft = d.getInt("her_faro_t");
@@ -747,7 +747,7 @@ public class PoliciaHerrero {
                     if (p.level().getBlockState(bp).is(Blocks.CAMPFIRE)) {
                         p.level().setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
                     }
-                    PoliciaMod.msg(p, "El Faro de Forja se apago");
+                    PoliciaMod.msg(p, "El Faro de Forja se apagó");
                     PoliciaHerrero.startCd(p, 4);
                 }
             }
@@ -760,7 +760,7 @@ public class PoliciaHerrero {
         if (mo > 0) {
             d.putInt("her_mark_on", --mo);
             if (mo == 0) {
-                PoliciaMod.msg(p, "La Marca del Herrero se borro");
+                PoliciaMod.msg(p, "La Marca del Herrero se borró");
                 PoliciaHerrero.startCd(p, 2);
             }
         }
@@ -781,7 +781,7 @@ public class PoliciaHerrero {
             }
             if (lt == 0) {
                 PoliciaHerrero.endLink(p);
-                PoliciaMod.msg(p, "Vinculo de Acero termino");
+                PoliciaMod.msg(p, "Vínculo de Acero terminó");
             }
         }
         int rt = d.getInt("her_rep_t");
@@ -821,11 +821,11 @@ public class PoliciaHerrero {
                         it = nu;
                     }
                     String ql = PoliciaHerrero.quality(it, Integer.bitCount(d.getInt("her_rep_hits")));
-                    PoliciaMod.msg(p, "Reparacion Maestra: " + it.getHoverName().getString() + " como nuevo" + ql);
+                    PoliciaMod.msg(p, "Reparación Maestra: " + it.getHoverName().getString() + " como nuevo" + ql);
                     PoliciaJefe.add(p, "repair", 1);
                     p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.8f);
                 } else {
-                    PoliciaMod.msg(p, "Reparacion Maestra: ya no tenias ese objeto en la mano");
+                    PoliciaMod.msg(p, "Reparación Maestra: ya no tenías ese objeto en la mano");
                 }
                 if (p.level() instanceof ServerLevel sl) {
                     sl.sendParticles((ParticleOptions) ParticleTypes.POOF, ax, ay, az, 10, 0.25, 0.2, 0.25, 0.03);

@@ -152,7 +152,7 @@ public class PoliciaExtra {
         }
         LivingEntity t = (LivingEntity) entity;
         if (p.level().clip(new ClipContext(eye, hit.getLocation(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, p)).getType() != HitResult.Type.MISS) {
-            PoliciaMod.msg(p, "Hay un obstaculo en el camino");
+            PoliciaMod.msg(p, "Hay un obstáculo en el camino");
             return false;
         }
         CompoundTag td = t.getPersistentData();

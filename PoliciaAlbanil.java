@@ -82,7 +82,7 @@ import net.minecraftforge.network.PacketDistributor;
 // ayudantes mineros, tractor y linterna que sigue la mirada.
 public class PoliciaAlbanil {
     static final String JOB = "albanil";
-    static final String[] NAMES = new String[]{"Pico de albanil", "MURO", "REFUGIO"};
+    static final String[] NAMES = new String[]{"Pico de albañil", "MURO", "REFUGIO"};
     static final int PICK_T = 140;
     static final int PICK_CD = 160;
     static final int WALL_T = 300;
@@ -186,7 +186,7 @@ public class PoliciaAlbanil {
         }
         if (id == 44) {
             if (d.getInt("alb_pl") >= 1) {
-                PoliciaMod.msg(p, "PICO II ya esta desbloqueado");
+                PoliciaMod.msg(p, "PICO II ya está desbloqueado");
                 return;
             }
             if (PoliciaMod.xp(p) < 25) {
@@ -203,7 +203,7 @@ public class PoliciaAlbanil {
         if (id == 43) {
             int lv = PoliciaAlbanil.lv(p);
             if (lv >= 3) {
-                PoliciaMod.msg(p, "REFUGIO II ya esta desbloqueado");
+                PoliciaMod.msg(p, "REFUGIO II ya está desbloqueado");
                 return;
             }
             if (lv < 2) {
@@ -223,7 +223,7 @@ public class PoliciaAlbanil {
         }
         if (id == 41) {
             if (d.getInt("alb_lu") >= 1) {
-                PoliciaMod.msg(p, "LINTERNA ya esta desbloqueada");
+                PoliciaMod.msg(p, "LINTERNA ya está desbloqueada");
                 return;
             }
             if (PoliciaMod.xp(p) < 10) {
@@ -240,7 +240,7 @@ public class PoliciaAlbanil {
         if (id == 40) {
             int hl = d.getInt("alb_hl");
             if (hl >= 3) {
-                PoliciaMod.msg(p, "AYUDANTE ya esta al nivel maximo");
+                PoliciaMod.msg(p, "AYUDANTE ya está al nivel máximo");
                 return;
             }
             int cost = 10 + 5 * hl;
@@ -262,7 +262,7 @@ public class PoliciaAlbanil {
             }
             int lv = PoliciaAlbanil.lv(p);
             if (lv >= 2) {
-                PoliciaMod.msg(p, "MURO ya esta mejorado a REFUGIO");
+                PoliciaMod.msg(p, "MURO ya está mejorado a REFUGIO");
                 return;
             }
             if (PoliciaMod.xp(p) < 10) {
@@ -309,7 +309,7 @@ public class PoliciaAlbanil {
             return;
         }
         if (!PoliciaMod.on(p)) {
-            PoliciaMod.msg(p, "Activa el modo albanil (B) primero");
+            PoliciaMod.msg(p, "Activa el modo albañil (B) primero");
             return;
         }
         if (id == 2) {
@@ -362,7 +362,7 @@ public class PoliciaAlbanil {
         }
         if (s == 0) {
             if (d.getInt("alb_pick") > 0) {
-                PoliciaMod.msg(p, "El pico ya esta activo");
+                PoliciaMod.msg(p, "El pico ya está activo");
                 return;
             }
             if (d.getInt("alb_c0") > 0) {
@@ -372,7 +372,7 @@ public class PoliciaAlbanil {
             d.putInt("alb_pick", PoliciaAlbanil.pickT(p));
             PoliciaAlbanil.startPick(p);
             p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ARMOR_EQUIP_IRON, SoundSource.PLAYERS, 0.6f, 1.4f);
-            PoliciaMod.msg(p, "Pico de albanil: fuerza y prisa minera");
+            PoliciaMod.msg(p, "Pico de albañil: fuerza y prisa minera");
         } else {
             boolean house;
             boolean bl = house = PoliciaAlbanil.lv(p) >= 2;
@@ -387,7 +387,7 @@ public class PoliciaAlbanil {
                 }
             } else {
                 if (d.getInt("alb_c1") > 0) {
-                    PoliciaMod.msg(p, "Construccion en enfriamiento: " + (d.getInt("alb_c1") + 19) / 20 + " s");
+                    PoliciaMod.msg(p, "Construcción en enfriamiento: " + (d.getInt("alb_c1") + 19) / 20 + " s");
                     return;
                 }
                 d.putInt("alb_walls", 0);
@@ -421,7 +421,7 @@ public class PoliciaAlbanil {
         d.putInt("alb_zw", wid);
         d.putInt("alb_zon", 1);
         d.putInt("alb_mode", 1);
-        PoliciaMod.msg(p, "Area fijada: " + len + " de largo x " + wid + " de ancho x 3 de alto. Orden: " + PoliciaAyudante.ORDERS[1]);
+        PoliciaMod.msg(p, "Área fijada: " + len + " de largo x " + wid + " de ancho x 3 de alto. Orden: " + PoliciaAyudante.ORDERS[1]);
         PoliciaMod.sync(p);
     }
 
@@ -435,7 +435,7 @@ public class PoliciaAlbanil {
             return;
         }
         if (!PoliciaMod.on(p)) {
-            PoliciaMod.msg(p, "Activa el modo albanil (B) primero");
+            PoliciaMod.msg(p, "Activa el modo albañil (B) primero");
             return;
         }
         if (d.getInt("alb_lamp") > 0) {
@@ -500,7 +500,7 @@ public class PoliciaAlbanil {
         ItemStack pk = new ItemStack((ItemLike) Items.WOODEN_PICKAXE);
         pk.getOrCreateTag().putBoolean("alb_pick", true);
         pk.getOrCreateTag().putBoolean("Unbreakable", true);
-        pk.setHoverName(Component.literal("Pico de albanil"));
+        pk.setHoverName(Component.literal("Pico de albañil"));
         ListTag en = p.getPersistentData().getList("alb_ench", 10);
         if (!en.isEmpty()) {
             pk.getOrCreateTag().put("Enchantments", (Tag) en.copy());
@@ -634,7 +634,7 @@ public class PoliciaAlbanil {
         CompoundTag d = p.getPersistentData();
         if (kind == 0) {
             if (d.getInt("alb_pick") > 0 || d.getBoolean("alb_saved")) {
-                PoliciaMod.msg(p, "El pico ya esta activo");
+                PoliciaMod.msg(p, "El pico ya está activo");
                 return false;
             }
             d.putInt("alb_pick", PoliciaAlbanil.pickT(p));
@@ -643,7 +643,7 @@ public class PoliciaAlbanil {
             return true;
         }
         if (d.getInt("alb_st") > 0 || d.getLongArray("alb_w").length > 0) {
-            PoliciaMod.msg(p, "Ya hay una construccion en pie");
+            PoliciaMod.msg(p, "Ya hay una construcción en pie");
             return false;
         }
         d.putInt("alb_walls", kind == 1 ? 1 : 0);
@@ -1082,7 +1082,7 @@ public class PoliciaAlbanil {
                 if (alb) {
                     d.putInt("alb_c0", 160);
                 }
-                PoliciaMod.msg(p, "El pico se retiro");
+                PoliciaMod.msg(p, "El pico se retiró");
                 ch = true;
             }
         } else if (d.getInt("alb_c0") > 0) {
@@ -1101,14 +1101,14 @@ public class PoliciaAlbanil {
                 if (alb) {
                     d.putInt("alb_c1", d.getInt("alb_house") == 1 ? 800 : 100);
                 }
-                PoliciaMod.msg(p, "La construccion desaparecio");
+                PoliciaMod.msg(p, "La construcción desapareció");
                 ch = true;
             }
         } else if (d.getInt("alb_c1") > 0) {
             int c3 = d.getInt("alb_c1") - 1;
             d.putInt("alb_c1", c3);
             if (c3 == 0) {
-                PoliciaMod.msg(p, "Construccion lista");
+                PoliciaMod.msg(p, "Construcción lista");
                 ch = true;
             }
         }
@@ -1120,7 +1120,7 @@ public class PoliciaAlbanil {
             if (lt == 0) {
                 PoliciaAlbanil.lampClear(p);
                 d.putInt("alb_lcd", 400);
-                PoliciaMod.msg(p, "La linterna se apago");
+                PoliciaMod.msg(p, "La linterna se apagó");
                 ch = true;
             }
         } else if (d.getInt("alb_lcd") > 0) {

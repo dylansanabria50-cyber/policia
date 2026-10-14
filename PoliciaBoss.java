@@ -113,13 +113,13 @@ public class PoliciaBoss {
         out.accept((ItemLike) PoliciaPlano.PLANO.get());
         out.accept((ItemLike) PoliciaShield.SHIELD.get());
         out.accept((ItemLike) VEST.get());
-        for (String[] x : sk = new String[][]{{"refuerzo", "Refuerzo"}, {"k9", "Perro K9"}, {"esposas", "Esposas"}, {"sirena", "Sirena y torreta"}, {"dron", "Dron de vigilancia"}, {"burbuja", "Escudo de burbuja"}, {"pico", "Pico de albanil"}, {"muro", "Muro"}, {"refugio", "Refugio"}, {"silbido", "Silbido"}}) {
+        for (String[] x : sk = new String[][]{{"refuerzo", "Refuerzo"}, {"k9", "Perro K9"}, {"esposas", "Esposas"}, {"sirena", "Sirena y torreta"}, {"dron", "Dron de vigilancia"}, {"burbuja", "Escudo de burbuja"}, {"pico", "Pico de albañil"}, {"muro", "Muro"}, {"refugio", "Refugio"}, {"silbido", "Silbido"}}) {
             out.accept(PoliciaBoss.single(x[0], x[1]));
         }
     }).build());
-    static final String[] NAMES = new String[]{"Jefe de policia", "Capataz", "Jefe de ladrones", "Perista", "Ladron", "Agente", "Obrero", "Maestro herrero"};
+    static final String[] NAMES = new String[]{"Jefe de policía", "Capataz", "Jefe de ladrones", "Perista", "Ladrón", "Agente", "Obrero", "Maestro herrero"};
     static final String[] JOBS = new String[]{"policia", "albanil", "ladron", "herrero"};
-    static final String[] JOBNAME = new String[]{"policia", "albanil", "ladron", "herrero legendario"};
+    static final String[] JOBNAME = new String[]{"policía", "albañil", "ladrón", "herrero legendario"};
     // Tipo de NPC del jefe de cada oficio (indice en NAMES).
     static final int HERRERO_BOSS = 7;
 
@@ -133,7 +133,7 @@ public class PoliciaBoss {
         return kind == HERRERO_BOSS ? 3 : Math.max(0, Math.min(2, kind));
     }
     static final Map<UUID, Cin> CIN = new HashMap<UUID, Cin>();
-    static final String[][] LINES = new String[][]{{"Mantener el orden no es un juego, novato.", "Los bandidos acampan lejos de las aldeas. Hablen con el comisario para las misiones.", "Un buen oficial cuida a la gente y cumple la ley.", "El chaleco antibalas te salva de las flechas... pero se gasta rapido."}, {"Una obra bien hecha dura toda la vida.", "Sin ayudantes no hay muro que se termine.", "Cuida el pico: lo que se rompe en la obra lo pagas tu.", "Muros, refugios y tractores: todo se construye."}, {"En este negocio se habla poco y se roba mucho.", "El perista compra todo lo que traigas, sin preguntas.", "Silba, acercate por la espalda y no mires atras.", "La suerte favorece a los que practican."}, {"El hierro se doblega con fuego y paciencia.", "Un buen yunque vale mas que cien espadas.", "Lo que no sabes forjar, analizalo primero.", "Golpe firme, mano tranquila. Asi se templa el acero."}};
+    static final String[][] LINES = new String[][]{{"Mantener el orden no es un juego, novato.", "Los bandidos acampan lejos de las aldeas. Hablen con el comisario para las misiones.", "Un buen oficial cuida a la gente y cumple la ley.", "El chaleco antibalas te salva de las flechas... pero se gasta rápido."}, {"Una obra bien hecha dura toda la vida.", "Sin ayudantes no hay muro que se termine.", "Cuida el pico: lo que se rompe en la obra lo pagas tu.", "Muros, refugios y tractores: todo se construye."}, {"En este negocio se habla poco y se roba mucho.", "El perista compra todo lo que traigas, sin preguntas.", "Silba, acercate por la espalda y no mires atrás.", "La suerte favorece a los que practican."}, {"El hierro se doblega con fuego y paciencia.", "Un buen yunque vale más que cien espadas.", "Lo que no sabes forjar, analizalo primero.", "Golpe firme, mano tranquila. Así se templa el acero."}};
 
     static void init() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaBoss::attrs);
@@ -166,7 +166,7 @@ public class PoliciaBoss {
     // Habilidades temporales del ladron compradas como objeto.
     static boolean tmpSkill(ServerPlayer p, String key, int ticks, String msg) {
         if (p.getPersistentData().getInt(key) > 0) {
-            PoliciaMod.msg(p, "Ya la tenes activa");
+            PoliciaMod.msg(p, "Ya la tenés activa");
             return false;
         }
         p.getPersistentData().putInt(key, ticks);
@@ -253,13 +253,13 @@ public class PoliciaBoss {
                     return PoliciaHerrero.single(p, 7);
                 }
                 case "l_carterismo": {
-                    return PoliciaBoss.tmpSkill(p, "pol_tmp_pick", 1200, "Carterismo maestro: tu proximo carterismo en 60 s sale si o si");
+                    return PoliciaBoss.tmpSkill(p, "pol_tmp_pick", 1200, "Carterismo maestro: tu próximo carterismo en 60 s sale sí o sí");
                 }
                 case "l_suerte": {
-                    return PoliciaBoss.tmpSkill(p, "pol_tmp_luck", 1200, "Suerte maxima (55%) durante 60 s");
+                    return PoliciaBoss.tmpSkill(p, "pol_tmp_luck", 1200, "Suerte máxima (55%) durante 60 s");
                 }
                 case "l_ganzua": {
-                    return PoliciaBoss.tmpSkill(p, "pol_tmp_lock", 1200, "Ganzua: podes forzar cerraduras (agachado + clic derecho) durante 60 s");
+                    return PoliciaBoss.tmpSkill(p, "pol_tmp_lock", 1200, "Ganzúa: podés forzar cerraduras (agachado + clic derecho) durante 60 s");
                 }
                 case "l_humo": {
                     return PoliciaLadron.single(p, 1);
@@ -320,8 +320,8 @@ public class PoliciaBoss {
             p.connection.teleport(c.x, c.y, c.z, yaw, pit);
             if (c.t != 22) continue;
             p.connection.send((Packet) new ClientboundSetTitlesAnimationPacket(8, 40, 12));
-            p.connection.send((Packet) new ClientboundSetSubtitleTextPacket(Component.literal(c.kind == 0 ? "Novato, que haces aqui?" : "Que haces aqui?")));
-            p.connection.send((Packet) new ClientboundSetTitleTextPacket(Component.literal(c.kind == 0 ? "Jefe de policia" : "Jefe de ladrones")));
+            p.connection.send((Packet) new ClientboundSetSubtitleTextPacket(Component.literal(c.kind == 0 ? "Novato, ¿qué haces aquí?" : "¿Qué haces aquí?")));
+            p.connection.send((Packet) new ClientboundSetTitleTextPacket(Component.literal(c.kind == 0 ? "Jefe de policía" : "Jefe de ladrones")));
             p.serverLevel().playSound(null, p.getX(), p.getY(), p.getZ(), c.kind == 0 ? SoundEvents.VILLAGER_NO : SoundEvents.PIGLIN_AMBIENT, SoundSource.NEUTRAL, 0.6f, 0.7f);
         }
     }
@@ -377,7 +377,7 @@ public class PoliciaBoss {
             if (act != null && act.id.equals(tr.id)) {
                 c.setItem(15, PoliciaJefe.done(sp) ? PoliciaBoss.named(Items.WRITABLE_BOOK, "Unirme al oficio", "Superaste la prueba!", "Clic para convertirte en " + JOBNAME[j]) : PoliciaBoss.named(Items.CLOCK, "Prueba de ingreso", tr.desc, "Progreso: " + PoliciaJefe.prog(sp) + "/" + tr.need));
             } else {
-                c.setItem(15, PoliciaBoss.named(Items.WRITABLE_BOOK, "Unirme al oficio", "Convertirte en " + JOBNAME[j], "Antes tenes que superar una prueba de ingreso"));
+                c.setItem(15, PoliciaBoss.named(Items.WRITABLE_BOOK, "Unirme al oficio", "Convertirte en " + JOBNAME[j], "Antes tenés que superar una prueba de ingreso"));
             }
         } else {
             c.setItem(15, PoliciaBoss.named(Items.BARRIER, "Dejar el oficio", "No eres de mi oficio (sos " + cur + ")", "Renuncia con tu jefe para poder unirte"));
@@ -402,7 +402,7 @@ public class PoliciaBoss {
                     p.closeContainer();
                     PoliciaBoss.later(p, () -> PoliciaJefe.joinFlow(p, k));
                 } else {
-                    PoliciaMod.msg(p, "Ya tenes un oficio: renuncia con tu jefe primero");
+                    PoliciaMod.msg(p, "Ya tenés un oficio: renuncia con tu jefe primero");
                 }
             } else if (slot == 22 && mine) {
                 if (j == 0) {
@@ -426,7 +426,7 @@ public class PoliciaBoss {
         for (int i = 0; i < 27; ++i) {
             c.setItem(i, PoliciaBoss.pane());
         }
-        c.setItem(13, PoliciaBoss.named(Items.BARRIER, "Esta despedido!", "Quiere dejar el oficio de " + JOBNAME[PoliciaBoss.jobIdx(k)] + "?", "Perdera el modo y el libro; el progreso se conserva."));
+        c.setItem(13, PoliciaBoss.named(Items.BARRIER, "¡Está despedido!", "Quiere dejar el oficio de " + JOBNAME[PoliciaBoss.jobIdx(k)] + "?", "Perderá el modo y el libro; el progreso se conserva."));
         c.setItem(11, PoliciaBoss.named(Items.LIME_DYE, "SI, quiero ser despedido", new String[0]));
         c.setItem(15, PoliciaBoss.named(Items.RED_DYE, "NO, quiero seguir", new String[0]));
         PoliciaBoss.openMenu3(sp, NAMES[k], c, (p, slot) -> {
@@ -476,13 +476,13 @@ public class PoliciaBoss {
             l.add(new Entry(PoliciaBoss.ench(new ItemStack((ItemLike) Items.IRON_PICKAXE), Enchantments.UNBREAKING, 3), 10));
             l.add(new Entry(PoliciaBoss.ench(new ItemStack((ItemLike) Items.IRON_SWORD), Enchantments.SHARPNESS, 2), 10));
             l.add(new Entry(PoliciaBoss.single("h_grito", "Grito del Forjador", "Onda que desarma y asusta a los enemigos cercanos"), 8));
-            l.add(new Entry(PoliciaBoss.single("h_yunque", "Yunque Portatil", "Yunque 40 s: Fuerza, Heroe de la aldea y doble XP"), 12));
+            l.add(new Entry(PoliciaBoss.single("h_yunque", "Yunque Portátil", "Yunque 40 s: Fuerza, Héroe de la aldea y doble XP"), 12));
             l.add(new Entry(PoliciaBoss.single("h_marca", "Marca del Herrero", "Marca a un enemigo 15 s: menos armadura"), 8));
             l.add(new Entry(PoliciaBoss.single("h_forja", "Forja Interior", "Funde 1 lingote de hierro y cura 2 corazones"), 6));
-            l.add(new Entry(PoliciaBoss.single("h_faro", "Faro de Forja", "Fogata 60 s: regeneracion e inmunidad al fuego"), 14));
-            l.add(new Entry(PoliciaBoss.single("h_vinculo", "Vinculo de Acero", "Te vincula 30 s con el jugador mas cercano"), 10));
-            l.add(new Entry(PoliciaBoss.single("h_reparar", "Reparacion Maestra", "Repara por completo lo que tengas en la mano"), 16));
-            l.add(new Entry(PoliciaBoss.single("h_guardian", "Yunque Guardian", "Yunque 40 s que destruye flechas y proyectiles"), 14));
+            l.add(new Entry(PoliciaBoss.single("h_faro", "Faro de Forja", "Fogata 60 s: regeneración e inmunidad al fuego"), 14));
+            l.add(new Entry(PoliciaBoss.single("h_vinculo", "Vínculo de Acero", "Te vincula 30 s con el jugador más cercano"), 10));
+            l.add(new Entry(PoliciaBoss.single("h_reparar", "Reparación Maestra", "Repara por completo lo que tengas en la mano"), 16));
+            l.add(new Entry(PoliciaBoss.single("h_guardian", "Yunque Guardián", "Yunque 40 s que destruye flechas y proyectiles"), 14));
             return l;
         }
         if (k == 0) {
@@ -513,10 +513,10 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.SCAFFOLDING, 8), 5));
             l.add(new Entry(new ItemStack((ItemLike) Items.STONE_PICKAXE), 3));
             l.add(new Entry(new ItemStack((ItemLike) PoliciaPlano.PLANO.get()), 3));
-            l.add(new Entry(PoliciaBoss.single("pico", "Pico de albanil"), 8));
+            l.add(new Entry(PoliciaBoss.single("pico", "Pico de albañil"), 8));
             l.add(new Entry(PoliciaBoss.single("muro", "Muro"), 6));
             l.add(new Entry(PoliciaBoss.single("refugio", "Refugio"), 14));
-            l.add(new Entry(PoliciaBoss.single("refugio2", "Refugio II", "Torre de 4 pisos con camas, cofres y jardin", "Dura 3 minutos y luego desaparece"), 24));
+            l.add(new Entry(PoliciaBoss.single("refugio2", "Refugio II", "Torre de 4 pisos con camas, cofres y jardín", "Dura 3 minutos y luego desaparece"), 24));
         } else {
             l.add(new Entry(PoliciaBoss.ench(PoliciaBoss.named(Items.IRON_BOOTS, "Botas de sigilo", new String[0]), Enchantments.FALL_PROTECTION, 2), 8));
             l.add(new Entry(new ItemStack((ItemLike) Items.ENDER_PEARL, 2), 6));
@@ -525,14 +525,14 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.BUNDLE), 6));
             l.add(new Entry(new ItemStack((ItemLike) Items.GUNPOWDER, 8), 3));
             l.add(new Entry(PoliciaBoss.single("silbido", "Silbido"), 8));
-            l.add(new Entry(PoliciaBoss.single("l_carterismo", "Carterismo maestro", "Tu proximo carterismo en 60 s no falla"), 6));
-            l.add(new Entry(PoliciaBoss.single("l_suerte", "Suerte", "60 s con la suerte al maximo (55%)"), 10));
-            l.add(new Entry(PoliciaBoss.single("l_humo", "Humo", "Invisible y rapido 8 s, los enemigos te pierden"), 8));
-            l.add(new Entry(PoliciaBoss.single("l_salto", "Salto", "Impulso hacia adelante con caida lenta"), 6));
+            l.add(new Entry(PoliciaBoss.single("l_carterismo", "Carterismo maestro", "Tu próximo carterismo en 60 s no falla"), 6));
+            l.add(new Entry(PoliciaBoss.single("l_suerte", "Suerte", "60 s con la suerte al máximo (55%)"), 10));
+            l.add(new Entry(PoliciaBoss.single("l_humo", "Humo", "Invisible y rápido 8 s, los enemigos te pierden"), 8));
+            l.add(new Entry(PoliciaBoss.single("l_salto", "Salto", "Impulso hacia adelante con caída lenta"), 6));
             l.add(new Entry(PoliciaBoss.single("l_instinto", "Instinto", "Los seres cercanos brillan 10 s"), 8));
             l.add(new Entry(PoliciaBoss.single("l_polvo", "Polvo cegador", "Debilita y frena a los cercanos 7 s"), 8));
-            l.add(new Entry(PoliciaBoss.single("l_ganzua", "Ganzua", "60 s para forzar puertas de hierro y cofres"), 10));
-            l.add(new Entry(PoliciaBoss.single("l_escape", "Escape", "10 s invisible y la policia te pierde"), 14));
+            l.add(new Entry(PoliciaBoss.single("l_ganzua", "Ganzúa", "60 s para forzar puertas de hierro y cofres"), 10));
+            l.add(new Entry(PoliciaBoss.single("l_escape", "Escape", "10 s invisible y la policía te pierde"), 14));
         }
         return l;
     }
@@ -627,7 +627,7 @@ public class PoliciaBoss {
         for (int i = 18; i < 27; ++i) {
             c.setItem(i, PoliciaBoss.pane());
         }
-        c.setItem(22, PoliciaBoss.named(Items.EMERALD, "VENDER", "Pon lo robado arriba y pulsa aqui", "Te pago en esmeraldas"));
+        c.setItem(22, PoliciaBoss.named(Items.EMERALD, "VENDER", "Pon lo robado arriba y pulsa aquí", "Te pago en esmeraldas"));
         sp.openMenu((MenuProvider) new SimpleMenuProvider((id, inv, pl) -> new Sell(id, inv, c, sp), Component.literal("Perista")));
     }
 

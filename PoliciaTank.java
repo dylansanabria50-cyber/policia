@@ -94,7 +94,7 @@ public class PoliciaTank {
                 p.stopRiding();
                 PoliciaMod.msg(p, "Bajaste del tanque (J para volver a subir)");
             } else {
-                PoliciaMod.msg(p, "El tanque ya esta invocado");
+                PoliciaMod.msg(p, "El tanque ya está invocado");
             }
             return;
         }

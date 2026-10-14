@@ -69,7 +69,7 @@ import org.joml.Vector3f;
 // Lado cliente: teclas, HUD, camara en tercera persona para vehiculos,
 // mira del tanque, cabina del helicoptero y efecto de "disfraz" de skin.
 public class PoliciaClient {
-    static final String CAT = "Policia";
+    static final String CAT = "Policía";
     static final KeyMapping K_FORM = new KeyMapping("Policia: Activar modo policia", 66, "Policia");
     static final KeyMapping K_USE = new KeyMapping("Policia: Usar habilidad", 74, "Policia");
     static final KeyMapping K_NEXT = new KeyMapping("Policia: Cambiar habilidad", 75, "Policia");
@@ -676,7 +676,7 @@ public class PoliciaClient {
         boolean bl2 = zk = K_ZONE.isDown() && free && PoliciaClient.alb() && PoliciaAlbanil.CL.hl >= 1;
         if (zk) {
             PoliciaXray.zoning = true;
-            mc.player.displayClientMessage(Component.literal("Area de picado: largo " + PoliciaXray.zl + " x ancho " + PoliciaXray.zw + " (rueda: largo, Mayus+rueda: ancho). Suelta X para fijarla"), true);
+            mc.player.displayClientMessage(Component.literal("Área de picado: largo " + PoliciaXray.zl + " x ancho " + PoliciaXray.zw + " (rueda: largo, Mayús+rueda: ancho). Suelta X para fijarla"), true);
         } else if (PoliciaXray.zoning) {
             PoliciaXray.zoning = false;
             if (free && PoliciaClient.alb()) {
@@ -692,7 +692,7 @@ public class PoliciaClient {
         }
     }
 
-    static final String[] JOB_TAG = new String[]{"", "Policia", "Albanil", "Ladron", "Herrero Legendario"};
+    static final String[] JOB_TAG = new String[]{"", "Policía", "Albañil", "Ladrón", "Herrero Legendario"};
 
     // Oficio escrito arriba del nombre del jugador: blanco para todos y
     // dorado para el Herrero Legendario. Se dibuja como el cartel del
@@ -794,7 +794,7 @@ public class PoliciaClient {
         g.fill(mx - 12, my - 2, mx - 3, my + 3, -53200);
         g.drawString(mc.font, "DIST " + (int) dist + " m", cx - 84, cy - 62, -12787602, true);
         String est = t.fireState() >= 0 ? "CARGANDO" : "LISTO";
-        String obus = t.isMobile() ? "OBUS " + t.shotsLeft() + "/3" : "OBUS 1/1";
+        String obus = t.isMobile() ? "OBÚS " + t.shotsLeft() + "/3" : "OBÚS 1/1";
         g.drawString(mc.font, obus + "  " + est, cx - 84, cy + 56, -12787602, true);
     }
 
@@ -887,7 +887,7 @@ public class PoliciaClient {
         boolean up = (s.un >> 4 & 1) == 1;
         ArrayList<Object> ls = new ArrayList<Object>();
         ArrayList<Integer> cs = new ArrayList<Integer>();
-        ls.add("ARBOL DE HABILIDADES - XP " + s.xp);
+        ls.add("ÁRBOL DE HABILIDADES - XP " + s.xp);
         cs.add(-1523648);
         int num = 0;
         for (int i = 0; i < PoliciaMod.SKILLS.length; ++i) {
@@ -896,7 +896,7 @@ public class PoliciaClient {
             String nm = i == 2 && up ? PoliciaMod.SKILLS[4] : PoliciaMod.SKILLS[i];
             line = (i == s.sel && open ? "> " : "  ") + ++num + ". " + nm;
             if (!open && i == 9) {
-                line = (String) line + "  [mision especial]";
+                line = (String) line + "  [misión especial]";
             } else if (!open) {
                 line = (String) line + "  [" + (PoliciaMod.LEVEL_COST[i] > 0 ? PoliciaMod.LEVEL_COST[i] + " niveles" : "10 XP") + "]";
             }
@@ -908,7 +908,7 @@ public class PoliciaClient {
             PoliciaTank.TankEntity tk0 = (PoliciaTank.TankEntity) ((Object) line);
             st = tk0.isMobile() ? "TANQUE: WASD mover, clic derecho disparar (" + tk0.shotsLeft() + "), Shift bajar" : "TANQUE: clic derecho para disparar";
         } else if (s.sel == 2) {
-            st = s.tcd > 0 ? "Tanque en enfriamiento: " + (s.tcd + 19) / 20 + " s" : (up ? "Tanque movil listo (J)" : "Tanque listo (J)");
+            st = s.tcd > 0 ? "Tanque en enfriamiento: " + (s.tcd + 19) / 20 + " s" : (up ? "Tanque móvil listo (J)" : "Tanque listo (J)");
         } else if (s.sel == 1) {
             st = s.rcd > 0 ? "Refuerzo en enfriamiento: " + (s.rcd + 19) / 20 + " s" : "Refuerzo nv " + Math.max(1, s.rl) + " listo (J)";
         } else if (s.sel >= 5) {
@@ -917,7 +917,7 @@ public class PoliciaClient {
         } else {
             PoliciaHeli.HeliEntity hh;
             Entity cc;
-            st = s.sel == 3 ? ((cc = mc.player.getVehicle()) instanceof PoliciaHeli.HeliEntity ? ((hh = (PoliciaHeli.HeliEntity) cc).isLight() ? "MODO LINTERNA: la luz sigue tu mirada. W/S/A/D mover, ESPACIO subir, CTRL bajar (tecla de linterna para apagar)" : "HELICOPTERO: W/S avanzar, A/D desplazar, ESPACIO subir, CTRL bajar, Shift salir, tecla de linterna: luz") : "Helicoptero listo (J)") : (s.shield > 0 ? "Escudo activo: " + (s.shield + 19) / 20 + " s" : (s.cooldown > 0 ? "Escudo en enfriamiento: " + (s.cooldown + 19) / 20 + " s" : "Escudo listo (J)"));
+            st = s.sel == 3 ? ((cc = mc.player.getVehicle()) instanceof PoliciaHeli.HeliEntity ? ((hh = (PoliciaHeli.HeliEntity) cc).isLight() ? "MODO LINTERNA: la luz sigue tu mirada. W/S/A/D mover, ESPACIO subir, CTRL bajar (tecla de linterna para apagar)" : "HELICÓPTERO: W/S avanzar, A/D desplazar, ESPACIO subir, CTRL bajar, Shift salir, tecla de linterna: luz") : "Helicóptero listo (J)") : (s.shield > 0 ? "Escudo activo: " + (s.shield + 19) / 20 + " s" : (s.cooldown > 0 ? "Escudo en enfriamiento: " + (s.cooldown + 19) / 20 + " s" : "Escudo listo (J)"));
         }
         ls.add(st);
         cs.add(-8331009);

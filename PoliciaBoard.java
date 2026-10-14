@@ -27,7 +27,7 @@ import net.minecraftforge.network.PacketDistributor;
 // mision especial y la del casino, y entrega una brujula que guia al
 // objetivo activo.
 public class PoliciaBoard {
-    static final String[] STORY = new String[]{"", "Un ladron acaba de asaltar un puesto y huye con lo robado. Lo vieron correr por esta zona. Siga la brujula, alcancelo y espose al sospechoso.", "Hubo disturbios en tres puntos de la zona. Recorralos antes del tiempo limite; la brujula le ira marcando el siguiente lugar.", "Secuestraron a un aldeano y lo tienen retenido cerca. Siga la brujula, liberelo con clic derecho y traigalo de vuelta aqui.", "Una pandilla acampa cerca y asusta a los viajeros; hay un francotirador en lo alto. La brujula marca el campamento: eliminelos a todos.", "Escondieron evidencia clave en un cofre vigilado. Recupere el papel y traigalo aqui. La brujula marca el cofre.", "Un aldeano debe viajar a salvo hasta otro punto, pero huele a emboscada. Escortelo; la brujula marca el destino.", "Un saboteador dejo tres bombas. Desactivelas rompiendolas antes de que acabe el tiempo. La brujula marca la mas cercana.", "El jefe de la banda se esconde con su guardia. La brujula le lleva a su escondite. Cacelo.", "Siga las pistas hasta la guarida de El Cerebro. Se teletransporta e invoca refuerzos. Vaya preparado.", "Los ladrones del casino secuestraron a unos aldeanos. El casino esta bajo tierra, con tres plantas y mucha gente armada. La brujula le lleva a la entrada: baje, abrase paso y libere a un rehen.", "Los vecinos denuncian un campamento de bandidos o un escondite de ladrones cerca. La brujula marca el lugar: asaltelo y elimine a todos sus habitantes. Cuidado con los arqueros y con el jefe."};
+    static final String[] STORY = new String[]{"", "Un ladrón acaba de asaltar un puesto y huye con lo robado. Lo vieron correr por esta zona. Siga la brújula, alcáncelo y espose al sospechoso.", "Hubo disturbios en tres puntos de la zona. Recórralos antes del tiempo límite; la brújula le ira marcando el siguiente lugar.", "Secuestraron a un aldeano y lo tienen retenido cerca. Siga la brújula, libérelo con clic derecho y tráigalo de vuelta aquí.", "Una pandilla acampa cerca y asusta a los viajeros; hay un francotirador en lo alto. La brújula marca el campamento: elimínelos a todos.", "Escondieron evidencia clave en un cofre vigilado. Recupere el papel y tráigalo aquí. La brújula marca el cofre.", "Un aldeano debe viajar a salvo hasta otro punto, pero huele a emboscada. Escóltelo; la brújula marca el destino.", "Un saboteador dejo tres bombas. Desactívelas rompiéndolas antes de que acabe el tiempo. La brújula marca la más cercana.", "El jefe de la banda se esconde con su guardia. La brújula le lleva a su escondite. Cácelo.", "Siga las pistas hasta la guarida de El Cerebro. Se teletransporta e invoca refuerzos. Vaya preparado.", "Los ladrones del casino secuestraron a unos aldeanos. El casino esta bajo tierra, con tres plantas y mucha gente armada. La brújula le lleva a la entrada: baje, abrase paso y libere a un rehén.", "Los vecinos denuncian un campamento de bandidos o un escondite de ladrones cerca. La brújula marca el lugar: asáltelo y elimine a todos sus habitantes. Cuidado con los arqueros y con el jefe."};
 
     static void init() {
         PoliciaMod.NET.registerMessage(3, Open.class, Open::enc, Open::dec, Open::handle);
@@ -81,7 +81,7 @@ public class PoliciaBoard {
             }
         } else if (slot == 5) {
             if (PoliciaStruct.Sites.get(sl).nearest(2, sp.blockPosition()) == null) {
-                sp.sendSystemMessage(Component.literal("[Comisario] Todavia no sabemos donde esta el casino. Explore mas lejos y vuelva."));
+                sp.sendSystemMessage(Component.literal("[Comisario] Todavía no sabemos donde esta el casino. Explore más lejos y vuelva."));
             } else {
                 PoliciaMision.start(sp, 10, o);
             }
@@ -89,7 +89,7 @@ public class PoliciaBoard {
             PoliciaMision.M m = PoliciaMision.ACTIVE.get(sp.getUUID());
             if (m != null) {
                 PoliciaMision.cleanup(sl, m);
-                PoliciaMod.msg(sp, "Mision cancelada");
+                PoliciaMod.msg(sp, "Misión cancelada");
             }
             removeCompass(sp);
         }
@@ -107,8 +107,8 @@ public class PoliciaBoard {
     static void narrate(ServerPlayer sp, int type, PoliciaMision.M m) {
         String s = type >= 1 && type < STORY.length ? STORY[type] : "";
         sp.sendSystemMessage(Component.literal("[Comisario] " + PoliciaMision.TITLE[type] + ". " + s));
-        sp.sendSystemMessage(Component.literal("[Comisario] Tome esta brujula: apunta a su objetivo y desaparece cuando termine la mision. Tiempo: " + PoliciaMision.TIME[type] / 1200 + " min."));
-        PoliciaMod.msg(sp, "Mision aceptada: " + PoliciaMision.TITLE[type]);
+        sp.sendSystemMessage(Component.literal("[Comisario] Tome esta brújula: apunta a su objetivo y desaparece cuando termine la misión. Tiempo: " + PoliciaMision.TIME[type] / 1200 + " min."));
+        PoliciaMod.msg(sp, "Misión aceptada: " + PoliciaMision.TITLE[type]);
         giveCompass(sp, m);
     }
 
@@ -145,7 +145,7 @@ public class PoliciaBoard {
         ItemStack c = new ItemStack((ItemLike) Items.COMPASS);
         ServerLevel sl = sp.serverLevel();
         BlockPos t = target(sl, sp, m);
-        aim(c, sl, t, "Brujula del comisario");
+        aim(c, sl, t, "Brújula del comisario");
         PoliciaMision.give(sp, c);
     }
 
@@ -272,7 +272,7 @@ public class PoliciaBoard {
                     continue;
                 }
                 long left = Math.max(0L, (m.end - sl.getGameTime()) / 20L);
-                aim(s, sl, target(sl, sp, m), "Brujula del comisario - " + left / 60L + ":" + (left % 60L < 10L ? "0" : "") + left % 60L);
+                aim(s, sl, target(sl, sp, m), "Brújula del comisario - " + left / 60L + ":" + (left % 60L < 10L ? "0" : "") + left % 60L);
             }
         }
     }

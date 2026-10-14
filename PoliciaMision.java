@@ -106,14 +106,14 @@ public class PoliciaMision {
     public static final RegistryObject<EntityType<Pj>> PJ = PoliciaRefuerzo.ENTITIES.register("bandido", () -> EntityType.Builder.of(Pj::new, MobCategory.MISC).sized(0.6f, 1.95f).fireImmune().clientTrackingRange(10).build("policia:bandido"));
     public static final RegistryObject<EntityType<Pj>> COM = PoliciaRefuerzo.ENTITIES.register("comisario", () -> EntityType.Builder.of(Pj::new, MobCategory.MISC).sized(0.6f, 1.95f).clientTrackingRange(10).build("policia:comisario"));
     public static final RegistryObject<EntityType<Pj>> VAN = PoliciaRefuerzo.ENTITIES.register("furgoneta", () -> EntityType.Builder.of(Pj::new, MobCategory.MISC).sized(2.0f, 1.8f).fireImmune().clientTrackingRange(10).build("policia:furgoneta"));
-    static final String[] NAMES = new String[]{"Ladron", "Pandillero", "Pandillero arquero", "Lider de pandilla", "Jefe de banda", "Francotirador", "Contrabandista", "Saboteador", "Evadido", "Aldeano", "Comisario", "El Cerebro", "Mercader negro"};
+    static final String[] NAMES = new String[]{"Ladrón", "Pandillero", "Pandillero arquero", "Líder de pandilla", "Jefe de banda", "Francotirador", "Contrabandista", "Saboteador", "Evadido", "Aldeano", "Comisario", "El Cerebro", "Mercader negro"};
     static final double[] HP = new double[]{16.0, 22.0, 18.0, 40.0, 120.0, 16.0, 30.0, 14.0, 20.0, 20.0, 40.0, 220.0, 40.0};
     static final double[] SPD = new double[]{0.23, 0.26, 0.24, 0.27, 0.27, 0.0, 0.25, 0.25, 0.25, 0.22, 0.0, 0.3, 0.0};
     static final double[] DMG = new double[]{2.0, 4.0, 2.0, 6.0, 9.0, 2.0, 3.0, 1.0, 3.0, 1.0, 1.0, 11.0, 1.0};
     static final int[] XP = new int[]{0, 8, 6, 10, 12, 10, 10, 10, 40, 70, 60, 30};
     static final int[] TIME = new int[]{0, 6000, 4800, 9600, 9600, 12000, 12000, 3000, 14400, 24000, 36000, 24000};
-    static final String[] TITLE = new String[]{"", "Atrapar al fugitivo", "Patrulla de 3 puntos", "Rescate de aldeano", "Limpiar el campamento", "Recuperar evidencia", "Escolta de aldeano", "Desactivar bombas", "Cazar al jefe de banda", "El cerebro de la organizacion", "Rescate en el casino", "Asalto al campamento"};
-    static final String[] DESC = new String[]{"", "Un delincuente huye con lo robado. Esposelo con la habilidad Esposas.", "Recorra los 3 puntos marcados antes de que se acabe el tiempo.", "Un aldeano fue secuestrado. Liberelo (clic derecho) y llevelo al comisario.", "Una pandilla acampa cerca. Eliminela entera, hay un francotirador.", "Traiga el papel de evidencia del cofre vigilado hasta el comisario.", "Lleve al aldeano a salvo hasta el punto marcado. Habra una emboscada.", "Un saboteador dejo 3 bombas. Desactivelas (romperlas) antes de que expire el tiempo.", "El jefe de la banda se esconde con su guardia. Cacelo.", "Siga las pistas hasta la guarida del cerebro de la organizacion y derrotelo. Se teletransporta e invoca refuerzos.", "Los ladrones del casino secuestraron a unos aldeanos. Baje al casino subterraneo (tres plantas) y libere a un rehen.", "Hay un campamento de bandidos o ladrones en la zona. Asaltelo y elimine a todos sus habitantes."};
+    static final String[] TITLE = new String[]{"", "Atrapar al fugitivo", "Patrulla de 3 puntos", "Rescate de aldeano", "Limpiar el campamento", "Recuperar evidencia", "Escolta de aldeano", "Desactivar bombas", "Cazar al jefe de banda", "El cerebro de la organización", "Rescate en el casino", "Asalto al campamento"};
+    static final String[] DESC = new String[]{"", "Un delincuente huye con lo robado. Espóselo con la habilidad Esposas.", "Recorra los 3 puntos marcados antes de que se acabe el tiempo.", "Un aldeano fue secuestrado. Libérelo (clic derecho) y llévelo al comisario.", "Una pandilla acampa cerca. Elimínela entera, hay un francotirador.", "Traiga el papel de evidencia del cofre vigilado hasta el comisario.", "Lleve al aldeano a salvo hasta el punto marcado. Habrá una emboscada.", "Un saboteador dejo 3 bombas. Desactívelas (romperlas) antes de que expire el tiempo.", "El jefe de la banda se esconde con su guardia. Cácelo.", "Siga las pistas hasta la guarida del cerebro de la organización y derrótelo. Se teletransporta e invoca refuerzos.", "Los ladrones del casino secuestraron a unos aldeanos. Baje al casino subterráneo (tres plantas) y libere a un rehén.", "Hay un campamento de bandidos o ladrones en la zona. Asáltelo y elimine a todos sus habitantes."};
     static final Item[] ICON = new Item[]{Items.PAPER, Items.CHAIN, Items.MAP, Items.EMERALD, Items.IRON_SWORD, Items.WRITABLE_BOOK, Items.SHIELD, Items.FLINT_AND_STEEL, Items.DIAMOND_SWORD, Items.NETHERITE_SWORD, Items.DIAMOND, Items.CROSSBOW};
     static final String[] DIRS = new String[]{"este", "sureste", "sur", "suroeste", "oeste", "noroeste", "norte", "noreste"};
     static final Map<UUID, M> ACTIVE = new HashMap<UUID, M>();
@@ -252,7 +252,7 @@ public class PoliciaMision {
                 int[] ks = new int[]{0, 0, 6, 8};
                 Pj e = PoliciaMision.spawn(sl, m, ks[sl.random.nextInt(ks.length)], s);
                 m.target = e.getUUID();
-                PoliciaMod.msg(sp, "Un " + NAMES[e.kind()].toLowerCase() + " huye con lo robado. Busquelo y esposelo.");
+                PoliciaMod.msg(sp, "Un " + NAMES[e.kind()].toLowerCase() + " huye con lo robado. Búsquelo y espóselo.");
                 return true;
             }
             case 2: {
@@ -408,7 +408,7 @@ public class PoliciaMision {
 
     static void start(ServerPlayer sp, int type, BlockPos origin) {
         if (ACTIVE.containsKey(sp.getUUID())) {
-            PoliciaMod.msg(sp, "Ya tiene una mision en curso");
+            PoliciaMod.msg(sp, "Ya tiene una misión en curso");
             return;
         }
         ServerLevel sl = sp.serverLevel();
@@ -422,7 +422,7 @@ public class PoliciaMision {
         ACTIVE.put(m.pl, m);
         if (!(type != 9 ? (type != 10 ? PoliciaMision.setup(sl, sp, m) : PoliciaBoard.setup10(sl, sp, m)) : PoliciaMision.setup9(sl, sp, m))) {
             PoliciaMision.cleanup(sl, m);
-            PoliciaMod.msg(sp, "No encuentro un lugar para la mision, intente en otra zona");
+            PoliciaMod.msg(sp, "No encuentro un lugar para la misión, intente en otra zona");
             return;
         }
         PoliciaBoard.narrate(sp, type, m);
@@ -454,8 +454,8 @@ public class PoliciaMision {
         }
         PoliciaMision.cleanup(sl, m);
         if (sp != null) {
-            sp.sendSystemMessage((Component) Component.literal("[Comisario] Mision fallida: " + why));
-            PoliciaMod.msg(sp, "Mision fallida: " + why);
+            sp.sendSystemMessage((Component) Component.literal("[Comisario] Misión fallida: " + why));
+            PoliciaMod.msg(sp, "Misión fallida: " + why);
         }
     }
 
@@ -492,11 +492,11 @@ public class PoliciaMision {
             sp.getPersistentData().putInt("pol_bdone", sp.getPersistentData().getInt("pol_bdone") + 1);
             PoliciaMision.give(sp, new ItemStack((ItemLike) Items.DIAMOND, 3));
             PoliciaMision.give(sp, new ItemStack((ItemLike) Items.TOTEM_OF_UNDYING));
-            extra = ", 3 diamantes y un totem";
+            extra = ", 3 diamantes y un tótem";
         }
         PoliciaMod.sync(sp);
-        sp.sendSystemMessage((Component) Component.literal("[Comisario] Mision cumplida: " + TITLE[m.type] + ". Recompensa: " + xp + " XP, " + em + " esmeraldas" + extra + "."));
-        PoliciaMod.msg(sp, "Mision cumplida +" + xp + " XP");
+        sp.sendSystemMessage((Component) Component.literal("[Comisario] Misión cumplida: " + TITLE[m.type] + ". Recompensa: " + xp + " XP, " + em + " esmeraldas" + extra + "."));
+        PoliciaMod.msg(sp, "Misión cumplida +" + xp + " XP");
         sl.playSound(null, sp.blockPosition(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.0f);
         PoliciaMision.cleanup(sl, m);
     }
@@ -508,21 +508,21 @@ public class PoliciaMision {
             h.removeEffect(MobEffects.WEAKNESS);
             h.owner = sp.getUUID();
             h.getPersistentData().putBoolean("pol_cas", false);
-            sp.sendSystemMessage((Component) Component.literal("[Comisario] Rehen liberado."));
+            sp.sendSystemMessage((Component) Component.literal("[Comisario] Rehén liberado."));
             if (m != null && m.type == 10) {
                 PoliciaMision.finish(sp, sp.serverLevel(), m, 1.0);
             }
             return;
         }
         if (m == null || m.type != 3 || !h.getUUID().equals(m.hostage)) {
-            PoliciaMod.msg(sp, "No es el aldeano de su mision");
+            PoliciaMod.msg(sp, "No es el aldeano de su misión");
             return;
         }
         h.setCaptive(false);
         h.removeEffect(MobEffects.WEAKNESS);
         h.owner = sp.getUUID();
         m.phase = 1;
-        sp.sendSystemMessage((Component) Component.literal("[Comisario] Aldeano liberado. Llevelo de vuelta al comisario."));
+        sp.sendSystemMessage((Component) Component.literal("[Comisario] Aldeano liberado. Llévelo de vuelta al comisario."));
     }
 
     static boolean hasEv(Player p) {
@@ -576,15 +576,15 @@ public class PoliciaMision {
                 PoliciaMision.spawn(sl, m, 1, PoliciaMision.around(sl, p, 6));
                 PoliciaMision.spawn(sl, m, 3, PoliciaMision.around(sl, p, 6));
                 if (m.phase == 1) {
-                    sp.sendSystemMessage((Component) Component.literal("[Comisario] Documento falso hallado. Hay otra pista mas adentro."));
+                    sp.sendSystemMessage((Component) Component.literal("[Comisario] Documento falso hallado. Hay otra pista más adentro."));
                 } else {
                     sp.sendSystemMessage((Component) Component.literal("[Comisario] Ya sabemos donde se esconde el cerebro. Vaya a la guarida, con cuidado."));
                 }
             } else if (t % 40L == 0L) {
-                PoliciaMod.msg(sp, "Pista " + (m.phase + 1) + "/2: siga la brujula");
+                PoliciaMod.msg(sp, "Pista " + (m.phase + 1) + "/2: siga la brújula");
             }
         } else if (t % 40L == 0L) {
-            PoliciaMod.msg(sp, "Guarida del cerebro: siga la brujula");
+            PoliciaMod.msg(sp, "Guarida del cerebro: siga la brújula");
         }
     }
 
@@ -598,7 +598,7 @@ public class PoliciaMision {
         if (sp == null || !sp.isAlive() || sp.level() != sl) {
             PoliciaMision.cleanup(sl, m);
             if (sp != null) {
-                PoliciaMod.msg(sp, "Mision cancelada");
+                PoliciaMod.msg(sp, "Misión cancelada");
             }
             return;
         }
@@ -671,12 +671,12 @@ public class PoliciaMision {
                 double dx;
                 Entity h = sl.getEntity(m.hostage);
                 if (m.hostDead || h == null && t > 100L) {
-                    PoliciaMision.fail(sp, sl, m, "el aldeano murio");
+                    PoliciaMision.fail(sp, sl, m, "el aldeano murió");
                     return;
                 }
                 if (m.phase == 0) {
                     if (!hint) break;
-                    PoliciaMod.msg(sp, "Rehen: " + PoliciaMision.dir(pos, m.dest) + " - " + (m.end - now) / 20L + " s");
+                    PoliciaMod.msg(sp, "Rehén: " + PoliciaMision.dir(pos, m.dest) + " - " + (m.end - now) / 20L + " s");
                     break;
                 }
                 if (h == null) break;
@@ -710,7 +710,7 @@ public class PoliciaMision {
                 if (m.phase == 0) {
                     if (PoliciaMision.hasEv((Player) sp)) {
                         m.phase = 1;
-                        sp.sendSystemMessage((Component) Component.literal("[Comisario] Tiene la evidencia. Llevela al comisario."));
+                        sp.sendSystemMessage((Component) Component.literal("[Comisario] Tiene la evidencia. Llévela al comisario."));
                         break;
                     }
                     if (!hint) break;
@@ -734,7 +734,7 @@ public class PoliciaMision {
                 double dx;
                 Entity h = sl.getEntity(m.hostage);
                 if (m.hostDead || h == null && t > 100L) {
-                    PoliciaMision.fail(sp, sl, m, "el aldeano murio");
+                    PoliciaMision.fail(sp, sl, m, "el aldeano murió");
                     return;
                 }
                 if (h == null) break;
@@ -817,12 +817,12 @@ public class PoliciaMision {
 
     static ItemStack missionItem(int type) {
         int xp = XP[type];
-        return PoliciaMision.named(ICON[type], TITLE[type], DESC[type], "Tiempo: " + TIME[type] / 1200 + " min", "Recompensa: " + xp + " XP y " + Math.max(1, xp / 2) + " esmeraldas" + (type == 8 ? ", diamantes y un totem" : (type == 4 || type == 3 ? " y una manzana dorada" : "")));
+        return PoliciaMision.named(ICON[type], TITLE[type], DESC[type], "Tiempo: " + TIME[type] / 1200 + " min", "Recompensa: " + xp + " XP y " + Math.max(1, xp / 2) + " esmeraldas" + (type == 8 ? ", diamantes y un tótem" : (type == 4 || type == 3 ? " y una manzana dorada" : "")));
     }
 
     static void openBoard(ServerPlayer sp, Pj com) {
         if (!"policia".equals(PoliciaMod.job((Player) sp))) {
-            sp.sendSystemMessage((Component) Component.literal("[Comisario] Solo atiendo a policias. Vuelva con su placa."));
+            sp.sendSystemMessage((Component) Component.literal("[Comisario] Solo atiendo a policías. Vuelva con su placa."));
             return;
         }
         PoliciaBoard.open(sp, com);
@@ -1057,7 +1057,7 @@ public class PoliciaMision {
             this.playSound(SoundEvents.VILLAGER_NO, 1.0f, 0.7f);
             if (p instanceof ServerPlayer) {
                 ServerPlayer sp = (ServerPlayer) p;
-                sp.sendSystemMessage((Component) Component.literal("Un ladron te robo " + this.stolen.getCount() + " x " + this.stolen.getHoverName().getString() + "! Pegale 2 veces para que lo suelte"));
+                sp.sendSystemMessage((Component) Component.literal("Un ladrón te robó " + this.stolen.getCount() + " x " + this.stolen.getHoverName().getString() + "! Pegale 2 veces para que lo suelte"));
             }
         }
 
@@ -1557,7 +1557,7 @@ public class PoliciaMision {
                 sp.closeContainer();
                 if (m != null) {
                     PoliciaMision.cleanup(sp.serverLevel(), m);
-                    PoliciaMod.msg(sp, "Mision cancelada");
+                    PoliciaMod.msg(sp, "Misión cancelada");
                 }
             }
         }

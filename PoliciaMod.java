@@ -69,7 +69,7 @@ public class PoliciaMod {
 
     // Arbol de habilidades del oficio Policia.
     public static final String[] SKILLS = new String[]{
-            "Escudo balistico", "REFUERZO", "Tanque", "Helicoptero", "Tanque movil",
+            "Escudo balístico", "REFUERZO", "Tanque", "Helicóptero", "Tanque móvil",
             "Esposas", "Perro K9", "Sirena y torreta", "Dron de vigilancia", "Escudo de burbuja"
     };
     public static final int[] PRE = new int[]{-1, 0, 0, 0, 2, 1, 1, 3, 3, 0};
@@ -223,7 +223,7 @@ public class PoliciaMod {
         CompoundTag d = p.getPersistentData();
         if (id == 0) {
             if (!on(p) && job(p).isEmpty()) {
-                msg(p, "Estas desempleado: no tenes ningun oficio");
+                msg(p, "Estas desempleado: no tenés ningún oficio");
                 return;
             }
             d.putBoolean("pol_on", !on(p));
@@ -296,7 +296,7 @@ public class PoliciaMod {
                 return;
             }
             if (lv >= 4) {
-                msg(p, "REFUERZO ya esta al nivel maximo");
+                msg(p, "REFUERZO ya está al nivel máximo");
                 return;
             }
             int cost = 10 * lv;
@@ -306,7 +306,7 @@ public class PoliciaMod {
             }
             d.putInt("pol_xp", xp(p) - cost);
             d.putInt("pol_rl", lv + 1);
-            msg(p, "REFUERZO nivel " + (lv + 1) + ": " + PoliciaRefuerzo.COUNT[lv + 1] + " policias, espada de " + PoliciaRefuerzo.SWORD[lv + 1]);
+            msg(p, "REFUERZO nivel " + (lv + 1) + ": " + PoliciaRefuerzo.COUNT[lv + 1] + " policías, espada de " + PoliciaRefuerzo.SWORD[lv + 1]);
             p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8f, 1.4f);
             sync(p);
             return;
@@ -317,7 +317,7 @@ public class PoliciaMod {
                 return;
             }
             if (s == 9) {
-                msg(p, "Se gana completando la mision especial del comisario");
+                msg(p, "Se gana completando la misión especial del comisario");
                 return;
             }
             if (!has(p, PRE[s])) {
@@ -363,7 +363,7 @@ public class PoliciaMod {
             return;
         }
         if (!on(p)) {
-            msg(p, "Activa el modo policia (B) primero");
+            msg(p, "Activa el modo policía (B) primero");
             return;
         }
         if (id == 2) {
@@ -383,7 +383,7 @@ public class PoliciaMod {
             int s = has(p, sel(p)) ? sel(p) : 0;
             if (s == 0) {
                 if (shield(p) > 0) {
-                    msg(p, "El escudo ya esta activo");
+                    msg(p, "El escudo ya está activo");
                     return;
                 }
                 if (cooldown(p) > 0) {
@@ -393,13 +393,13 @@ public class PoliciaMod {
                 d.putInt("pol_shield", 240);
                 startShield(p);
                 p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 0.6f, 1.6f);
-                msg(p, "Escudo balistico desplegado");
+                msg(p, "Escudo balístico desplegado");
                 sync(p);
             } else if (s == 2 && has(p, 4)) {
                 PoliciaTank.useMobile(p);
             } else if (s == 2) {
                 if (p.getVehicle() instanceof PoliciaTank.TankEntity) {
-                    msg(p, "El tanque ya esta invocado");
+                    msg(p, "El tanque ya está invocado");
                     return;
                 }
                 if (shield(p) > 0) {
@@ -419,7 +419,7 @@ public class PoliciaMod {
             } else if (s == 1) {
                 PoliciaRefuerzo.use(p);
             } else {
-                msg(p, SKILLS[s] + " (proximamente)");
+                msg(p, SKILLS[s] + " (próximamente)");
             }
         }
     }
@@ -616,7 +616,7 @@ public class PoliciaMod {
                 pushMobs(p);
                 d.putInt("pol_cd", 80);
                 p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 0.5f, 1.4f);
-                msg(p, "El escudo se retiro");
+                msg(p, "El escudo se retiró");
                 change = true;
             }
         } else {

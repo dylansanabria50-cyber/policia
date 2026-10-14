@@ -61,7 +61,7 @@ public class PoliciaBubble {
 
     static boolean use(ServerPlayer p) {
         if (ACTIVE.containsKey(p.getUUID())) {
-            PoliciaMod.msg(p, "La burbuja ya esta activa");
+            PoliciaMod.msg(p, "La burbuja ya está activa");
             return false;
         }
         ServerLevel sl = p.serverLevel();
@@ -94,7 +94,7 @@ public class PoliciaBubble {
             sl.playSound(null, st.c.x, st.c.y, st.c.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0f, 1.5f);
         }
         if (o != null) {
-            PoliciaMod.msg(o, "La burbuja se disipo");
+            PoliciaMod.msg(o, "La burbuja se disipó");
         }
     }
 

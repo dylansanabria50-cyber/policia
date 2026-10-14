@@ -104,7 +104,7 @@ public class PoliciaRefuerzo {
         ServerLevel sl = p.serverLevel();
         List<AgentEntity> mine = sl.getEntitiesOfClass(AgentEntity.class, p.getBoundingBox().inflate(128.0), a -> p.getUUID().equals(a.owner));
         if (!mine.isEmpty()) {
-            PoliciaMod.msg(p, "Tus refuerzos ya estan en el campo");
+            PoliciaMod.msg(p, "Tus refuerzos ya están en el campo");
             return;
         }
         if (d.getInt("pol_rcd") > 0) {
@@ -134,7 +134,7 @@ public class PoliciaRefuerzo {
         // Aproximacion de sonidos de invocacion de refuerzos
         sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 1.0f, 1.4f);
         sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ARMOR_EQUIP_IRON, SoundSource.PLAYERS, 1.0f, 0.8f);
-        PoliciaMod.msg(p, "Refuerzo nivel " + lv + ": " + n + (n == 1 ? " policia" : " policias") + " con espada de " + SWORD[lv]);
+        PoliciaMod.msg(p, "Refuerzo nivel " + lv + ": " + n + (n == 1 ? " policía" : " policías") + " con espada de " + SWORD[lv]);
         PoliciaMod.sync(p);
     }
 

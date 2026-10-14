@@ -136,7 +136,7 @@ public class PoliciaTractor {
     static void unlock(ServerPlayer p) {
         CompoundTag d = p.getPersistentData();
         if (d.getInt("alb_tu") >= 1) {
-            PoliciaMod.msg(p, "TRACTOR ya esta desbloqueado");
+            PoliciaMod.msg(p, "TRACTOR ya está desbloqueado");
             return;
         }
         if (PoliciaMod.xp(p) < 15) {
@@ -167,7 +167,7 @@ public class PoliciaTractor {
         }
         if (p.getVehicle() instanceof TractorEntity) {
             p.stopRiding();
-            PoliciaMod.msg(p, "Bajaste del tractor (J: volver a subir, Mayus+J: retirarlo)");
+            PoliciaMod.msg(p, "Bajaste del tractor (J: volver a subir, Mayús+J: retirarlo)");
             return;
         }
         TractorEntity t = PoliciaTractor.mine(p);
@@ -177,7 +177,7 @@ public class PoliciaTractor {
                 return;
             }
             if (t.level() != p.level() || t.distanceToSqr((Entity) p) > 400.0) {
-                PoliciaMod.msg(p, "El tractor esta lejos (Mayus+J lo retira)");
+                PoliciaMod.msg(p, "El tractor está lejos (Mayús+J lo retira)");
                 return;
             }
             if (t.getFirstPassenger() != null) {

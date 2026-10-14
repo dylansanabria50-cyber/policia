@@ -72,7 +72,7 @@ public class PoliciaGrupo {
         for (UUID u : new ArrayList<>(s)) {
             ServerPlayer o = srv.getPlayerList().getPlayer(u);
             if (o == null) continue;
-            tell(o, nm + " salio del grupo");
+            tell(o, nm + " salió del grupo");
         }
         if (s.size() <= 1) {
             ArrayList<UUID> rest = new ArrayList<>(s);
@@ -83,7 +83,7 @@ public class PoliciaGrupo {
             for (UUID u : rest) {
                 ServerPlayer o = srv.getPlayerList().getPlayer(u);
                 if (o == null) continue;
-                tell(o, "El grupo se disolvio");
+                tell(o, "El grupo se disolvió");
                 PoliciaMod.NET.send(PacketDistributor.PLAYER.with(() -> o), new Team());
             }
         }
@@ -99,7 +99,7 @@ public class PoliciaGrupo {
         }
         Set<UUID> s = PARTY.get(id);
         if (s.size() >= 5) {
-            tell(b, "El grupo esta lleno");
+            tell(b, "El grupo está lleno");
             return;
         }
         s.add(b.getUUID());
@@ -108,7 +108,7 @@ public class PoliciaGrupo {
         for (UUID u : s) {
             ServerPlayer o = srv.getPlayerList().getPlayer(u);
             if (o == null) continue;
-            tell(o, b.getGameProfile().getName() + " se unio al grupo");
+            tell(o, b.getGameProfile().getName() + " se unió al grupo");
         }
     }
 
@@ -223,12 +223,12 @@ public class PoliciaGrupo {
                         }
                         Set<UUID> mine = members(a.getUUID());
                         if (mine != null && mine.size() >= 5) {
-                            tell(a, "Su grupo esta lleno");
+                            tell(a, "Su grupo está lleno");
                             return 0;
                         }
                         INV.put(b.getUUID(), a.getUUID());
                         INV_T.put(b.getUUID(), a.serverLevel().getGameTime());
-                        tell(a, "Invitacion enviada a " + b.getGameProfile().getName());
+                        tell(a, "Invitación enviada a " + b.getGameProfile().getName());
                         tell(b, a.getGameProfile().getName() + " le invita a su grupo. Escriba /grupo aceptar (60 s)");
                         return 1;
                     })))
@@ -250,11 +250,11 @@ public class PoliciaGrupo {
                     .then(Commands.literal("salir").executes(c -> {
                         ServerPlayer p = c.getSource().getPlayerOrException();
                         if (!OF.containsKey(p.getUUID())) {
-                            tell(p, "No esta en ningun grupo");
+                            tell(p, "No está en ningún grupo");
                             return 0;
                         }
                         leave(p.getServer(), p.getUUID());
-                        tell(p, "Salio del grupo");
+                        tell(p, "Salió del grupo");
                         PoliciaMod.NET.send(PacketDistributor.PLAYER.with(() -> p), new Team());
                         return 1;
                     }))
@@ -262,7 +262,7 @@ public class PoliciaGrupo {
                         ServerPlayer p = c.getSource().getPlayerOrException();
                         Set<UUID> s = members(p.getUUID());
                         if (s == null) {
-                            tell(p, "No esta en ningun grupo. Use /grupo invitar <jugador>");
+                            tell(p, "No está en ningún grupo. Use /grupo invitar <jugador>");
                             return 0;
                         }
                         StringBuilder sb = new StringBuilder();

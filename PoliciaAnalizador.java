@@ -48,9 +48,9 @@ public class PoliciaAnalizador {
     static final String[] QUEST_NAMES = new String[]{
             "Minar menas", "Cazar monstruos", "Caminar", "Sobrevivir sin heridas",
             "Reunir materiales", "Pescar", "Construir", "Nadar",
-            "Talar arboles", "Cosechar cultivos", "Criar animales", "Comerciar con aldeanos",
+            "Talar árboles", "Cosechar cultivos", "Criar animales", "Comerciar con aldeanos",
             "Fundir en el horno", "Craftear objetos", "Domesticar animales", "Escalar las alturas",
-            "Bajar a las profundidades", "Comer", "Dormir una noche", "Punteria con arco", "Saltar"
+            "Bajar a las profundidades", "Comer", "Dormir una noche", "Puntería con arco", "Saltar"
     };
     static final int[] QUEST_NEED = new int[]{12, 8, 500, 1200, 10, 5, 20, 600,
             16, 12, 3, 3, 16, 10, 2, 1, 1, 10, 1, 5, 100};
@@ -215,12 +215,12 @@ public class PoliciaAnalizador {
     static void startQuest(ServerPlayer p, String itemId) {
         CompoundTag d = p.getPersistentData();
         if (PoliciaAnalizador.known(p, itemId)) {
-            PoliciaMod.msg(p, "Ese item ya esta analizado");
+            PoliciaMod.msg(p, "Ese item ya está analizado");
             return;
         }
         String cur = d.getString("her_an_qitem");
         if (!cur.isEmpty()) {
-            PoliciaMod.msg(p, "Ya tenes una mision de analisis en curso: cancelala en el Analizador (O) para pedir otra");
+            PoliciaMod.msg(p, "Ya tenés una misión de análisis en curso: cancelala en el Analizador (O) para pedir otra");
             return;
         }
         String[] q = PoliciaAnalizador.questFor(itemId);
@@ -233,7 +233,7 @@ public class PoliciaAnalizador {
         d.putInt("her_an_qhp", (int) p.getHealth());
         d.putDouble("her_an_qx", p.getX());
         d.putDouble("her_an_qz", p.getZ());
-        PoliciaMod.msg(p, "Mision de analisis: " + QUEST_NAMES[type] + " (" + QUEST_NEED[type] + ")");
+        PoliciaMod.msg(p, "Misión de análisis: " + QUEST_NAMES[type] + " (" + QUEST_NEED[type] + ")");
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1.0f, 1.0f);
         PoliciaAnalizador.send(p);
     }
@@ -245,7 +245,7 @@ public class PoliciaAnalizador {
         }
         d.putString("her_an_qitem", "");
         d.putInt("her_an_qprog", 0);
-        PoliciaMod.msg(p, "Mision de analisis cancelada");
+        PoliciaMod.msg(p, "Misión de análisis cancelada");
         PoliciaAnalizador.send(p);
     }
 
@@ -263,7 +263,7 @@ public class PoliciaAnalizador {
             }
             d.putString("her_an_qitem", "");
             PoliciaAnalizador.learn(p, item);
-            PoliciaMod.msg(p, "Mision de analisis completa!");
+            PoliciaMod.msg(p, "Misión de análisis completa!");
         }
         PoliciaAnalizador.send(p);
     }

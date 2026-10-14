@@ -20,8 +20,8 @@ public class PoliciaTreeScreen extends Screen {
     static final int PW = 460;
     static final int PH = 340;
     static final int LEFT_W = 104;
-    static final String[] NAMES = new String[]{"Escudo balistico", "REFUERZO", "Tanque", "Helicoptero", "Tanque movil", "Esposas", "Perro K9", "Sirena y torreta", "Dron de vigilancia", "Escudo de burbuja"};
-    static final String[] DESC = new String[]{"Despliega un escudo antidisturbios durante 12 s. Bloquea los golpes de frente.", "Policias de refuerzo que te protegen y atacan a tus enemigos.", "Invoca un tanque bajo tus pies. Apunta y dispara con clic derecho una sola vez; luego se retira. Enfriamiento: 30 s.", "Invoca un helicoptero policial pilotable: W/S avanzar, A/D desplazar, ESPACIO subir, CTRL bajar. Tecla de linterna: luz que sigue tu mirada. Dura 2 min y aterriza solo. Enfriamiento: 60 s.", "Mejora del Tanque: lo reemplaza. Conduce con WASD, 3 disparos con clic derecho; baja con Mayus y vuelve a subir con clic derecho. Enfriamiento: 30 s.", "Apunta a un objetivo (hasta 12 m) y lo esposas 15 s: no puede atacar ni interactuar y tu puedes arrastrarlo. Enfriamiento: 30 s.", "Invoca un perro policia que te protege, ataca amenazas y marca con brillo a los enemigos cercanos. Dura 45 s. Enfriamiento: 60 s.", "Despliega una patrulla con sirena: los mobs hostiles cercanos huyen de miedo y la torreta dispara a los que esten a tiro. Dura 20 s. Enfriamiento: 40 s.", "Un dron vigila sobre ti 45 s y marca con brillo, incluso tras las paredes, a las amenazas en 32 m. Enfriamiento: 60 s.", "Recompensa de la mision especial El cerebro de la organizacion. Una esfera azul de 14 bloques te sigue 23 s: todo lo que entra (enemigos, flechas, otros jugadores) se mueve muy lento, menos tu. Bloquea proyectiles y reduce el dano cuerpo a cuerpo. Enfriamiento: 26 s."};
+    static final String[] NAMES = new String[]{"Escudo balístico", "REFUERZO", "Tanque", "Helicóptero", "Tanque móvil", "Esposas", "Perro K9", "Sirena y torreta", "Dron de vigilancia", "Escudo de burbuja"};
+    static final String[] DESC = new String[]{"Despliega un escudo antidisturbios durante 12 s. Bloquea los golpes de frente.", "Policías de refuerzo que te protegen y atacan a tus enemigos.", "Invoca un tanque bajo tus pies. Apunta y dispara con clic derecho una sola vez; luego se retira. Enfriamiento: 30 s.", "Invoca un helicóptero policial pilotable: W/S avanzar, A/D desplazar, ESPACIO subir, CTRL bajar. Tecla de linterna: luz que sigue tu mirada. Dura 2 min y aterriza solo. Enfriamiento: 60 s.", "Mejora del Tanque: lo reemplaza. Conduce con WASD, 3 disparos con clic derecho; baja con Mayús y vuelve a subir con clic derecho. Enfriamiento: 30 s.", "Apunta a un objetivo (hasta 12 m) y lo esposas 15 s: no puede atacar ni interactuar y tu puedes arrastrarlo. Enfriamiento: 30 s.", "Invoca un perro policía que te protege, ataca amenazas y marca con brillo a los enemigos cercanos. Dura 45 s. Enfriamiento: 60 s.", "Despliega una patrulla con sirena: los mobs hostiles cercanos huyen de miedo y la torreta dispara a los que estén a tiro. Dura 20 s. Enfriamiento: 40 s.", "Un dron vigila sobre ti 45 s y marca con brillo, incluso tras las paredes, a las amenazas en 32 m. Enfriamiento: 60 s.", "Recompensa de la misión especial El cerebro de la organización. Una esfera azul de 14 bloques te sigue 23 s: todo lo que entra (enemigos, flechas, otros jugadores) se mueve muy lento, menos tu. Bloquea proyectiles y reduce el daño cuerpo a cuerpo. Enfriamiento: 26 s."};
     static final int[] CX = new int[]{174, 72, 174, 276, 174, 38, 106, 242, 310, 276};
     static final int[] ROW = new int[]{0, 1, 1, 1, 2, 2, 2, 2, 2, 0};
     int px;
@@ -215,7 +215,7 @@ public class PoliciaTreeScreen extends Screen {
         int sel = s == null ? 0 : s.sel;
         int lvl = this.minecraft != null && this.minecraft.player != null ? this.minecraft.player.experienceLevel : 0;
         PoliciaTreeScreen.panel(g, this.px, this.py, this.px + 104, this.py + 340);
-        this.tag(g, "Policia", this.px + 6, this.py - 6);
+        this.tag(g, "Policía", this.px + 6, this.py - 6);
         if (this.minecraft != null && this.minecraft.player != null) {
             InventoryScreen.renderEntityInInventoryFollowsMouse(g, this.px + 52, this.py + 340 - 30, 55, (float) (this.px + 52 - mx), (float) (this.py + 60 - my), this.minecraft.player);
         }
@@ -302,11 +302,11 @@ public class PoliciaTreeScreen extends Screen {
         if (show == 1 && open) {
             int lv = Math.max(1, s == null ? 1 : s.rl);
             g.drawString(this.font, "Nv " + lv + "/4 - " + PoliciaRefuerzo.COUNT[lv] + " NPC - espada " + PoliciaRefuerzo.SWORD[lv], bx0 + 5, by0 + 36, -1523648, false);
-            String upg = lv >= 4 ? "Nivel maximo" : "Clic derecho: mejorar (" + 10 * lv + " XP)";
+            String upg = lv >= 4 ? "Nivel máximo" : "Clic derecho: mejorar (" + 10 * lv + " XP)";
             g.drawString(this.font, upg, bx0 + 5, by0 + 46, -6642512, false);
         }
         if (!open) {
-            g.drawString(this.font, show == 9 ? "Bloqueada - se gana con la mision especial del comisario" : "Bloqueada - cuesta " + PoliciaTreeScreen.cost(show), bx0 + 5, by1 - 11, -1525712, false);
+            g.drawString(this.font, show == 9 ? "Bloqueada - se gana con la misión especial del comisario" : "Bloqueada - cuesta " + PoliciaTreeScreen.cost(show), bx0 + 5, by1 - 11, -1525712, false);
         } else if (show == sel) {
             g.drawString(this.font, "Elegida (tecla J)", bx0 + 5, by1 - 11, -10428320, false);
         } else {

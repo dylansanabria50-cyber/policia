@@ -23,8 +23,8 @@ public class PoliciaLadronScreen extends Screen {
     static final int PW = 460;
     static final int PH = 340;
     static final int LEFT_W = 104;
-    static final String[] NAMES = new String[]{"Carterismo", "Silbido", "Suerte", "Humo", "Salto", "Instinto", "Polvo", "Ganzua", "Escape"};
-    static final String[] DESC = new String[]{"Con el modo ladron (B) activo, agachate (Mayus) detras de un jugador o mob y haz clic derecho. Si sale bien abres sus bolsillos y te llevas lo que quieras. Siempre activa.", "Los mobs a 12 bloques miran para otro lado 7 s, quedan lentos y no te atacan: facilita acercarte por la espalda. Tecla J. Enfriamiento: 15 s.", "Trebol de cuatro hojas: mejora la probabilidad del carterismo a 40%, 45%, 50% y 55%. Cada nivel reemplaza al anterior. Clic para mejorar.", "Bomba de humo: te vuelves invisible 8 s, corres mas rapido y los mobs que te perseguian te pierden. Se elige con K y se usa con J. Enfriamiento: 30 s. Requiere Silbido.", "Salto de sombra: das un gran salto hacia donde miras y caes sin danio. Se elige con K y se usa con J. Enfriamiento: 12 s. Requiere Silbido.", "Sentido de ladron: todo ser vivo a 24 bloques brilla 10 s, incluso a traves de las paredes. Se elige con K y se usa con J. Enfriamiento: 25 s. Requiere Suerte nivel 1.", "Polvo cegador: los mobs a 6 bloques quedan ciegos, lentos y debiles 7 s y pierden su objetivo. Se elige con K y se usa con J. Enfriamiento: 20 s. Requiere Suerte nivel 1.", "Ganzua: en las aldeas con comisaria hay cofres con llave (sin abrir) que nadie mas puede abrir, y puertas de hierro. Agachate (Mayus) y clic derecho: 50% de exito, +10% por cada nivel de Suerte. Si falla salta la alarma y la policia te busca. Requiere Suerte nivel 1.", "Escape: durante 10 s te vuelves invisible y mas rapido, la policia te pierde de vista y, si no cometes ningun delito, tu nivel de Buscado vuelve a cero. Se elige con K y se usa con J. Enfriamiento: 90 s. Requiere Silbido."};
+    static final String[] NAMES = new String[]{"Carterismo", "Silbido", "Suerte", "Humo", "Salto", "Instinto", "Polvo", "Ganzúa", "Escape"};
+    static final String[] DESC = new String[]{"Con el modo ladrón (B) activo, agachate (Mayús) detrás de un jugador o mob y haz clic derecho. Si sale bien abres sus bolsillos y te llevas lo que quieras. Siempre activa.", "Los mobs a 12 bloques miran para otro lado 7 s, quedan lentos y no te atacan: facilita acercarte por la espalda. Tecla J. Enfriamiento: 15 s.", "Trébol de cuatro hojas: mejora la probabilidad del carterismo a 40%, 45%, 50% y 55%. Cada nivel reemplaza al anterior. Clic para mejorar.", "Bomba de humo: te vuelves invisible 8 s, corres más rápido y los mobs que te perseguían te pierden. Se elige con K y se usa con J. Enfriamiento: 30 s. Requiere Silbido.", "Salto de sombra: das un gran salto hacia donde miras y caes sin daño. Se elige con K y se usa con J. Enfriamiento: 12 s. Requiere Silbido.", "Sentido de ladrón: todo ser vivo a 24 bloques brilla 10 s, incluso a través de las paredes. Se elige con K y se usa con J. Enfriamiento: 25 s. Requiere Suerte nivel 1.", "Polvo cegador: los mobs a 6 bloques quedan ciegos, lentos y débiles 7 s y pierden su objetivo. Se elige con K y se usa con J. Enfriamiento: 20 s. Requiere Suerte nivel 1.", "Ganzúa: en las aldeas con comisaría hay cofres con llave (sin abrir) que nadie más puede abrir, y puertas de hierro. Agachate (Mayús) y clic derecho: 50% de éxito, +10% por cada nivel de Suerte. Si falla salta la alarma y la policía te busca. Requiere Suerte nivel 1.", "Escape: durante 10 s te vuelves invisible y más rápido, la policía te pierde de vista y, si no cometes ningún delito, tu nivel de Buscado vuelve a cero. Se elige con K y se usa con J. Enfriamiento: 90 s. Requiere Silbido."};
     static final int[] CX = new int[]{174, 90, 258, 40, 140, 208, 308, 258, 90};
     static final int[] ROW = new int[]{0, 1, 1, 2, 2, 2, 2, 2, 2};
     static final int[] PRE = new int[]{-1, 0, 0, 1, 1, 2, 2, 2, 1};
@@ -33,7 +33,7 @@ public class PoliciaLadronScreen extends Screen {
     int py;
 
     public PoliciaLadronScreen() {
-        super(Component.literal("Rama del ladron"));
+        super(Component.literal("Rama del ladrón"));
     }
 
     @Override
@@ -100,7 +100,7 @@ public class PoliciaLadronScreen extends Screen {
         int mask = s == null ? 0 : s.un;
         int xp = s == null ? 0 : s.xp;
         PoliciaLadronScreen.panel(g, this.px, this.py, this.px + 104, this.py + 340);
-        this.tag(g, "Ladron", this.px + 6, this.py - 6);
+        this.tag(g, "Ladrón", this.px + 6, this.py - 6);
         if (this.minecraft != null && this.minecraft.player != null) {
             InventoryScreen.renderEntityInInventoryFollowsMouse(g, this.px + 52, this.py + 340 - 30, 55, (float) (this.px + 52 - mx), (float) (this.py + 60 - my), this.minecraft.player);
         }
@@ -176,7 +176,7 @@ public class PoliciaLadronScreen extends Screen {
             boolean op = this.open(show, sil, lv, mask);
             g.drawString(this.font, op ? (show == 7 ? "Desbloqueada (agachado + clic derecho)" : "Desbloqueada (K elige, J usa)") : "Bloqueada - cuesta 20 XP", bx0 + 5, by1 - 11, op ? -10428320 : -1525712, false);
         } else {
-            g.drawString(this.font, lv >= 4 ? "Nivel maximo" : "Siguiente nivel: " + PoliciaLadron.CHANCE[lv + 1] + "% - cuesta " + 10 * (lv + 1) + " XP", bx0 + 5, by1 - 11, -1525712, false);
+            g.drawString(this.font, lv >= 4 ? "Nivel máximo" : "Siguiente nivel: " + PoliciaLadron.CHANCE[lv + 1] + "% - cuesta " + 10 * (lv + 1) + " XP", bx0 + 5, by1 - 11, -1525712, false);
         }
         super.render(g, mx, my, pt);
     }
@@ -208,9 +208,9 @@ public class PoliciaLadronScreen extends Screen {
         int lv = Math.max(0, Math.min(4, s.rl));
         ArrayList<String> ls = new ArrayList<>();
         ArrayList<Integer> cs = new ArrayList<>();
-        ls.add("OFICIO LADRON - XP " + s.xp);
+        ls.add("OFICIO LADRÓN - XP " + s.xp);
         cs.add(-1523648);
-        ls.add("Carterismo: Mayus + clic der. (" + PoliciaLadron.CHANCE[lv] + "%)");
+        ls.add("Carterismo: Mayús + clic der. (" + PoliciaLadron.CHANCE[lv] + "%)");
         cs.add(-1);
         if (s.tcd > 0) {
             ls.add("BUSCADO " + "*".repeat(Math.min(5, s.tcd)));
@@ -223,7 +223,7 @@ public class PoliciaLadronScreen extends Screen {
             if ((s.un >> a & 1) == 0) continue;
             any = true;
             if (a == 5) {
-                ls.add("  Ganzua: agachado + clic");
+                ls.add("  Ganzúa: agachado + clic");
                 cs.add(-5187400);
                 continue;
             }

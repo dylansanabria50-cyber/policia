@@ -208,7 +208,7 @@ public class PoliciaHerreroScreen extends Screen {
             g.drawString(this.font, lines.get(k), bx0 + 5, by0 + 15 + k * 9, -3616548, false);
         }
         boolean op = open(show, xp);
-        String foot = !op ? "Bloqueada - se desbloquea sola al llegar a " + need(show) + " XP (tenes " + xp + ")"
+        String foot = !op ? "Bloqueada - se desbloquea sola al llegar a " + need(show) + " XP (tenés " + xp + ")"
                 : (show == 8 ? "Desbloqueada - siempre activa, tecla O abre el Analizador" : "Desbloqueada - clic para elegirla, J para usarla");
         g.drawString(this.font, foot, bx0 + 5, by1 - 11, op ? -10428320 : -1525712, false);
         super.render(g, mx, my, pt);

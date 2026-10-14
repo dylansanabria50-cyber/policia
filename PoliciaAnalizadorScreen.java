@@ -268,7 +268,7 @@ public class PoliciaAnalizadorScreen extends Screen {
             case 0 -> "Mina " + need + " de " + tn;
             case 1 -> "Mata " + need + " " + tn;
             case 2 -> "Camina " + need + " bloques";
-            case 3 -> "Sobrevive " + need / 20 + " s sin recibir danio";
+            case 3 -> "Sobrevive " + need / 20 + " s sin recibir daño";
             case 4 -> "Junta " + need + " de " + tn + " (se gastan al terminar)";
             case 5 -> "Pesca " + need + " veces";
             case 6 -> "Coloca " + need + " bloques";
@@ -280,10 +280,10 @@ public class PoliciaAnalizadorScreen extends Screen {
             case 12 -> "Funde " + need + " items en un horno";
             case 13 -> "Craftea " + need + " objetos en la mesa";
             case 14 -> "Domestica " + need + " animales";
-            case 15 -> "Subi hasta la altura 120";
+            case 15 -> "Subí hasta la altura 120";
             case 16 -> "Baja hasta la altura -30";
             case 17 -> "Come " + need + " veces";
-            case 18 -> "Dormi en una cama hasta la manana";
+            case 18 -> "Dormí en una cama hasta la mañana";
             case 19 -> "Mata " + need + " monstruos con arco o ballesta";
             default -> "Salta " + need + " veces";
         };
@@ -432,7 +432,7 @@ public class PoliciaAnalizadorScreen extends Screen {
             }
         }
         if (this.shown.isEmpty()) {
-            String msg = t.kind == K_KNOWN ? "Todavia no analizaste nada" : "No hay objetos";
+            String msg = t.kind == K_KNOWN ? "Todavía no analizaste nada" : "No hay objetos";
             g.drawString(this.font, msg, gx + 81 - this.font.width(msg) / 2, gy + 40, TEXT, false);
         }
         // Barra de desplazamiento (con la lente del Analizador).
@@ -450,7 +450,7 @@ public class PoliciaAnalizadorScreen extends Screen {
         int ly = gy + 92;
         if (LAST != null && !LAST.questItem.isEmpty()) {
             String qn = new ItemStack(PoliciaAnalizadorScreen.item(LAST.questItem)).getHoverName().getString();
-            String line = "Mision: " + qn + " " + PoliciaAnalizadorScreen.progText(LAST.questType, LAST.questProg, LAST.questNeed);
+            String line = "Misión: " + qn + " " + PoliciaAnalizadorScreen.progText(LAST.questType, LAST.questProg, LAST.questNeed);
             g.fill(x0 + 8, ly + 3, x0 + 14, ly + 9, C_QUEST);
             g.drawString(this.font, this.font.plainSubstrByWidth(line, PW - 26), x0 + 18, ly + 2, TEXT, false);
             ly += 12;
@@ -460,7 +460,7 @@ public class PoliciaAnalizadorScreen extends Screen {
         g.pose().scale(0.75f, 0.75f, 1.0f);
         int lx = 0;
         int[] lc = new int[]{C_UNCONF, C_CONF, C_QUEST};
-        String[] ln = new String[]{"sin confirmar", "confirmada", "mision"};
+        String[] ln = new String[]{"sin confirmar", "confirmada", "misión"};
         for (int i = 0; i < 3; ++i) {
             g.fill(lx, 1, lx + 7, 8, OUTLINE);
             g.fill(lx + 1, 2, lx + 6, 7, lc[i]);
@@ -495,7 +495,7 @@ public class PoliciaAnalizadorScreen extends Screen {
         PoliciaAnalizadorScreen.bevel(g, x0, dy, x0 + PW, dy + DH, PANEL, P_LIGHT, P_DARK);
         int bx = x0 + PW - 64;
         if (this.selected.isEmpty()) {
-            List<FormattedCharSequence> ls = this.font.split(FormattedText.of("Elegi un objeto para ver su receta o la mision para aprenderlo. Sostener un objeto 2 s en la mano secundaria lo analiza al instante."), PW - 16);
+            List<FormattedCharSequence> ls = this.font.split(FormattedText.of("Elegí un objeto para ver su receta o la misión para aprenderlo. Sostener un objeto 2 s en la mano secundaria lo analiza al instante."), PW - 16);
             for (int i = 0; i < ls.size() && i < 5; ++i) {
                 g.drawString(this.font, ls.get(i), x0 + 8, dy + 8 + i * 10, TEXT, false);
             }
@@ -525,9 +525,9 @@ public class PoliciaAnalizadorScreen extends Screen {
                 this.button(g, bx, dy + 6, 58, "Cancelar", true, 5, mx, my);
                 g.drawString(this.font, PoliciaAnalizadorScreen.progText(type, LAST.questProg, LAST.questNeed), bx + 2, dy + 26, TEXT, false);
             } else {
-                this.button(g, bx, dy + 6, 58, "Pedir mision", !otherQuest, 0, mx, my);
+                this.button(g, bx, dy + 6, 58, "Pedir misión", !otherQuest, 0, mx, my);
                 if (otherQuest) {
-                    g.drawString(this.font, "Ya tenes otra", bx + 2, dy + 24, 0xFF9A2A10, false);
+                    g.drawString(this.font, "Ya tenés otra", bx + 2, dy + 24, 0xFF9A2A10, false);
                     this.button(g, bx, dy + 36, 58, "Cancelarla", true, 5, mx, my);
                 }
             }

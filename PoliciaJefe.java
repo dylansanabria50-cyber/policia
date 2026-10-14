@@ -71,7 +71,7 @@ public class PoliciaJefe {
 
     // Pruebas de ingreso, una por oficio (0 policia, 1 albanil, 2 ladron, 3 herrero).
     static final Def[] TRIALS = new Def[]{
-            new Def("t_policia", 0, "kill_enemy", "", 8, "Prueba de reclutamiento: elimina 8 monstruos para demostrar que podes proteger a la gente", 0, 0),
+            new Def("t_policia", 0, "kill_enemy", "", 8, "Prueba de reclutamiento: elimina 8 monstruos para demostrar que podés proteger a la gente", 0, 0),
             new Def("t_albanil", 1, "place", "", 64, "Prueba de obra: coloca 64 bloques", 0, 0),
             new Def("t_ladron", 2, "sneak", "", 150, "Prueba de sigilo: recorre 150 bloques agachado", 0, 0),
             new Def("t_herrero", 3, "smelt", "minecraft:iron_ingot", 16, "Prueba de forja: funde 16 lingotes de hierro en un horno", 0, 0)
@@ -86,17 +86,17 @@ public class PoliciaJefe {
             new Def("a_vidrio", 1, "deliver", "minecraft:glass", 32, "Entrega 32 bloques de vidrio", 7, 5),
             new Def("l_sigilo", 2, "sneak", "", 250, "Recorre 250 bloques agachado sin que te vean", 6, 4),
             new Def("l_bolsillos", 2, "pick", "", 3, "Haz 3 carterismos exitosos", 8, 6),
-            new Def("l_ganzua", 2, "lock", "", 2, "Abre 2 cerraduras con la ganzua", 7, 5),
+            new Def("l_ganzua", 2, "lock", "", 2, "Abre 2 cerraduras con la ganzúa", 7, 5),
             new Def("l_oro", 2, "deliver", "minecraft:gold_ingot", 12, "Entrega 12 lingotes de oro", 7, 6),
             new Def("l_rivales", 2, "kill", "minecraft:pillager", 4, "Elimina 4 saqueadores: nos arruinan el negocio", 7, 5),
             new Def("l_diamantes", 2, "deliver", "minecraft:diamond", 3, "Consigue 3 diamantes para el jefe", 9, 8),
             new Def("h_fundir", 3, "smelt", "minecraft:iron_ingot", 32, "Funde 32 lingotes de hierro", 6, 4),
             new Def("h_forjar", 3, "craft_iron", "", 4, "Forja 4 herramientas, armas o armaduras de hierro", 7, 5),
             new Def("h_yunque", 3, "deliver", "minecraft:anvil", 1, "Entrega un yunque nuevo para el taller", 6, 5),
-            new Def("h_reparar", 3, "repair", "", 2, "Usa Reparacion Maestra 2 veces", 7, 5),
+            new Def("h_reparar", 3, "repair", "", 2, "Usa Reparación Maestra 2 veces", 7, 5),
             new Def("h_analizar", 3, "analyze", "", 3, "Analiza 3 objetos nuevos", 8, 6),
             new Def("h_menas", 3, "mine", "#minecraft:iron_ores", 16, "Mina 16 menas de hierro", 6, 5),
-            new Def("h_carbon", 3, "deliver", "minecraft:coal_block", 6, "Entrega 6 bloques de carbon para la forja", 5, 4)
+            new Def("h_carbon", 3, "deliver", "minecraft:coal_block", 6, "Entrega 6 bloques de carbón para la forja", 5, 4)
     };
 
     static void init() {
@@ -170,7 +170,7 @@ public class PoliciaJefe {
         t.putDouble("jm_lz", p.getZ());
         t.putDouble("jm_acc", 0.0);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1.0f, 1.0f);
-        p.sendSystemMessage(Component.literal("[Mision] " + d.desc).withStyle(s -> s.withColor(0x7CFC7C)));
+        p.sendSystemMessage(Component.literal("[Misión] " + d.desc).withStyle(s -> s.withColor(0x7CFC7C)));
     }
 
     static void clear(ServerPlayer p) {
@@ -193,9 +193,9 @@ public class PoliciaJefe {
         t.putInt("jm_prog", now);
         if (now >= d.need) {
             p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8f, 1.2f);
-            p.sendSystemMessage(Component.literal("[Mision] Completa! Volve con " + PoliciaBoss.NAMES[PoliciaJefe.bossKind(d.job)] + (PoliciaJefe.isTrial(d) ? " para que te acepte en el oficio" : " para cobrar")).withStyle(s -> s.withColor(0xFFD700)));
+            p.sendSystemMessage(Component.literal("[Misión] Completa! Volvé con " + PoliciaBoss.NAMES[PoliciaJefe.bossKind(d.job)] + (PoliciaJefe.isTrial(d) ? " para que te acepte en el oficio" : " para cobrar")).withStyle(s -> s.withColor(0xFFD700)));
         } else if (d.need <= 20 || now / Math.max(1, d.need / 10) != before / Math.max(1, d.need / 10)) {
-            PoliciaMod.msg(p, "Mision: " + d.desc + " (" + now + "/" + d.need + ")");
+            PoliciaMod.msg(p, "Misión: " + d.desc + " (" + now + "/" + d.need + ")");
         }
     }
 
@@ -216,7 +216,7 @@ public class PoliciaJefe {
         List<String> lore = new ArrayList<String>();
         lore.add(d.desc);
         if ("deliver".equals(d.type)) {
-            lore.add("Tenes " + Math.min(d.need, PoliciaJefe.count(p, d.target)) + "/" + d.need + " " + PoliciaJefe.itemName(d.target));
+            lore.add("Tenés " + Math.min(d.need, PoliciaJefe.count(p, d.target)) + "/" + d.need + " " + PoliciaJefe.itemName(d.target));
         } else if (active) {
             lore.add("Progreso: " + PoliciaJefe.prog(p) + "/" + d.need);
         }
@@ -238,7 +238,7 @@ public class PoliciaJefe {
             case "analyze" -> Items.SPYGLASS;
             default -> BuiltInRegistries.ITEM.get(new ResourceLocation(d.target));
         };
-        return PoliciaBoss.named(icon, (active ? "Mision actual: " : "Mision: ") + d.desc, lore.toArray(new String[0]));
+        return PoliciaBoss.named(icon, (active ? "Misión actual: " : "Misión: ") + d.desc, lore.toArray(new String[0]));
     }
 
     static List<Def> offers(ServerPlayer p, int job) {
@@ -267,10 +267,10 @@ public class PoliciaJefe {
             boolean here = cur.job == job && !PoliciaJefe.isTrial(cur);
             c.setItem(13, PoliciaJefe.card(cur, sp, true));
             if (here) {
-                c.setItem(11, PoliciaJefe.done(sp) ? PoliciaBoss.named(Items.EMERALD, "Cobrar recompensa", cur.xp + " XP de oficio y " + cur.em + " esmeraldas") : PoliciaBoss.named(Items.CLOCK, "Todavia no terminaste", "Progreso: " + PoliciaJefe.prog(sp) + "/" + cur.need));
-                c.setItem(15, PoliciaBoss.named(Items.BARRIER, "Abandonar mision", "Podes pedir otra despues"));
+                c.setItem(11, PoliciaJefe.done(sp) ? PoliciaBoss.named(Items.EMERALD, "Cobrar recompensa", cur.xp + " XP de oficio y " + cur.em + " esmeraldas") : PoliciaBoss.named(Items.CLOCK, "Todavía no terminaste", "Progreso: " + PoliciaJefe.prog(sp) + "/" + cur.need));
+                c.setItem(15, PoliciaBoss.named(Items.BARRIER, "Abandonar misión", "Podés pedir otra después"));
             } else {
-                c.setItem(15, PoliciaBoss.named(Items.BARRIER, "Abandonar mision", "Es de otro jefe; abandonala para pedir una aca"));
+                c.setItem(15, PoliciaBoss.named(Items.BARRIER, "Abandonar misión", "Es de otro jefe; abandonala para pedir una acá"));
             }
         } else {
             List<Def> offers = PoliciaJefe.offers(sp, job);
@@ -278,7 +278,7 @@ public class PoliciaJefe {
             for (int i = 0; i < offers.size(); ++i) {
                 c.setItem(slots[i], PoliciaJefe.card(offers.get(i), sp, false));
             }
-            c.setItem(22, PoliciaBoss.named(Items.PAPER, "Elegi una mision", "Las ofertas cambian cada dia"));
+            c.setItem(22, PoliciaBoss.named(Items.PAPER, "Elegí una misión", "Las ofertas cambian cada día"));
         }
         if (job == 2) {
             c.setItem(20, PoliciaGolpe.card(sp, 1));
@@ -294,7 +294,7 @@ public class PoliciaJefe {
                 boolean here = a.job == job && !PoliciaJefe.isTrial(a);
                 if (slot == 15) {
                     PoliciaJefe.clear(p);
-                    PoliciaMod.msg(p, "Mision abandonada");
+                    PoliciaMod.msg(p, "Misión abandonada");
                     p.closeContainer();
                 } else if (slot == 11 && here && PoliciaJefe.done(p)) {
                     p.closeContainer();
@@ -307,7 +307,7 @@ public class PoliciaJefe {
             if (idx >= 0 && idx < o.size()) {
                 p.closeContainer();
                 PoliciaJefe.start(p, o.get(idx));
-                p.sendSystemMessage(Component.literal("<" + PoliciaBoss.NAMES[bossKind] + "> Cuento con vos. Volve cuando termines."));
+                p.sendSystemMessage(Component.literal("<" + PoliciaBoss.NAMES[bossKind] + "> Cuento con vos. Volvé cuando termines."));
             }
         });
     }
@@ -324,7 +324,7 @@ public class PoliciaJefe {
         p.getPersistentData().putInt("pol_xp", PoliciaMod.xp(p) + d.xp);
         PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, d.em));
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.VILLAGER_YES, SoundSource.PLAYERS, 1.0f, 1.0f);
-        p.sendSystemMessage(Component.literal("<" + PoliciaBoss.NAMES[PoliciaJefe.bossKind(d.job)] + "> Buen trabajo. Aca tenes lo tuyo: +" + d.xp + " XP y " + d.em + " esmeraldas."));
+        p.sendSystemMessage(Component.literal("<" + PoliciaBoss.NAMES[PoliciaJefe.bossKind(d.job)] + "> Buen trabajo. Acá tenés lo tuyo: +" + d.xp + " XP y " + d.em + " esmeraldas."));
         PoliciaMod.sync(p);
     }
 
@@ -340,19 +340,19 @@ public class PoliciaJefe {
                 PoliciaOficio.assign(p, PoliciaOficio.JOBS[job], PoliciaOficio.LABEL[job], PoliciaOficio.HINT[job]);
                 p.sendSystemMessage(Component.literal("<" + boss + "> Superaste la prueba. Bienvenido al oficio: no me hagas quedar mal."));
             } else {
-                p.sendSystemMessage(Component.literal("<" + boss + "> Todavia no terminaste la prueba: " + trial.desc + " (" + PoliciaJefe.prog(p) + "/" + trial.need + ")"));
+                p.sendSystemMessage(Component.literal("<" + boss + "> Todavía no terminaste la prueba: " + trial.desc + " (" + PoliciaJefe.prog(p) + "/" + trial.need + ")"));
             }
             return;
         }
         if (cur != null) {
-            p.sendSystemMessage(Component.literal("<" + boss + "> Ya estas haciendo otra cosa (" + cur.desc + "). Abandonala en el menu de misiones si queres esta."));
+            p.sendSystemMessage(Component.literal("<" + boss + "> Ya estas haciendo otra cosa (" + cur.desc + "). Abandonala en el menú de misiones si querés esta."));
             return;
         }
         SimpleContainer c = new SimpleContainer(27);
         for (int i = 0; i < 27; ++i) {
             c.setItem(i, PoliciaBoss.pane());
         }
-        c.setItem(13, PoliciaBoss.named(Items.WRITABLE_BOOK, "Prueba de ingreso", trial.desc, "Superala y volve a hablarme para entrar al oficio."));
+        c.setItem(13, PoliciaBoss.named(Items.WRITABLE_BOOK, "Prueba de ingreso", trial.desc, "Superala y volvé a hablarme para entrar al oficio."));
         c.setItem(11, PoliciaBoss.named(Items.LIME_DYE, "Aceptar la prueba", new String[0]));
         c.setItem(15, PoliciaBoss.named(Items.RED_DYE, "Ahora no", new String[0]));
         PoliciaBoss.openMenu3(p, boss, c, (pl, slot) -> {
@@ -362,7 +362,7 @@ public class PoliciaJefe {
                     return;
                 }
                 PoliciaJefe.start(pl, trial);
-                pl.sendSystemMessage(Component.literal("<" + boss + "> Demostrame lo que sabes hacer y volve a verme."));
+                pl.sendSystemMessage(Component.literal("<" + boss + "> Demostrame lo que sabes hacer y volvé a verme."));
             } else if (slot == 15) {
                 pl.closeContainer();
             }
@@ -440,7 +440,7 @@ public class PoliciaJefe {
         // tiempo, desaparecen.
         PoliciaJefe.tmp(p, "pol_tmp_luck", "Suerte temporal");
         PoliciaJefe.tmp(p, "pol_tmp_pick", "Carterismo maestro");
-        PoliciaJefe.tmp(p, "pol_tmp_lock", "Ganzua temporal");
+        PoliciaJefe.tmp(p, "pol_tmp_lock", "Ganzúa temporal");
         Def d = PoliciaJefe.active(p);
         if (d == null || !"sneak".equals(d.type)) {
             return;
@@ -470,7 +470,7 @@ public class PoliciaJefe {
         }
         t.putInt(key, --v);
         if (v == 0) {
-            PoliciaMod.msg(p, name + ": se termino");
+            PoliciaMod.msg(p, name + ": se terminó");
         } else if (v % 200 == 0) {
             PoliciaMod.msg(p, name + ": quedan " + v / 20 + " s");
         }

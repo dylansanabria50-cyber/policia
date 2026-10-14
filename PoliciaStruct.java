@@ -551,17 +551,17 @@ public class PoliciaStruct {
                             k = i;
                         }
                         if (k < 0) {
-                            c.getSource().sendFailure(Component.literal("Use: comisaria, obra, casino, bandidos, ladrones, atalaya, cueva o herreria"));
+                            c.getSource().sendFailure(Component.literal("Use: comisaría, obra, casino, bandidos, ladrones, atalaya, cueva o herrería"));
                             return 0;
                         }
-                        String vnm = k == 0 ? "Comisaria" : "Herreria";
+                        String vnm = k == 0 ? "Comisaría" : "Herrería";
                         if ((k == 0 || k == 7) && PoliciaStruct.genNearVillage(p, p.serverLevel(), k)) {
                             c.getSource().sendSuccess(() -> Component.literal(vnm + " colocada junto a la aldea"), false);
                             return 1;
                         }
                         Direction f = p.getDirection();
                         PoliciaStruct.place(p.serverLevel(), k, p.getBlockX() + f.getStepX() * 14, p.getBlockZ() + f.getStepZ() * 14, true);
-                        c.getSource().sendSuccess(() -> Component.literal("Construccion colocada"), false);
+                        c.getSource().sendSuccess(() -> Component.literal("Construcción colocada"), false);
                         return 1;
                     })));
         }

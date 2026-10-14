@@ -19,8 +19,8 @@ public class PoliciaAlbanilScreen extends Screen {
     static final int PW = 460;
     static final int PH = 340;
     static final int LEFT_W = 104;
-    static final String[] NAMES = new String[]{"Pico de albanil", "MURO", "REFUGIO", "AYUDANTE I", "AYUDANTE II", "AYUDANTE III", "LINTERNA", "TRACTOR", "REFUGIO II", "PICO II"};
-    static final String[] DESC = new String[]{"Te da un pico de diamante durante 7 s, con Fuerza I, Prisa minera I y Fortuna II. No se puede soltar ni guardar en cofres; puedes encantarlo y conserva los encantamientos. Enfriamiento: 8 s.", "Levanta un muro de 3 de alto por 3 de largo frente a ti. Puedes hacer hasta 3 muros (pulsa J de nuevo para cada uno). Desaparecen a los 15 s. Enfriamiento: 5 s.", "Mejora de MURO: lo reemplaza. Casa sobre la superficie con puerta y piso de madera, cama y cofre, durante 35 s. Lo que dejes dentro (cofre, bloques, objetos) vuelve a estar en el mismo lugar cuando la invocas de nuevo. Enfriamiento: 40 s.", "PEDIR AYUDANTE: 1 ayudante con pico de piedra que sigue y defiende. H: orden (seguir, picar delante, buscar minerales). X: elegir area (rueda: largo, Mayus+rueda: ancho). Avisan de minerales (Y/N). U: su inventario. 60 s, enf. 30 s. Ves menas de carbon a 4 bloques.", "Nivel 2: 3 ayudantes con picos de hierro. Mientras estan activos ves todos los minerales (menos diamante y netherita) a 4 bloques.", "Nivel 3: 4 ayudantes con picos de diamante. Mientras estan activos ves todos los minerales a 4 bloques.", "LINTERNA: una luz que sigue tu mirada hasta 48 bloques durante 60 s (tecla J con la habilidad elegida, o tecla G). Enfriamiento: 20 s.", "TRACTOR: pala cargadora amarilla con cabina, inventario propio (54 casillas) y luces. J la invoca, te bajas o vuelves a subir; Mayus+J la retira. W/S avanzar, A/D girar, ESPACIO sube la pala, CTRL la baja, G luces, U inventario. Rompe lo natural que tiene delante (guarda lo que rompe), pero nunca construcciones de jugadores. Dura 45 s. Enfriamiento: 35 s.", "Mejora de REFUGIO (40 XP): una torre de madera de 4 pisos con anexo, camas, cofres, barriles, horno y jardin en el techo. La puerta mira hacia ti. Dura 3 minutos y luego desaparece. Lo que dejes en cualquier cofre, barril u horno se conserva para la proxima vez (el cofre principal de la planta baja recibe lo del REFUGIO anterior). Enfriamiento: 40 s.", "Mejora del Pico (25 XP): el pico dura 14 s en vez de 7 s y da Fuerza II y Prisa minera II (conserva Fortuna II y los encantamientos). Enfriamiento: 8 s."};
+    static final String[] NAMES = new String[]{"Pico de albañil", "MURO", "REFUGIO", "AYUDANTE I", "AYUDANTE II", "AYUDANTE III", "LINTERNA", "TRACTOR", "REFUGIO II", "PICO II"};
+    static final String[] DESC = new String[]{"Te da un pico de diamante durante 7 s, con Fuerza I, Prisa minera I y Fortuna II. No se puede soltar ni guardar en cofres; puedes encantarlo y conserva los encantamientos. Enfriamiento: 8 s.", "Levanta un muro de 3 de alto por 3 de largo frente a ti. Puedes hacer hasta 3 muros (pulsa J de nuevo para cada uno). Desaparecen a los 15 s. Enfriamiento: 5 s.", "Mejora de MURO: lo reemplaza. Casa sobre la superficie con puerta y piso de madera, cama y cofre, durante 35 s. Lo que dejes dentro (cofre, bloques, objetos) vuelve a estar en el mismo lugar cuando la invocas de nuevo. Enfriamiento: 40 s.", "PEDIR AYUDANTE: 1 ayudante con pico de piedra que sigue y defiende. H: orden (seguir, picar delante, buscar minerales). X: elegir área (rueda: largo, Mayús+rueda: ancho). Avisan de minerales (Y/N). U: su inventario. 60 s, enf. 30 s. Ves menas de carbón a 4 bloques.", "Nivel 2: 3 ayudantes con picos de hierro. Mientras están activos ves todos los minerales (menos diamante y netherita) a 4 bloques.", "Nivel 3: 4 ayudantes con picos de diamante. Mientras están activos ves todos los minerales a 4 bloques.", "LINTERNA: una luz que sigue tu mirada hasta 48 bloques durante 60 s (tecla J con la habilidad elegida, o tecla G). Enfriamiento: 20 s.", "TRACTOR: pala cargadora amarilla con cabina, inventario propio (54 casillas) y luces. J la invoca, te bajas o vuelves a subir; Mayús+J la retira. W/S avanzar, A/D girar, ESPACIO sube la pala, CTRL la baja, G luces, U inventario. Rompe lo natural que tiene delante (guarda lo que rompe), pero nunca construcciones de jugadores. Dura 45 s. Enfriamiento: 35 s.", "Mejora de REFUGIO (40 XP): una torre de madera de 4 pisos con anexo, camas, cofres, barriles, horno y jardín en el techo. La puerta mira hacia ti. Dura 3 minutos y luego desaparece. Lo que dejes en cualquier cofre, barril u horno se conserva para la próxima vez (el cofre principal de la planta baja recibe lo del REFUGIO anterior). Enfriamiento: 40 s.", "Mejora del Pico (25 XP): el pico dura 14 s en vez de 7 s y da Fuerza II y Prisa minera II (conserva Fortuna II y los encantamientos). Enfriamiento: 8 s."};
     static final int[] CX = new int[]{45, 45, 45, 130, 130, 130, 215, 300, 45, 215};
     static final int[] ROW = new int[]{0, 1, 2, 0, 1, 2, 0, 0, 3, 1};
     int px;
@@ -172,7 +172,7 @@ public class PoliciaAlbanilScreen extends Screen {
         int n = xp = ms == null ? 0 : ms.xp;
         int sel = s.sel == 1 ? (s.lv >= 3 ? 8 : (s.lv >= 2 ? 2 : 1)) : (s.sel == 2 ? 2 + Math.max(1, s.hl) : (s.sel == 3 ? 6 : (s.sel == 4 ? 7 : 0)));
         PoliciaTreeScreen.panel(g, this.px, this.py, this.px + 104, this.py + 340);
-        this.tag(g, "Albanil", this.px + 6, this.py - 6);
+        this.tag(g, "Albañil", this.px + 6, this.py - 6);
         if (this.minecraft != null && this.minecraft.player != null) {
             InventoryScreen.renderEntityInInventoryFollowsMouse(g, this.px + 52, this.py + 340 - 30, 55, (float) (this.px + 52 - mx), (float) (this.py + 60 - my), this.minecraft.player);
         }
@@ -300,10 +300,10 @@ public class PoliciaAlbanilScreen extends Screen {
         PoliciaAlbanil.AlbSync s = PoliciaAlbanil.CL;
         ArrayList<String> ls = new ArrayList<>();
         ArrayList<Integer> cs = new ArrayList<>();
-        ls.add("OFICIO ALBANIL - XP " + ms.xp);
+        ls.add("OFICIO ALBAÑIL - XP " + ms.xp);
         cs.add(-1523648);
         String n1 = s.lv >= 3 ? "REFUGIO II" : (s.lv >= 2 ? "REFUGIO" : "MURO");
-        ls.add((s.sel == 0 ? "> " : "  ") + "1. Pico de albanil" + (s.pl >= 1 ? " II" : ""));
+        ls.add((s.sel == 0 ? "> " : "  ") + "1. Pico de albañil" + (s.pl >= 1 ? " II" : ""));
         cs.add(s.sel == 0 ? -1 : -5192482);
         boolean o1 = s.lv >= 1;
         ls.add((s.sel == 1 && o1 ? "> " : "  ") + "2. " + n1 + (o1 ? "" : "  [10 XP]"));
@@ -318,11 +318,11 @@ public class PoliciaAlbanilScreen extends Screen {
         ls.add((s.sel == 4 && o4 ? "> " : "  ") + "5. TRACTOR" + (o4 ? "" : "  [15 XP]"));
         cs.add(o4 ? (s.sel == 4 ? -1 : -5192482) : -9408400);
         if (s.sel == 4 && o4) {
-            st = s.ta > 0 ? "Tractor: " + (s.ta + 19) / 20 + " s (J: bajar o subir, Mayus+J: retirar)" : (s.tc > 0 ? "Tractor en enfriamiento: " + (s.tc + 19) / 20 + " s" : "Tractor listo (J)");
+            st = s.ta > 0 ? "Tractor: " + (s.ta + 19) / 20 + " s (J: bajar o subir, Mayús+J: retirar)" : (s.tc > 0 ? "Tractor en enfriamiento: " + (s.tc + 19) / 20 + " s" : "Tractor listo (J)");
         } else if (s.sel == 3 && o3) {
             st = s.lt > 0 ? "Linterna: " + (s.lt + 19) / 20 + " s (J o G: apagar)" : (s.lc > 0 ? "Linterna en enfriamiento: " + (s.lc + 19) / 20 + " s" : "Linterna lista (J o G)");
         } else if (s.sel == 2 && o2) {
-            String ord = PoliciaAyudante.ORDERS[Math.max(0, Math.min(2, s.mode))] + (s.mode == 1 ? (s.zl > 0 ? " " + s.zl + "x" + s.zw : " (X: area)") : "");
+            String ord = PoliciaAyudante.ORDERS[Math.max(0, Math.min(2, s.mode))] + (s.mode == 1 ? (s.zl > 0 ? " " + s.zl + "x" + s.zw : " (X: área)") : "");
             st = s.ht > 0 ? "Ayudantes: " + (s.ht + 19) / 20 + " s - orden: " + ord + " (H)" : (s.hc > 0 ? "Ayudantes en enfriamiento: " + (s.hc + 19) / 20 + " s" : "Ayudantes listos (J) - orden: " + ord + " (H)");
         } else {
             st = s.sel == 0 || !o1 ? (s.pickT > 0 ? "Pico activo: " + (s.pickT + 19) / 20 + " s" : (s.c0 > 0 ? "Pico en enfriamiento: " + (s.c0 + 19) / 20 + " s" : "Pico listo (J)")) : (s.structT > 0 ? n1 + " activo: " + (s.structT + 19) / 20 + " s" + (s.lv < 2 ? " - muros " + s.walls + "/3 (J: otro)" : "") : (s.c1 > 0 ? n1 + " en enfriamiento: " + (s.c1 + 19) / 20 + " s" : n1 + " listo (J)"));

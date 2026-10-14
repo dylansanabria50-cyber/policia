@@ -24,7 +24,7 @@ public class PoliciaBoardScreen extends Screen {
     final int[][] rects = new int[7][4];
 
     public PoliciaBoardScreen(PoliciaBoard.Open o) {
-        super(Component.literal("Tablon del comisario"));
+        super(Component.literal("Tablón del comisario"));
         this.o = o;
     }
 
@@ -188,10 +188,10 @@ public class PoliciaBoardScreen extends Screen {
         g.pose().pushPose();
         g.pose().translate((double) this.px + 160.0, (double) (this.py + 20), 0.0);
         g.pose().scale(1.5f, 1.5f, 1.0f);
-        String t = "TABLON DEL COMISARIO";
+        String t = "TABLÓN DEL COMISARIO";
         g.drawString(this.font, t, -this.font.width(t) / 2, 0, ink, false);
         g.pose().popPose();
-        String sub = this.o.active > 0 ? "Mision en curso: " + PoliciaMision.TITLE[this.o.active] : "Elija un encargo, agente";
+        String sub = this.o.active > 0 ? "Misión en curso: " + PoliciaMision.TITLE[this.o.active] : "Elija un encargo, agente";
         g.drawString(this.font, sub, this.px + 160 - this.font.width(sub) / 2, this.py + 42, this.o.active > 0 ? -7661030 : soft, false);
         g.fill(this.px + 22, this.py + 53, this.px + 320 - 22, this.py + 54, 1615867920);
         for (int i = 0; i < 3; ++i) {
@@ -228,7 +228,7 @@ public class PoliciaBoardScreen extends Screen {
         g.drawString(this.font, st, this.px + 160 - this.font.width(st) / 2, this.py + 214, soft, false);
         for (int i = 3; i < 7; ++i) {
             if (!this.in(i, mx, my)) continue;
-            String tip = i == 3 ? "Mision especial: El Cerebro (necesita 1 jefe cazado)" : (i == 4 ? "Cazar al jefe de banda" : (i == 5 ? (this.enabled(5) ? "Rescate en el casino subterraneo" : "No se conoce ningun casino todavia") : "Abandonar la mision actual"));
+            String tip = i == 3 ? "Misión especial: El Cerebro (necesita 1 jefe cazado)" : (i == 4 ? "Cazar al jefe de banda" : (i == 5 ? (this.enabled(5) ? "Rescate en el casino subterráneo" : "No se conoce ningún casino todavía") : "Abandonar la misión actual"));
             g.drawString(this.font, tip, this.px + 160 - this.font.width(tip) / 2, this.py + 226, -7661030, false);
         }
     }

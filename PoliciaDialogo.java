@@ -20,49 +20,49 @@ import net.minecraft.world.entity.LivingEntity;
 // que le podes hacer. Lo que dice depende de si sos de su oficio, si no
 // tenes oficio o si sos de otro.
 public class PoliciaDialogo extends Screen {
-    static final String[] BOSS = new String[]{"Jefe de policia", "Capataz", "Jefe de ladrones", "Maestro herrero"};
+    static final String[] BOSS = new String[]{"Jefe de policía", "Capataz", "Jefe de ladrones", "Maestro herrero"};
     static final int[] COLOR = new int[]{0xFF6FA0FF, 0xFFFFC04A, 0xFFB98CFF, 0xFFFF9A4A};
     // Saludo segun la relacion: [oficio][0 = de su oficio, 1 = sin oficio, 2 = otro oficio]
     static final String[][] GREET = new String[][]{
-            {"Agente, novedades? La ciudad no se cuida sola.", "Buscas trabajo? La policia siempre necesita gente valiente.", "Mmm... no sos de los nuestros. Habla rapido."},
-            {"Eh, companero! Venis a laburar o a mirar?", "Sabes poner un ladrillo derecho? Aca siempre falta mano de obra.", "Esta obra no es para cualquiera, eh."},
-            {"Ah, sos vos. Nadie te siguio, no?", "Tenes cara de saber guardar secretos... Buscas un negocio?", "Yo a vos no te conozco. Y vos a mi tampoco, entendido?"},
-            {"Aprendiz! El fuego ya esta encendido.", "Te interesa el arte de la forja? Las manos se curten, pero vale la pena.", "Si no venis a forjar, al menos no me tapes la luz del horno."}
+            {"Agente, novedades? La ciudad no se cuida sola.", "Buscas trabajo? La policía siempre necesita gente valiente.", "Mmm... no sos de los nuestros. Habla rápido."},
+            {"Eh, compañero! Venís a laburar o a mirar?", "Sabes poner un ladrillo derecho? Acá siempre falta mano de obra.", "Esta obra no es para cualquiera, eh."},
+            {"Ah, sos vos. Nadie te siguió, no?", "Tenés cara de saber guardar secretos... Buscas un negocio?", "Yo a vos no te conozco. Y vos a mi tampoco, entendido?"},
+            {"Aprendiz! El fuego ya está encendido.", "Te interesa el arte de la forja? Las manos se curten, pero vale la pena.", "Si no venís a forjar, al menos no me tapes la luz del horno."}
     };
-    static final String[] TOPICS = new String[]{"Quien sos?", "Contame del oficio", "Tenes trabajo para mi?", "Algun consejo?"};
+    static final String[] TOPICS = new String[]{"Quien sos?", "Contame del oficio", "Tenés trabajo para mi?", "Algún consejo?"};
     // Respuestas [oficio][tema] (cada una puede tener varias lineas).
     static final String[][][] ANSWERS = new String[][][]{
             {
-                    {"Soy el Jefe de policia de esta zona.", "Desde esta comisaria coordino a los agentes y los refuerzos."},
-                    {"Un policia tiene escudo balistico, refuerzos, tanque, helicoptero, esposas, perro K9 y mas.", "Todo se desbloquea con XP en tu arbol de habilidades."},
+                    {"Soy el Jefe de policía de esta zona.", "Desde esta comisaría coordino a los agentes y los refuerzos."},
+                    {"Un policía tiene escudo balístico, refuerzos, tanque, helicóptero, esposas, perro K9 y más.", "Todo se desbloquea con XP en tu árbol de habilidades."},
                     {},
-                    {"Los bandidos acampan lejos de las aldeas.", "Y nunca subestimes a un francotirador de torre: usa el escudo balistico."}
+                    {"Los bandidos acampan lejos de las aldeas.", "Y nunca subestimes a un francotirador de torre: usa el escudo balístico."}
             },
             {
-                    {"Soy el Capataz. Si algo se construye por aca, pasa por mis manos."},
-                    {"El albanil levanta muros y refugios, tiene ayudantes que pican por el y hasta un tractor.", "El pico de albanil es sagrado: cuidalo."},
+                    {"Soy el Capataz. Si algo se construye por acá, pasa por mis manos."},
+                    {"El albañil levanta muros y refugios, tiene ayudantes que pican por el y hasta un tractor.", "El pico de albañil es sagrado: cuidalo."},
                     {},
-                    {"Sin andamios no hay altura.", "Y nunca rompas lo que construyo otro: eso no se hace."}
+                    {"Sin andamios no hay altura.", "Y nunca rompas lo que construyó otro: eso no se hace."}
             },
             {
-                    {"Nadie. Un empresario del entretenimiento.", "Este casino es mi oficina, y lo que pasa aca, aca se queda."},
-                    {"Carterismo, ganzuas, silbidos para distraer y escapes de pelicula.", "El Perista de arriba te compra lo que traigas, sin preguntas."},
+                    {"Nadie. Un empresario del entretenimiento.", "Este casino es mi oficina, y lo que pasa acá, acá se queda."},
+                    {"Carterismo, ganzúas, silbidos para distraer y escapes de película.", "El Perista de arriba te compra lo que traigas, sin preguntas."},
                     {},
-                    {"Agachate, acercate por la espalda y no mires atras.", "Si la policia te busca, desaparece un rato."}
+                    {"Agachate, acercate por la espalda y no mires atrás.", "Si la policía te busca, desaparece un rato."}
             },
             {
-                    {"Soy el Maestro herrero. Llevo cuarenta anos martillando acero.", "Cada yunque de esta herreria tiene una historia."},
+                    {"Soy el Maestro herrero. Llevo cuarenta años martillando acero.", "Cada yunque de esta herrería tiene una historia."},
                     {"El Herrero Legendario planta yunques que dan fuerza o frenan flechas, se cura con su forja interior y repara cualquier herramienta.", "Y con el Analizador aprende a crear objetos que nunca tuvo en la mano."},
                     {},
-                    {"Golpe firme, mano tranquila: asi se templa el acero.", "Y el yunque que plantas desaparece cuando termina tu habilidad: no lo busques despues."}
+                    {"Golpe firme, mano tranquila: así se templa el acero.", "Y el yunque que plantas desaparece cuando termina tu habilidad: no lo busques después."}
             }
     };
     // "Tenes trabajo para mi?" segun la relacion.
     static final String[][][] WORK = new String[][][]{
-            {{"Las misiones de patrulla te las da el Comisario de cada aldea, junto a la campana."}, {"Primero supera la prueba de reclutamiento: elimina 8 monstruos.", "Despues volve y te doy la placa. Usa 'Unirme al oficio' en mi menu."}, {"Para trabajar conmigo tendrias que dejar tu oficio actual."}},
-            {{"Siempre hay obra. Abri mi menu y mira las Misiones."}, {"Para entrar a la cuadrilla, supera la prueba de obra: coloca 64 bloques.", "Pedila con 'Unirme al oficio' en mi menu."}, {"Ya tenes patron. Si renuncias, hablamos."}},
-            {{"Tengo un par de encargos... discretos. Mira las Misiones en mi menu."}, {"Primero demostra que sabes moverte: recorre 150 bloques agachado.", "Pedi la prueba con 'Unirme al oficio' en mi menu."}, {"No trabajo con gente de otro bando."}},
-            {{"Siempre hay metal que fundir. Mira las Misiones en mi menu."}, {"Demostrame que sabes fundir: 16 lingotes de hierro en un horno.", "Pedi la prueba con 'Unirme al oficio' en mi menu."}, {"Un buen herrero no anda con dos oficios a la vez."}}
+            {{"Las misiones de patrulla te las da el Comisario de cada aldea, junto a la campana."}, {"Primero supera la prueba de reclutamiento: elimina 8 monstruos.", "Después volvé y te doy la placa. Usa 'Unirme al oficio' en mi menú."}, {"Para trabajar conmigo tendrías que dejar tu oficio actual."}},
+            {{"Siempre hay obra. Abrí mi menú y mira las Misiones."}, {"Para entrar a la cuadrilla, supera la prueba de obra: coloca 64 bloques.", "Pedila con 'Unirme al oficio' en mi menú."}, {"Ya tenés patrón. Si renuncias, hablamos."}},
+            {{"Tengo un par de encargos... discretos. Mira las Misiones en mi menú."}, {"Primero demostrá que sabes moverte: recorre 150 bloques agachado.", "Pedí la prueba con 'Unirme al oficio' en mi menú."}, {"No trabajo con gente de otro bando."}},
+            {{"Siempre hay metal que fundir. Mira las Misiones en mi menú."}, {"Demostrame que sabes fundir: 16 lingotes de hierro en un horno.", "Pedí la prueba con 'Unirme al oficio' en mi menú."}, {"Un buen herrero no anda con dos oficios a la vez."}}
     };
 
     final int entityId;

@@ -56,7 +56,7 @@ public class PoliciaHeli {
 
     public static void use(ServerPlayer p) {
         if (p.getVehicle() instanceof HeliEntity) {
-            PoliciaMod.msg(p, "Ya vas en el helicoptero (Shift para bajar)");
+            PoliciaMod.msg(p, "Ya vas en el helicóptero (Shift para bajar)");
             return;
         }
         if (p.isPassenger()) {
@@ -65,12 +65,12 @@ public class PoliciaHeli {
         }
         List<HeliEntity> mine = p.level().getEntitiesOfClass(HeliEntity.class, p.getBoundingBox().inflate(64.0), e -> !e.isRemoved() && p.getUUID().equals(e.owner));
         if (!mine.isEmpty()) {
-            PoliciaMod.msg(p, "Haz clic derecho sobre el helicoptero para montarte");
+            PoliciaMod.msg(p, "Haz clic derecho sobre el helicóptero para montarte");
             return;
         }
         long left = p.getPersistentData().getLong("pol_hcd_t") - p.level().getGameTime();
         if (left > 0L) {
-            PoliciaMod.msg(p, "Helicoptero en enfriamiento: " + (left + 19L) / 20L + " s");
+            PoliciaMod.msg(p, "Helicóptero en enfriamiento: " + (left + 19L) / 20L + " s");
             return;
         }
         if (PoliciaMod.shield(p) > 0) {
@@ -83,7 +83,7 @@ public class PoliciaHeli {
     public static void toggleLight(ServerPlayer p) {
         Entity entity = p.getVehicle();
         if (!(entity instanceof HeliEntity)) {
-            PoliciaMod.msg(p, "El modo linterna es del helicoptero");
+            PoliciaMod.msg(p, "El modo linterna es del helicóptero");
             return;
         }
         HeliEntity h = (HeliEntity) entity;
@@ -117,7 +117,7 @@ public class PoliciaHeli {
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0f, 0.7f);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0f, 0.6f);
         p.serverLevel().sendParticles((ParticleOptions) ParticleTypes.HAPPY_VILLAGER, p.getX(), p.getY() + 0.1, p.getZ(), 16, 1.5, 0.1, 1.5, 0.03);
-        PoliciaMod.msg(p, "Helicoptero listo: W/S avanzar, A/D desplazarte, ESPACIO subir, CTRL bajar, Shift para salir");
+        PoliciaMod.msg(p, "Helicóptero listo: W/S avanzar, A/D desplazarte, ESPACIO subir, CTRL bajar, Shift para salir");
     }
 
     public static class HeliEntity extends Entity {
@@ -209,7 +209,7 @@ public class PoliciaHeli {
                 ServerPlayer sp = (ServerPlayer) pl;
                 sp.startRiding(this, true);
                 this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0f, 0.7f);
-                PoliciaMod.msg(sp, "Subiste al helicoptero");
+                PoliciaMod.msg(sp, "Subiste al helicóptero");
             }
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
@@ -448,7 +448,7 @@ public class PoliciaHeli {
             boolean bl = landing = this.life >= 2160;
             if (landing && !this.landMsg) {
                 this.landMsg = true;
-                this.notifyOwner(sl, "El helicoptero va a aterrizar");
+                this.notifyOwner(sl, "El helicóptero va a aterrizar");
             }
             if (landing && this.entityData.get(LIGHT)) {
                 this.entityData.set(LIGHT, false);
@@ -505,7 +505,7 @@ public class PoliciaHeli {
             sl.sendParticles((ParticleOptions) ParticleTypes.POOF, this.getX(), this.getY() + 0.8, this.getZ(), 18, 1.0, 0.5, 1.0, 0.03);
             if (this.owner != null && (o = sl.getServer().getPlayerList().getPlayer(this.owner)) != null) {
                 o.getPersistentData().putLong("pol_hcd_t", sl.getGameTime() + 1200L);
-                PoliciaMod.msg(o, "Helicoptero retirado");
+                PoliciaMod.msg(o, "Helicóptero retirado");
             }
             this.ejectPassengers();
             this.discard();

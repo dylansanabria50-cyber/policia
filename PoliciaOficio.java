@@ -18,11 +18,11 @@ import net.minecraftforge.network.PacketDistributor;
 public class PoliciaOficio {
     // Mismo orden que las opciones de la ventana; la ultima es DESEMPLEADO.
     static final String[] JOBS = new String[]{"policia", "albanil", "ladron", "herrero", ""};
-    static final String[] LABEL = new String[]{"policia", "albanil", "ladron", "herrero legendario", ""};
+    static final String[] LABEL = new String[]{"policía", "albañil", "ladrón", "herrero legendario", ""};
     static final String[] HINT = new String[]{
-            "Pulsa B para activar el modo policia",
-            "Pulsa B para activar el modo albanil",
-            "Pulsa B para activar el modo ladron",
+            "Pulsa B para activar el modo policía",
+            "Pulsa B para activar el modo albañil",
+            "Pulsa B para activar el modo ladrón",
             "Pulsa B para activar el modo herrero",
             ""
     };

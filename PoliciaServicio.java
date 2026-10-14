@@ -60,7 +60,7 @@ public class PoliciaServicio {
         e.setCancellationResult(InteractionResult.SUCCESS);
         ItemStack it = client.getMainHandItem();
         if (it.isEmpty()) {
-            PoliciaMod.msg(client, "Sostene en la mano lo que queres que el herrero repare o mejore");
+            PoliciaMod.msg(client, "Sostené en la mano lo que querés que el herrero repare o mejore");
             return;
         }
         PoliciaServicio.open(client, smith);
@@ -77,16 +77,16 @@ public class PoliciaServicio {
         ItemStack show = it.copy();
         show.setCount(1);
         c.setItem(13, show);
-        c.setItem(11, rp > 0 ? PoliciaBoss.named(Items.ANVIL, "Reparar", "Lo deja como nuevo y le quita el costo de yunque", "Precio: " + rp + " esmeraldas") : PoliciaBoss.named(Items.BARRIER, "Reparar", "No esta gastado"));
-        c.setItem(15, up ? PoliciaBoss.named(Items.ENCHANTED_BOOK, "Mejorar", "+1 Irrompibilidad (tiene " + PoliciaServicio.unbreaking(it) + ", maximo 3)", "Precio: " + UPGRADE_PRICE + " esmeraldas") : PoliciaBoss.named(Items.BARRIER, "Mejorar", "No se puede mejorar mas"));
-        c.setItem(22, PoliciaBoss.named(Items.EMERALD, "Tenes " + PoliciaBoss.emeralds(client) + " esmeraldas", "Las esmeraldas van para " + smith.getName().getString()));
+        c.setItem(11, rp > 0 ? PoliciaBoss.named(Items.ANVIL, "Reparar", "Lo deja como nuevo y le quita el costo de yunque", "Precio: " + rp + " esmeraldas") : PoliciaBoss.named(Items.BARRIER, "Reparar", "No está gastado"));
+        c.setItem(15, up ? PoliciaBoss.named(Items.ENCHANTED_BOOK, "Mejorar", "+1 Irrompibilidad (tiene " + PoliciaServicio.unbreaking(it) + ", máximo 3)", "Precio: " + UPGRADE_PRICE + " esmeraldas") : PoliciaBoss.named(Items.BARRIER, "Mejorar", "No se puede mejorar más"));
+        c.setItem(22, PoliciaBoss.named(Items.EMERALD, "Tenés " + PoliciaBoss.emeralds(client) + " esmeraldas", "Las esmeraldas van para " + smith.getName().getString()));
         PoliciaBoss.openMenu3(client, "Herrero " + smith.getName().getString(), c, (p, slot) -> {
             if (slot != 11 && slot != 15) {
                 return;
             }
             p.closeContainer();
             if (!smith.isAlive() || smith.distanceToSqr(p) > 64.0 || !PoliciaMod.on(smith)) {
-                PoliciaMod.msg(p, "El herrero ya no esta disponible");
+                PoliciaMod.msg(p, "El herrero ya no está disponible");
                 return;
             }
             ItemStack cur = p.getMainHandItem();
@@ -95,7 +95,7 @@ public class PoliciaServicio {
             }
             int price = slot == 11 ? PoliciaServicio.repairPrice(cur) : UPGRADE_PRICE;
             if (slot == 11 && price <= 0 || slot == 15 && !PoliciaServicio.canUpgrade(cur)) {
-                PoliciaMod.msg(p, slot == 11 ? "No esta gastado" : "No se puede mejorar mas");
+                PoliciaMod.msg(p, slot == 11 ? "No está gastado" : "No se puede mejorar más");
                 return;
             }
             if (PoliciaBoss.emeralds(p) < price) {
