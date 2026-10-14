@@ -141,7 +141,7 @@ public class PoliciaPatrullero {
     static void siren(ServerPlayer p) {
         if (p.getVehicle() instanceof Car c) {
             boolean on = !c.siren();
-            c.entityData.set(Car.SIREN, on);
+            c.setSiren(on);
             p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.LEVER_CLICK, SoundSource.PLAYERS, 0.8f, on ? 1.4f : 0.9f);
             PoliciaMod.msg(p, on ? "Sirena y luces encendidas" : "Sirena apagada");
         }
@@ -180,6 +180,10 @@ public class PoliciaPatrullero {
 
         public boolean siren() {
             return this.entityData.get(SIREN);
+        }
+
+        void setSiren(boolean on) {
+            this.entityData.set(SIREN, on);
         }
 
         @Override
