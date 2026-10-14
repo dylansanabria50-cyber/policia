@@ -428,6 +428,11 @@ public class PoliciaJefe {
         if (e.phase != TickEvent.Phase.END || !(e.player instanceof ServerPlayer p)) {
             return;
         }
+        // Habilidades temporales compradas (un solo uso): al terminar el
+        // tiempo, desaparecen.
+        PoliciaJefe.tmp(p, "pol_tmp_luck", "Suerte temporal");
+        PoliciaJefe.tmp(p, "pol_tmp_pick", "Carterismo maestro");
+        PoliciaJefe.tmp(p, "pol_tmp_lock", "Ganzua temporal");
         Def d = PoliciaJefe.active(p);
         if (d == null || !"sneak".equals(d.type)) {
             return;
@@ -447,6 +452,20 @@ public class PoliciaJefe {
             acc -= (int) acc;
         }
         t.putDouble("jm_acc", acc);
+    }
+
+    static void tmp(ServerPlayer p, String key, String name) {
+        CompoundTag t = p.getPersistentData();
+        int v = t.getInt(key);
+        if (v <= 0) {
+            return;
+        }
+        t.putInt(key, --v);
+        if (v == 0) {
+            PoliciaMod.msg(p, name + ": se termino");
+        } else if (v % 200 == 0) {
+            PoliciaMod.msg(p, name + ": quedan " + v / 20 + " s");
+        }
     }
 
     // ---------------- Dialogo (abre la ventana de charla en el cliente) ----------------

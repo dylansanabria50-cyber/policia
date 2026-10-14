@@ -647,9 +647,12 @@ public class PoliciaAlbanil {
             return false;
         }
         d.putInt("alb_walls", kind == 1 ? 1 : 0);
-        d.putInt("alb_house", kind == 2 ? 1 : 0);
-        d.putInt("alb_st", kind == 2 ? 700 : 300);
-        if (kind == 2) {
+        d.putInt("alb_house", kind >= 2 ? 1 : 0);
+        d.putInt("alb_st", kind == 3 ? 3600 : (kind == 2 ? 700 : 300));
+        if (kind == 3) {
+            PoliciaAlbanil.buildHouse2(p);
+            PoliciaMod.msg(p, "REFUGIO II levantado (3 minutos)");
+        } else if (kind == 2) {
             PoliciaAlbanil.buildHouse(p);
         } else {
             PoliciaAlbanil.buildWall(p);

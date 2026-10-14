@@ -75,6 +75,9 @@ public class PoliciaLadron {
     static final int[] OP = new int[]{8, 6, 12, 10, 4, 3};
 
     public static int luck(Player p) {
+        if (p.getPersistentData().getInt("pol_tmp_luck") > 0) {
+            return 4;
+        }
         return Math.max(0, Math.min(4, p.getPersistentData().getInt("pol_lsu")));
     }
 
@@ -413,6 +416,17 @@ public class PoliciaLadron {
         PoliciaMod.sync(p);
     }
 
+    // Objeto de un solo uso: la habilidad activa "a" dura lo mismo que la
+    // normal pero no gasta su enfriamiento.
+    static boolean single(ServerPlayer p, int a) {
+        String key = a == 0 ? "pol_lcd" : "pol_lc" + a;
+        int old = p.getPersistentData().getInt(key);
+        PoliciaLadron.use(p, a);
+        p.getPersistentData().putInt(key, old);
+        PoliciaMod.sync(p);
+        return true;
+    }
+
     static void whistleUse(ServerPlayer p) {
         ServerLevel sl = p.serverLevel();
         int n = 0;
@@ -498,7 +512,8 @@ public class PoliciaLadron {
         if (p.distanceToSqr((Entity) t) > 9.0) {
             return;
         }
-        int chance = CHANCE[PoliciaLadron.luck(p)];
+        boolean sure = p.getPersistentData().getInt("pol_tmp_pick") > 0;
+        int chance = sure ? 100 : CHANCE[PoliciaLadron.luck(p)];
         if (p.getRandom().nextInt(100) >= chance) {
             PoliciaMod.msg(p, "Te descubrieron! (" + chance + "% de exito)");
             if (t instanceof AbstractVillager) {
@@ -530,6 +545,10 @@ public class PoliciaLadron {
         }
         p.getPersistentData().putInt("pol_xp", PoliciaMod.xp(p) + 2);
         PoliciaMod.msg(p, "Carterismo exitoso (" + chance + "%)");
+        if (sure) {
+            p.getPersistentData().putInt("pol_tmp_pick", 0);
+            PoliciaMod.msg(p, "Usaste el Carterismo maestro");
+        }
         PoliciaJefe.add(p, "pick", 1);
         if (t instanceof AbstractVillager || t instanceof Player) {
             PoliciaLadron.crime(p, 1, "robo");
@@ -588,7 +607,7 @@ public class PoliciaLadron {
             if (chest && ((be = sl.getBlockEntity(bp)) == null || !be.saveWithoutMetadata().contains("LootTable"))) {
                 return;
             }
-            boolean bl2 = can = "ladron".equals(PoliciaMod.job(p)) && PoliciaMod.on(p) && PoliciaLadron.has(p, 5);
+            boolean bl2 = can = "ladron".equals(PoliciaMod.job(p)) && PoliciaMod.on(p) && (PoliciaLadron.has(p, 5) || p.getPersistentData().getInt("pol_tmp_lock") > 0);
             if (can && p.isShiftKeyDown()) {
                 e.setCanceled(true);
                 e.setCancellationResult(InteractionResult.SUCCESS);

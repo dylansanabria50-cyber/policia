@@ -151,6 +151,29 @@ public class PoliciaBoss {
         return s;
     }
 
+    static ItemStack single(String id, String name, String... lore) {
+        ItemStack s = PoliciaBoss.single(id, name);
+        ListTag l = new ListTag();
+        for (String x : lore) {
+            l.add(StringTag.valueOf(Component.Serializer.toJson(Component.literal(x))));
+        }
+        l.add(StringTag.valueOf(Component.Serializer.toJson(Component.literal("Dura lo mismo que la habilidad y desaparece al terminar"))));
+        s.getOrCreateTagElement("display").put("Lore", (Tag) l);
+        return s;
+    }
+
+    // Habilidades temporales del ladron compradas como objeto.
+    static boolean tmpSkill(ServerPlayer p, String key, int ticks, String msg) {
+        if (p.getPersistentData().getInt(key) > 0) {
+            PoliciaMod.msg(p, "Ya la tenes activa");
+            return false;
+        }
+        p.getPersistentData().putInt(key, ticks);
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ILLUSIONER_PREPARE_MIRROR, SoundSource.PLAYERS, 0.8f, 1.4f);
+        PoliciaMod.msg(p, msg);
+        return true;
+    }
+
     static boolean run(ServerPlayer p, String id) {
         CompoundTag d = p.getPersistentData();
         try {
@@ -200,6 +223,57 @@ public class PoliciaBoss {
                 }
                 case "pico": {
                     return PoliciaAlbanil.useSingle(p, 0);
+                }
+                case "refugio2": {
+                    return PoliciaAlbanil.useSingle(p, 3);
+                }
+                case "h_grito": {
+                    return PoliciaHerrero.single(p, 0);
+                }
+                case "h_yunque": {
+                    return PoliciaHerrero.single(p, 1);
+                }
+                case "h_marca": {
+                    return PoliciaHerrero.single(p, 2);
+                }
+                case "h_forja": {
+                    return PoliciaHerrero.single(p, 3);
+                }
+                case "h_faro": {
+                    return PoliciaHerrero.single(p, 4);
+                }
+                case "h_vinculo": {
+                    return PoliciaHerrero.single(p, 5);
+                }
+                case "h_reparar": {
+                    return PoliciaHerrero.single(p, 6);
+                }
+                case "h_guardian": {
+                    return PoliciaHerrero.single(p, 7);
+                }
+                case "l_carterismo": {
+                    return PoliciaBoss.tmpSkill(p, "pol_tmp_pick", 1200, "Carterismo maestro: tu proximo carterismo en 60 s sale si o si");
+                }
+                case "l_suerte": {
+                    return PoliciaBoss.tmpSkill(p, "pol_tmp_luck", 1200, "Suerte maxima (55%) durante 60 s");
+                }
+                case "l_ganzua": {
+                    return PoliciaBoss.tmpSkill(p, "pol_tmp_lock", 1200, "Ganzua: podes forzar cerraduras (agachado + clic derecho) durante 60 s");
+                }
+                case "l_humo": {
+                    return PoliciaLadron.single(p, 1);
+                }
+                case "l_salto": {
+                    return PoliciaLadron.single(p, 2);
+                }
+                case "l_instinto": {
+                    return PoliciaLadron.single(p, 3);
+                }
+                case "l_polvo": {
+                    return PoliciaLadron.single(p, 4);
+                }
+                case "l_escape": {
+                    return PoliciaLadron.single(p, 6);
                 }
             }
             PoliciaMod.msg(p, "Objeto sin efecto");
@@ -400,6 +474,14 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE), 24));
             l.add(new Entry(PoliciaBoss.ench(new ItemStack((ItemLike) Items.IRON_PICKAXE), Enchantments.UNBREAKING, 3), 10));
             l.add(new Entry(PoliciaBoss.ench(new ItemStack((ItemLike) Items.IRON_SWORD), Enchantments.SHARPNESS, 2), 10));
+            l.add(new Entry(PoliciaBoss.single("h_grito", "Grito del Forjador", "Onda que desarma y asusta a los enemigos cercanos"), 8));
+            l.add(new Entry(PoliciaBoss.single("h_yunque", "Yunque Portatil", "Yunque 40 s: Fuerza, Heroe de la aldea y doble XP"), 12));
+            l.add(new Entry(PoliciaBoss.single("h_marca", "Marca del Herrero", "Marca a un enemigo 15 s: menos armadura"), 8));
+            l.add(new Entry(PoliciaBoss.single("h_forja", "Forja Interior", "Funde 1 lingote de hierro y cura 2 corazones"), 6));
+            l.add(new Entry(PoliciaBoss.single("h_faro", "Faro de Forja", "Fogata 60 s: regeneracion e inmunidad al fuego"), 14));
+            l.add(new Entry(PoliciaBoss.single("h_vinculo", "Vinculo de Acero", "Te vincula 30 s con el jugador mas cercano"), 10));
+            l.add(new Entry(PoliciaBoss.single("h_reparar", "Reparacion Maestra", "Repara por completo lo que tengas en la mano"), 16));
+            l.add(new Entry(PoliciaBoss.single("h_guardian", "Yunque Guardian", "Yunque 40 s que destruye flechas y proyectiles"), 14));
             return l;
         }
         if (k == 0) {
@@ -432,6 +514,7 @@ public class PoliciaBoss {
             l.add(new Entry(PoliciaBoss.single("pico", "Pico de albanil"), 8));
             l.add(new Entry(PoliciaBoss.single("muro", "Muro"), 6));
             l.add(new Entry(PoliciaBoss.single("refugio", "Refugio"), 14));
+            l.add(new Entry(PoliciaBoss.single("refugio2", "Refugio II", "Torre de 4 pisos con camas, cofres y jardin", "Dura 3 minutos y luego desaparece"), 24));
         } else {
             l.add(new Entry(PoliciaBoss.ench(PoliciaBoss.named(Items.IRON_BOOTS, "Botas de sigilo", new String[0]), Enchantments.FALL_PROTECTION, 2), 8));
             l.add(new Entry(new ItemStack((ItemLike) Items.ENDER_PEARL, 2), 6));
@@ -440,6 +523,14 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.BUNDLE), 6));
             l.add(new Entry(new ItemStack((ItemLike) Items.GUNPOWDER, 8), 3));
             l.add(new Entry(PoliciaBoss.single("silbido", "Silbido"), 8));
+            l.add(new Entry(PoliciaBoss.single("l_carterismo", "Carterismo maestro", "Tu proximo carterismo en 60 s no falla"), 6));
+            l.add(new Entry(PoliciaBoss.single("l_suerte", "Suerte", "60 s con la suerte al maximo (55%)"), 10));
+            l.add(new Entry(PoliciaBoss.single("l_humo", "Humo", "Invisible y rapido 8 s, los enemigos te pierden"), 8));
+            l.add(new Entry(PoliciaBoss.single("l_salto", "Salto", "Impulso hacia adelante con caida lenta"), 6));
+            l.add(new Entry(PoliciaBoss.single("l_instinto", "Instinto", "Los seres cercanos brillan 10 s"), 8));
+            l.add(new Entry(PoliciaBoss.single("l_polvo", "Polvo cegador", "Debilita y frena a los cercanos 7 s"), 8));
+            l.add(new Entry(PoliciaBoss.single("l_ganzua", "Ganzua", "60 s para forzar puertas de hierro y cofres"), 10));
+            l.add(new Entry(PoliciaBoss.single("l_escape", "Escape", "10 s invisible y la policia te pierde"), 14));
         }
         return l;
     }

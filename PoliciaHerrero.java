@@ -51,6 +51,10 @@ public class PoliciaHerrero {
     static final int[] CD = new int[]{500, 900, 400, 160, 1000, 1200, 1200, 900};
 
     static void startCd(ServerPlayer p, int i) {
+        if (p.getPersistentData().getBoolean("her_sg" + i)) {
+            p.getPersistentData().remove("her_sg" + i);
+            return;
+        }
         if (PoliciaHerrero.isHerrero(p)) {
             p.getPersistentData().putInt("her_cd" + i, CD[i]);
         }
@@ -228,27 +232,33 @@ public class PoliciaHerrero {
             PoliciaMod.msg(p, SKILLS[s] + " en enfriamiento: " + (PoliciaHerrero.cd(p, s) + 19) / 20 + " s");
             return;
         }
+        PoliciaHerrero.doSkill(p, s);
+    }
+
+    // Ejecuta la habilidad s (sin mirar desbloqueo ni enfriamiento).
+    // Devuelve true si se pudo usar.
+    static boolean doSkill(ServerPlayer p, int s) {
+        CompoundTag d = p.getPersistentData();
         switch (s) {
             case 0: {
                 PoliciaHerrero.forgerShout(p);
                 PoliciaHerrero.startCd(p, 0);
-                break;
+                return true;
             }
             case 1: {
-                PoliciaHerrero.placeAnvil(p, 0);
-                break;
+                return PoliciaHerrero.placeAnvil(p, 0);
             }
             case 2: {
                 if (d.getInt("her_mark_on") > 0) {
                     PoliciaMod.msg(p, "La Marca sigue activa: " + (d.getInt("her_mark_on") + 19) / 20 + " s");
-                    return;
+                    return false;
                 }
                 if (!PoliciaHerrero.mark(p)) {
                     PoliciaMod.msg(p, "Marca del Herrero: sin objetivo a la vista");
-                    return;
+                    return false;
                 }
                 d.putInt("her_mark_on", 300);
-                break;
+                return true;
             }
             case 3: {
                 int slot = -1;
@@ -259,7 +269,7 @@ public class PoliciaHerrero {
                 }
                 if (slot < 0) {
                     PoliciaMod.msg(p, "Forja Interior: necesitas un lingote de hierro en el inventario");
-                    return;
+                    return false;
                 }
                 p.getInventory().getItem(slot).shrink(1);
                 p.heal(4.0f);
@@ -270,58 +280,75 @@ public class PoliciaHerrero {
                 p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 0.5f, 1.6f);
                 PoliciaMod.msg(p, "Forja Interior: fundiste un lingote de hierro, +2 corazones");
                 PoliciaHerrero.startCd(p, 3);
-                break;
+                return true;
             }
             case 4: {
                 if (d.getInt("her_faro_t") > 0) {
                     PoliciaMod.msg(p, "El Faro de Forja sigue encendido: " + (d.getInt("her_faro_t") + 19) / 20 + " s");
-                    return;
+                    return false;
                 }
                 BlockPos fp = p.blockPosition();
                 if (!PoliciaHerrero.free(p, fp)) {
                     PoliciaMod.msg(p, "No hay espacio libre para el Faro de Forja");
-                    return;
+                    return false;
                 }
                 p.level().setBlockAndUpdate(fp, Blocks.CAMPFIRE.defaultBlockState());
                 d.putLong("her_faro_pos", fp.asLong());
                 d.putInt("her_faro_t", 1200);
                 PoliciaMod.msg(p, "Faro de Forja encendido: cura y da inmunidad al fuego cerca suyo");
-                break;
+                return true;
             }
             case 5: {
                 if (d.getInt("her_link_t") > 0) {
                     PoliciaMod.msg(p, "El Vinculo de Acero sigue activo: " + (d.getInt("her_link_t") + 19) / 20 + " s");
-                    return;
+                    return false;
                 }
                 if (!PoliciaHerrero.link(p)) {
                     PoliciaMod.msg(p, "Vinculo de Acero: necesitas otro jugador cerca");
-                    return;
+                    return false;
                 }
-                break;
+                return true;
             }
             case 6: {
                 boolean off = !PoliciaHerrero.repairable(p.getMainHandItem()) && PoliciaHerrero.repairable(p.getOffhandItem());
                 ItemStack it = off ? p.getOffhandItem() : p.getMainHandItem();
                 if (!PoliciaHerrero.repairable(it)) {
                     PoliciaMod.msg(p, "Reparacion Maestra: necesitas en la mano algo gastado (o con costo de yunque) para reparar");
-                    return;
+                    return false;
                 }
                 d.putBoolean("her_rep_off", off);
                 if (d.getInt("her_rep_t") > 0 || d.getInt("her_anvil_wait") > 0) {
                     PoliciaMod.msg(p, "Termina lo que estas forjando primero");
-                    return;
+                    return false;
                 }
                 d.putInt("her_rep_slot", p.getInventory().selected);
                 d.putInt("her_rep_t", 1);
                 PoliciaHerrero.anim(p, 1);
                 PoliciaMod.msg(p, "Reparacion Maestra: sacas el yunque y empezas a forjar...");
-                break;
+                return true;
             }
             case 7: {
-                PoliciaHerrero.placeAnvil(p, 1);
-                break;
+                return PoliciaHerrero.placeAnvil(p, 1);
             }
         }
+        return false;
+    }
+
+    // Objeto de un solo uso (tienda del Maestro herrero): la habilidad dura
+    // lo mismo que la normal, pero al terminar NO empieza el enfriamiento.
+    static boolean single(ServerPlayer p, int s) {
+        if (!PoliciaHerrero.isHerrero(p)) {
+            PoliciaMod.msg(p, "Solo un herrero puede usar esto");
+            return false;
+        }
+        CompoundTag d = p.getPersistentData();
+        d.putBoolean("her_sg" + s, true);
+        if (!PoliciaHerrero.doSkill(p, s)) {
+            d.remove("her_sg" + s);
+            return false;
+        }
+        PoliciaHerrero.send(p);
+        return true;
     }
 
     static boolean free(ServerPlayer p, BlockPos bp) {
@@ -410,6 +437,7 @@ public class PoliciaHerrero {
         if (!PoliciaHerrero.free(p, bp)) {
             PoliciaMod.msg(p, "No hay espacio libre para el yunque");
             d.putInt("her_cd" + (type == 0 ? 1 : 7), 0);
+            d.remove("her_sg" + (type == 0 ? 1 : 7));
             return;
         }
         p.level().setBlockAndUpdate(bp, Blocks.ANVIL.defaultBlockState().setValue(net.minecraft.world.level.block.AnvilBlock.FACING, p.getDirection().getClockWise()));
