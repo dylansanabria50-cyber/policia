@@ -86,9 +86,11 @@ public class PoliciaEncargo {
         }
         p.getPersistentData().putLong("enc_d" + j, PoliciaLadron.day() + 1L);
         p.getPersistentData().putInt("pol_xp", PoliciaMod.xp(p) + XP);
-        PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, (Integer) o[2]));
+        int em = PoliciaEstacion.scale(p.serverLevel(), "herrero", (Integer) o[2]);
+        PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, em));
+        PoliciaDiario.add(p.serverLevel(), "El herrero " + p.getName().getString() + " le entregó un encargo a " + boss);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.VILLAGER_YES, SoundSource.PLAYERS, 1.0f, 1.0f);
-        p.sendSystemMessage(Component.literal("<" + boss + "> ¡Excelente trabajo, herrero! Acá tenés: " + o[2] + " esmeraldas y " + XP + " XP."));
+        p.sendSystemMessage(Component.literal("<" + boss + "> ¡Excelente trabajo, herrero! Acá tenés: " + em + " esmeraldas y " + XP + " XP."));
         PoliciaMod.sync(p);
     }
 }

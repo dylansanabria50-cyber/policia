@@ -111,6 +111,7 @@ public class PoliciaDiario {
             return;
         }
         boolean first = d.lastDay < 0L;
+        boolean newSeason = !first && (day - 1L) % PoliciaEstacion.DAYS == 0L;
         d.lastDay = day;
         d.setDirty();
         if (first) {
@@ -118,6 +119,9 @@ public class PoliciaDiario {
         }
         String head = d.news.isEmpty() ? "Un día tranquilo en la aldea." : d.news.get(d.news.size() - 1).replaceFirst("^Día \\d+: ", "");
         for (ServerPlayer p : srv.getPlayerList().getPlayers()) {
+            if (newSeason) {
+                p.sendSystemMessage(Component.literal("§b[Estación] §fEmpieza el " + PoliciaEstacion.name(ow) + ". " + PoliciaEstacion.desc(ow)));
+            }
             p.sendSystemMessage(Component.literal("§6[Diario de la aldea] §fDía " + day + " (" + PoliciaEstacion.name(ow) + "). Titular: §e" + head + " §7(tocá una campana para leer más)"));
         }
     }

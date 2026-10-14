@@ -116,6 +116,7 @@ public class PoliciaContratos {
     @SubscribeEvent
     public void login(PlayerEvent.PlayerLoggedInEvent e) {
         if (e.getEntity() instanceof ServerPlayer p) {
+            p.getPersistentData().putInt("mus_cur", 0);
             PoliciaContratos.collect(p);
         }
     }

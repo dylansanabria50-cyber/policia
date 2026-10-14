@@ -83,6 +83,7 @@ public class PoliciaGolpe {
         }
         d.putInt("gh_k", k);
         d.putInt("gh_ph", 1);
+        PoliciaSonido.music(p, 2);
         d.putLong("gh_site", site.asLong());
         if (k == 1) {
             // site = (x0 + 6, g + 1, z0 + 13): la bóveda va en el 2.º sótano.
@@ -128,6 +129,7 @@ public class PoliciaGolpe {
         CompoundTag d = p.getPersistentData();
         int k = PoliciaGolpe.kind(p);
         d.putInt("gh_ph", 2);
+        PoliciaSonido.music(p, 1);
         d.putInt("gh_t", TIME[k]);
         d.putLong("gh_from", at.asLong());
         ServerLevel sl = p.serverLevel();
@@ -157,18 +159,25 @@ public class PoliciaGolpe {
         if (k == 0) {
             return;
         }
+        boolean was2 = d.getInt("gh_ph") == 2;
         d.remove("gh_k");
         d.remove("gh_ph");
         d.remove("gh_t");
         d.putLong("gh_cd", p.serverLevel().getGameTime() + 24000L);
+        PoliciaSonido.music(p, 0);
         if (ok) {
+            int em = PoliciaEstacion.scale(p.serverLevel(), "ladron", EM[k]);
             d.putInt("pol_xp", PoliciaMod.xp(p) + XP[k]);
-            PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, EM[k]));
-            PoliciaGolpe.title(p, "§a¡GOLPE PERFECTO!", "§f" + NAME[k] + ": +" + XP[k] + " XP y " + EM[k] + " esmeraldas");
+            PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, em));
+            PoliciaGolpe.title(p, "§a¡GOLPE PERFECTO!", "§f" + NAME[k] + ": +" + XP[k] + " XP y " + em + " esmeraldas");
+            PoliciaDiario.add(p.serverLevel(), (k == 1 ? "¡Asaltaron la bóveda del casino!" : "¡Le vaciaron los bolsillos al Perista!") + " El ladrón escapó sin dejar rastro");
             p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.0f, 1.0f);
             PoliciaMod.sync(p);
         } else {
             PoliciaGolpe.title(p, "§cGolpe fallido", "§7" + why);
+            if (was2) {
+                PoliciaDiario.add(p.serverLevel(), "Fracasó un golpe en el casino: " + p.getName().getString() + " no logró escapar");
+            }
         }
     }
 

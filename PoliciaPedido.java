@@ -174,6 +174,7 @@ public class PoliciaPedido {
                     dd.putInt("pol_xp", PoliciaMod.xp(p) + XP[kk]);
                     PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, PoliciaEstacion.scale(p.serverLevel(), "albanil", EM[kk])));
                     p.level().playSound(null, v.getX(), v.getY(), v.getZ(), SoundEvents.VILLAGER_CELEBRATE, SoundSource.NEUTRAL, 1.0f, 1.0f);
+                    PoliciaDiario.add(p.serverLevel(), "El albañil " + p.getName().getString() + " terminó un pedido: " + NAME[kk].toLowerCase());
                     p.sendSystemMessage(Component.literal("§a<Aldeano> ¡Quedó hermoso! Acá tenés " + EM[kk] + " esmeraldas. (+" + XP[kk] + " XP)"));
                     PoliciaMod.sync(p);
                 }

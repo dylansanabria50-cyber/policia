@@ -130,6 +130,8 @@ public class PoliciaEventos {
             sub = "Un mercader adinerado pasa cerca: robale los bolsillos (agachado, por detrás)";
         }
         d.putInt("ev_k", k);
+        if (k == 1) PoliciaSonido.music(p, 1);
+        if (k == 4) PoliciaSonido.music(p, 2);
         d.putInt("ev_t", TIME[k]);
         PoliciaEventos.announce(p, k, sub);
         return true;
@@ -158,11 +160,15 @@ public class PoliciaEventos {
         for (String key : new String[]{"ev_k", "ev_t", "ev_e", "ev_b", "ev_n", "ev_i", "ev_last"}) {
             d.remove(key);
         }
-        d.putInt("ev_next", 12000 + p.getRandom().nextInt(12000));
+        d.putInt("ev_next", PoliciaEstacion.eventDelay(sl, 12000 + p.getRandom().nextInt(12000)));
+        if (k == 1 || k == 4) PoliciaSonido.music(p, 0);
         if (ok) {
+            int em = PoliciaEstacion.scale(sl, PoliciaMod.job(p), EM[k]);
             d.putInt("pol_xp", PoliciaMod.xp(p) + XP[k]);
-            PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, EM[k]));
-            PoliciaGolpe.title(p, "§a¡Evento superado!", "§f" + NAME[k] + ": +" + XP[k] + " XP y " + EM[k] + " esmeraldas");
+            PoliciaBoss.give(p, new ItemStack((ItemLike) Items.EMERALD, em));
+            PoliciaGolpe.title(p, "§a¡Evento superado!", "§f" + NAME[k] + ": +" + XP[k] + " XP y " + em + " esmeraldas");
+            String[] news = new String[]{"", "El oficial " + p.getName().getString() + " atrapó a un ladrón fugitivo", "El albañil " + p.getName().getString() + " despejó un derrumbe", "El herrero " + p.getName().getString() + " entregó un pedido urgente a la guardia", "Un mercader adinerado denunció que le vaciaron los bolsillos"};
+            PoliciaDiario.add(sl, news[k]);
             p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8f, 1.2f);
             PoliciaMod.sync(p);
         } else {
