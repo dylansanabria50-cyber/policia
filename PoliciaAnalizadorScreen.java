@@ -2,51 +2,96 @@ package com.example.policia;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 
-// Ventana del Analizador del Forjador (tecla O): a la izquierda todos los
-// items del juego (incluidos los de otros mods), a la derecha los que ya
-// se analizaron, y abajo el detalle del elegido con sus botones: Pedir
-// mision / Cancelar mision para los que no tenes, y Otra receta /
-// Confirmar / Craftear para los analizados. Borde blanco = sin analizar,
-// verde = mision en curso, naranja = receta sin confirmar, dorado =
-// receta confirmada.
+// Ventana del Analizador del Forjador (tecla O), armada como el inventario
+// creativo pero con los colores del Analizador (dorado de forja y el azul
+// de la lente): pestanas por categoria (las mismas del creativo, incluidas
+// las de otros mods) con paginas, buscador, "Analizados" y "Todos", grilla
+// de 9x5 con barra de desplazamiento, y abajo el detalle del objeto
+// elegido: su receta con Craftear / Otra receta / Confirmar, o su mision
+// con Pedir mision / Cancelar.
 public class PoliciaAnalizadorScreen extends Screen {
     static PoliciaAnalizador.State LAST;
-    static final List<Item> ALL = new ArrayList<Item>();
-    static final int W = 520;
-    static final int H = 360;
-    int px;
-    int py;
-    int scrollL;
-    int scrollR;
+    // Paleta del Analizador.
+    static final int OUTLINE = 0xFF2A1C07;
+    static final int PANEL = 0xFFD8BE82;
+    static final int P_LIGHT = 0xFFFFF1C4;
+    static final int P_DARK = 0xFF8A6526;
+    static final int TAB_OFF = 0xFFB0904F;
+    static final int SLOT = 0xFF9A7738;
+    static final int S_DARK = 0xFF574013;
+    static final int S_LIGHT = 0xFFF3DEA6;
+    static final int TEXT = 0xFF3A2606;
+    static final int LENS = 0xFF9FD8F0;
+    static final int LENS_D = 0xFF3B7C97;
+    static final int C_QUEST = 0xFF4CD964;
+    static final int C_UNCONF = 0xFFFF9F2E;
+    static final int C_CONF = 0xFFFFE14A;
+    static final int PW = 195;
+    static final int PH = 136;
+    static final int DH = 72;
+    static final int COLS = 9;
+    static final int ROWS = 5;
+    static final int TABS_PER_PAGE = 7;
+
+    static class Tab {
+        final String name;
+        final ItemStack icon;
+        final List<Item> items;
+        final int kind;
+
+        Tab(String name, ItemStack icon, List<Item> items, int kind) {
+            this.name = name;
+            this.icon = icon;
+            this.items = items;
+            this.kind = kind;
+        }
+    }
+
+    static final int K_NORMAL = 0;
+    static final int K_SEARCH = 1;
+    static final int K_KNOWN = 2;
+    static List<Tab> TABS;
+    static int lastTab = 2;
+    static int lastPage = 0;
+
+    int tab;
+    int page;
+    int scroll;
+    boolean dragging;
     String selected = "";
-    float open = 0.0f;
-    // Botones del panel de detalle: {x0, y0, x1, y1, accion}. Se recalculan
-    // en cada render y los usa mouseClicked.
+    EditBox search;
+    List<Item> shown = new ArrayList<Item>();
     final List<int[]> btns = new ArrayList<int[]>();
+    int x0;
+    int ay;
+    int py;
+    int dy;
 
     public PoliciaAnalizadorScreen() {
         super(Component.literal("Analizador del Forjador"));
-        if (ALL.isEmpty()) {
-            for (Item it : ForgeRegistries.ITEMS.getValues()) {
-                if (it != Items.AIR) {
-                    ALL.add(it);
-                }
-            }
-        }
     }
 
     static void onState(PoliciaAnalizador.State m) {
@@ -85,12 +130,59 @@ public class PoliciaAnalizadorScreen extends Screen {
         }
     }
 
+    // Pestanas: Buscar, Analizados, Todos y las categorias del creativo.
+    static void buildTabs() {
+        List<Tab> out = new ArrayList<Tab>();
+        List<Item> all = new ArrayList<Item>();
+        for (Item it : ForgeRegistries.ITEMS.getValues()) {
+            if (it != Items.AIR) {
+                all.add(it);
+            }
+        }
+        out.add(new Tab("Buscar", new ItemStack(Items.COMPASS), all, K_SEARCH));
+        out.add(new Tab("Analizados", new ItemStack(Items.KNOWLEDGE_BOOK), new ArrayList<Item>(), K_KNOWN));
+        out.add(new Tab("Todos los objetos", new ItemStack(Items.SPYGLASS), all, K_NORMAL));
+        try {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null && mc.level != null) {
+                CreativeModeTabs.tryRebuildTabContents(mc.player.connection.enabledFeatures(), false, mc.level.registryAccess());
+            }
+            for (CreativeModeTab t : net.minecraftforge.common.CreativeModeTabRegistry.getSortedCreativeModeTabs()) {
+                if (t.getType() != CreativeModeTab.Type.CATEGORY) continue;
+                LinkedHashSet<Item> set = new LinkedHashSet<Item>();
+                for (ItemStack st : t.getDisplayItems()) {
+                    if (!st.isEmpty()) {
+                        set.add(st.getItem());
+                    }
+                }
+                if (set.isEmpty()) continue;
+                out.add(new Tab(t.getDisplayName().getString(), t.getIconItem(), new ArrayList<Item>(set), K_NORMAL));
+            }
+        } catch (Throwable ignored) {
+            // Sin categorias: quedan Buscar, Analizados y Todos.
+        }
+        TABS = out;
+    }
+
     @Override
     protected void init() {
-        this.px = (this.width - W) / 2;
-        this.py = (this.height - H) / 2 + 6;
-        this.addRenderableWidget(Button.builder(Component.literal("Cerrar"), b -> this.onClose())
-                .bounds(this.px + W - 60, this.py + H + 4, 60, 20).build());
+        if (TABS == null) {
+            PoliciaAnalizadorScreen.buildTabs();
+        }
+        this.tab = Mth.clamp(lastTab, 0, TABS.size() - 1);
+        this.page = this.tab / TABS_PER_PAGE;
+        this.x0 = (this.width - PW) / 2;
+        int total = 20 + 28 + PH + 4 + DH;
+        this.ay = Math.max(2, (this.height - total) / 2);
+        this.py = this.ay + 20 + 28;
+        this.dy = this.py + PH + 4;
+        this.search = new EditBox(this.font, this.x0 + 82, this.py + 6, 88, 9, Component.literal("Buscar"));
+        this.search.setMaxLength(50);
+        this.search.setBordered(false);
+        this.search.setTextColor(0xFFFFFF);
+        this.search.setResponder(s -> this.refresh());
+        this.addRenderableWidget(this.search);
+        this.refresh();
         PoliciaAnalizadorScreen.act(4, "");
     }
 
@@ -98,16 +190,35 @@ public class PoliciaAnalizadorScreen extends Screen {
         PoliciaMod.NET.sendToServer((Object) new PoliciaAnalizador.Act(kind, item));
     }
 
-    @Override
-    public void tick() {
-        if (this.open < 1.0f) {
-            this.open = Math.min(1.0f, this.open + 0.12f);
-        }
+    Tab cur() {
+        return TABS.get(Mth.clamp(this.tab, 0, TABS.size() - 1));
     }
 
-    static void panel(GuiGraphics g, int x0, int y0, int x1, int y1) {
-        g.fill(x0 - 1, y0 - 1, x1 + 1, y1 + 1, -11183002);
-        g.fill(x0, y0, x1, y1, -16118766);
+    void refresh() {
+        Tab t = this.cur();
+        boolean isSearch = t.kind == K_SEARCH;
+        this.search.visible = isSearch;
+        this.search.setFocused(isSearch);
+        this.setFocused(isSearch ? this.search : null);
+        if (t.kind == K_KNOWN) {
+            this.shown = this.known();
+        } else if (isSearch) {
+            String q = this.search.getValue().trim().toLowerCase(Locale.ROOT);
+            List<Item> out = new ArrayList<Item>();
+            for (Item it : t.items) {
+                if (q.isEmpty() || new ItemStack(it).getHoverName().getString().toLowerCase(Locale.ROOT).contains(q) || PoliciaAnalizadorScreen.id(it).contains(q)) {
+                    out.add(it);
+                }
+            }
+            this.shown = out;
+        } else {
+            this.shown = t.items;
+        }
+        this.scroll = Mth.clamp(this.scroll, 0, this.maxScroll());
+    }
+
+    int maxScroll() {
+        return Math.max(0, (this.shown.size() + COLS - 1) / COLS - ROWS);
     }
 
     int state(String item) {
@@ -124,55 +235,6 @@ public class PoliciaAnalizadorScreen extends Screen {
             return 2;
         }
         return 0;
-    }
-
-    int color(int st) {
-        return switch (st) {
-            case 1 -> -10440449;
-            case 2 -> -19712;
-            case 3 -> -181;
-            default -> -7707118;
-        };
-    }
-
-    void grid(GuiGraphics g, int x0, int y0, int x1, int y1, List<Item> items, int scroll, int mx, int my) {
-        PoliciaAnalizadorScreen.panel(g, x0, y0, x1, y1);
-        int cols = (x1 - x0 - 4) / 20;
-        int rows = (y1 - y0 - 4) / 20;
-        int start = scroll * cols;
-        for (int row = 0; row < rows; ++row) {
-            for (int col = 0; col < cols; ++col) {
-                int idx = start + row * cols + col;
-                if (idx >= items.size()) continue;
-                Item it = items.get(idx);
-                String id = PoliciaAnalizadorScreen.id(it);
-                int nx = x0 + 2 + col * 20;
-                int ny = y0 + 2 + row * 20;
-                int st = this.state(id);
-                boolean hover = mx >= nx && mx < nx + 18 && my >= ny && my < ny + 18;
-                int border = id.equals(this.selected) ? -1 : (hover ? -5728 : this.color(st));
-                g.fill(nx - 1, ny - 1, nx + 19, ny + 19, border);
-                g.fill(nx, ny, nx + 18, ny + 18, st == 0 ? -16777216 : -14540254);
-                g.renderItem(new ItemStack(it), nx + 1, ny + 1);
-            }
-        }
-    }
-
-    Item itemAt(int x0, int y0, int x1, int y1, List<Item> items, int scroll, int mx, int my) {
-        int cols = (x1 - x0 - 4) / 20;
-        int rows = (y1 - y0 - 4) / 20;
-        int start = scroll * cols;
-        for (int row = 0; row < rows; ++row) {
-            for (int col = 0; col < cols; ++col) {
-                int idx = start + row * cols + col;
-                if (idx >= items.size()) continue;
-                int nx = x0 + 2 + col * 20;
-                int ny = y0 + 2 + row * 20;
-                if (mx < nx || mx >= nx + 18 || my < ny || my >= ny + 18) continue;
-                return items.get(idx);
-            }
-        }
-        return null;
     }
 
     List<Item> known() {
@@ -234,14 +296,70 @@ public class PoliciaAnalizadorScreen extends Screen {
         return prog + "/" + need;
     }
 
+
+    // ---------------- Dibujo estilo inventario ----------------
+
+    static void bevel(GuiGraphics g, int x0, int y0, int x1, int y1, int fill, int light, int dark) {
+        g.fill(x0, y0, x1, y1, OUTLINE);
+        g.fill(x0 + 1, y0 + 1, x1 - 1, y1 - 1, fill);
+        g.fill(x0 + 1, y0 + 1, x1 - 2, y0 + 3, light);
+        g.fill(x0 + 1, y0 + 1, x0 + 3, y1 - 2, light);
+        g.fill(x0 + 3, y1 - 3, x1 - 1, y1 - 1, dark);
+        g.fill(x1 - 3, y0 + 3, x1 - 1, y1 - 1, dark);
+    }
+
+    static void slot(GuiGraphics g, int x, int y) {
+        g.fill(x, y, x + 18, y + 18, SLOT);
+        g.fill(x, y, x + 17, y + 1, S_DARK);
+        g.fill(x, y, x + 1, y + 17, S_DARK);
+        g.fill(x + 1, y + 17, x + 18, y + 18, S_LIGHT);
+        g.fill(x + 17, y + 1, x + 18, y + 18, S_LIGHT);
+    }
+
+    static void outline(GuiGraphics g, int x, int y, int w, int h, int c) {
+        g.fill(x, y, x + w, y + 1, c);
+        g.fill(x, y + h - 1, x + w, y + h, c);
+        g.fill(x, y, x + 1, y + h, c);
+        g.fill(x + w - 1, y, x + w, y + h, c);
+    }
+
+    int tabX(int i) {
+        return this.x0 + (i % TABS_PER_PAGE) * 28;
+    }
+
+    int pages() {
+        return (TABS.size() + TABS_PER_PAGE - 1) / TABS_PER_PAGE;
+    }
+
+    void drawTab(GuiGraphics g, int i, boolean sel) {
+        int x = this.tabX(i);
+        int y = this.py - 28;
+        if (sel) {
+            g.fill(x, y, x + 26, this.py + 2, OUTLINE);
+            g.fill(x + 1, y + 1, x + 25, this.py + 2, PANEL);
+            g.fill(x + 1, y + 1, x + 24, y + 3, P_LIGHT);
+            g.fill(x + 1, y + 1, x + 3, this.py + 2, P_LIGHT);
+            g.fill(x + 23, y + 3, x + 25, this.py, P_DARK);
+        } else {
+            g.fill(x, y + 2, x + 26, this.py, OUTLINE);
+            g.fill(x + 1, y + 3, x + 25, this.py, TAB_OFF);
+            g.fill(x + 1, y + 3, x + 24, y + 5, PANEL);
+            g.fill(x + 23, y + 5, x + 25, this.py, P_DARK);
+        }
+        g.renderItem(TABS.get(i).icon, x + 5, y + (sel ? 7 : 9));
+    }
+
     void button(GuiGraphics g, int x, int y, int w, String label, boolean enabled, int action, int mx, int my) {
-        boolean hover = enabled && mx >= x && mx < x + w && my >= y && my < y + 18;
-        g.fill(x - 1, y - 1, x + w + 1, y + 19, enabled ? (hover ? -5728 : -11183002) : -13421773);
-        g.fill(x, y, x + w, y + 18, enabled ? (hover ? -7696487 : -10066330) : -14540254);
-        int tw = this.font.width(label);
-        g.drawString(this.font, label, x + (w - tw) / 2, y + 5, enabled ? -1 : -8355712, true);
+        boolean hover = enabled && mx >= x && mx < x + w && my >= y && my < y + 14;
         if (enabled) {
-            this.btns.add(new int[]{x, y, x + w, y + 18, action});
+            PoliciaAnalizadorScreen.bevel(g, x, y, x + w, y + 14, hover ? LENS : 0xFFC9A34E, hover ? 0xFFE6F7FF : 0xFFFFE9A8, hover ? LENS_D : 0xFF6E4E17);
+        } else {
+            PoliciaAnalizadorScreen.bevel(g, x, y, x + w, y + 14, 0xFF8F8A7E, 0xFFB5B0A3, 0xFF5E5A50);
+        }
+        int tw = this.font.width(label);
+        g.drawString(this.font, label, x + (w - tw) / 2, y + 3, enabled ? TEXT : 0xFF4E4A40, false);
+        if (enabled) {
+            this.btns.add(new int[]{x, y, x + w, y + 14, action});
         }
     }
 
@@ -249,153 +367,321 @@ public class PoliciaAnalizadorScreen extends Screen {
     public void render(GuiGraphics g, int mx, int my, float pt) {
         this.renderBackground(g);
         this.btns.clear();
-        int lx0 = this.px;
-        int lx1 = this.px + 250;
-        int rx0 = this.px + 260;
-        int rx1 = this.px + W;
-        int gy1 = this.py + 200;
-        g.drawString(this.font, "Todos los items (rueda: bajar)", lx0, this.py - 11, -1, true);
-        this.grid(g, lx0, this.py, lx1, gy1, ALL, this.scrollL, mx, my);
-        g.drawString(this.font, "Analizados", rx0, this.py - 11, -1, true);
-        this.grid(g, rx0, this.py, rx1, gy1, this.known(), this.scrollR, mx, my);
-        int dy0 = gy1 + 8;
-        int dy1 = this.py + H;
-        PoliciaAnalizadorScreen.panel(g, this.px, dy0, this.px + W, dy1);
-        int tx = this.px + 8;
-        int bx = this.px + W - 128;
-        if (LAST != null && !LAST.questItem.isEmpty()) {
-            String qn = new ItemStack(PoliciaAnalizadorScreen.item(LAST.questItem)).getHoverName().getString();
-            g.drawString(this.font, "Mision en curso: " + qn + " - " + PoliciaAnalizadorScreen.questText(LAST.questType, LAST.questTarget, LAST.questNeed) + " (" + PoliciaAnalizadorScreen.progText(LAST.questType, LAST.questProg, LAST.questNeed) + ")", tx, dy1 - 12, -10440449, false);
+        if (this.cur().kind == K_KNOWN) {
+            this.shown = this.known();
         }
-        if (this.selected.isEmpty()) {
-            g.drawString(this.font, "Hace clic en un item para ver su receta o pedir una mision.", tx, dy0 + 6, -6642512, false);
+        int x0 = this.x0;
+        int py = this.py;
+        // Paginas de pestanas, como el "1 / 2" del creativo.
+        int pages = this.pages();
+        if (pages > 1) {
+            String pg = (this.page + 1) + " / " + pages;
+            g.drawString(this.font, pg, x0 + PW / 2 - this.font.width(pg) / 2, this.ay + 4, 0xFFFFFFFF, true);
+            this.button(g, x0, this.ay, 18, "<", this.page > 0, 100, mx, my);
+            this.button(g, x0 + PW - 18, this.ay, 18, ">", this.page < pages - 1, 101, mx, my);
+        }
+        // Pestanas sin elegir (detras del panel).
+        int first = this.page * TABS_PER_PAGE;
+        int last = Math.min(TABS.size(), first + TABS_PER_PAGE);
+        for (int i = first; i < last; ++i) {
+            if (i != this.tab) {
+                this.drawTab(g, i, false);
+            }
+        }
+        // Panel principal.
+        PoliciaAnalizadorScreen.bevel(g, x0, py, x0 + PW, py + PH, PANEL, P_LIGHT, P_DARK);
+        if (this.tab >= first && this.tab < last) {
+            this.drawTab(g, this.tab, true);
+        }
+        Tab t = this.cur();
+        if (t.kind == K_SEARCH) {
+            g.drawString(this.font, "Buscar:", x0 + 8, py + 6, TEXT, false);
+            g.fill(x0 + 80, py + 4, x0 + 172, py + 16, OUTLINE);
+            g.fill(x0 + 81, py + 5, x0 + 171, py + 15, 0xFF2B2B2B);
         } else {
-            Item it = PoliciaAnalizadorScreen.item(this.selected);
-            ItemStack big = new ItemStack(it);
-            g.renderItem(big, tx, dy0 + 6);
-            g.drawString(this.font, big.getHoverName().getString(), tx + 22, dy0 + 10, -1, true);
-            int st = this.state(this.selected);
-            boolean questing = st == 1;
-            boolean otherQuest = LAST != null && !LAST.questItem.isEmpty() && !questing;
-            if (st == 0 || questing) {
-                String[] q = PoliciaAnalizador.questFor(this.selected);
-                int type = Integer.parseInt(q[0]);
-                int need = PoliciaAnalizador.QUEST_NEED[type];
-                g.drawString(this.font, "Sin analizar. Sostenelo 2 s en la mano secundaria para aprenderlo,", tx, dy0 + 30, -6642512, false);
-                g.drawString(this.font, "o completa su mision:", tx, dy0 + 41, -6642512, false);
-                g.drawString(this.font, PoliciaAnalizador.QUEST_NAMES[type] + ": " + PoliciaAnalizadorScreen.questText(type, q[1], need), tx, dy0 + 55, -10440449, false);
-                if (questing) {
-                    int pw = 220;
-                    float f = LAST.questNeed <= 0 ? 0.0f : (float) LAST.questProg / (float) LAST.questNeed;
-                    g.fill(tx, dy0 + 70, tx + pw, dy0 + 78, -14540254);
-                    g.fill(tx, dy0 + 70, tx + (int) ((float) pw * f), dy0 + 78, -10440449);
-                    g.drawString(this.font, PoliciaAnalizadorScreen.progText(type, LAST.questProg, LAST.questNeed), tx + pw + 6, dy0 + 70, -1, false);
-                    this.button(g, bx, dy0 + 8, 120, "Cancelar mision", true, 5, mx, my);
-                } else {
-                    this.button(g, bx, dy0 + 8, 120, "Pedir mision", !otherQuest, 0, mx, my);
-                    if (otherQuest) {
-                        g.drawString(this.font, "Ya tenes otra mision", bx, dy0 + 30, -1525712, false);
-                        this.button(g, bx, dy0 + 42, 120, "Cancelar la otra", true, 5, mx, my);
-                    }
+            String title = this.font.plainSubstrByWidth(t.name + "  (" + this.shown.size() + ")", PW - 16);
+            g.drawString(this.font, title, x0 + 8, py + 6, TEXT, false);
+        }
+        // Grilla 9x5.
+        int gx = x0 + 9;
+        int gy = py + 18;
+        Item hovered = null;
+        int start = this.scroll * COLS;
+        for (int r = 0; r < ROWS; ++r) {
+            for (int c = 0; c < COLS; ++c) {
+                int sx = gx + c * 18;
+                int sy = gy + r * 18;
+                PoliciaAnalizadorScreen.slot(g, sx - 1, sy - 1);
+                int idx = start + r * COLS + c;
+                if (idx >= this.shown.size()) continue;
+                Item it = this.shown.get(idx);
+                String id = PoliciaAnalizadorScreen.id(it);
+                g.renderItem(new ItemStack(it), sx, sy);
+                int st = this.state(id);
+                if (st != 0) {
+                    PoliciaAnalizadorScreen.outline(g, sx - 1, sy - 1, 18, 18, st == 1 ? C_QUEST : (st == 2 ? C_UNCONF : C_CONF));
                 }
-            } else {
-                Map<String, List<String>> ingMap = new HashMap<String, List<String>>();
-                Map<String, Boolean> confMap = new HashMap<String, Boolean>();
-                PoliciaAnalizadorScreen.parse(LAST.recipeBlob.toString(), ingMap, confMap);
-                List<String> ings = ingMap.getOrDefault(this.selected, List.of());
-                boolean conf = st == 3;
-                g.drawString(this.font, conf ? "Receta confirmada:" : "Receta (sin confirmar, podes cambiarla):", tx, dy0 + 30, conf ? -181 : -19712, false);
-                boolean all = !ings.isEmpty();
-                int ix = tx;
-                Minecraft mc = Minecraft.getInstance();
-                for (String ing : ings) {
-                    int x = ing.lastIndexOf('x');
-                    if (x <= 0) continue;
-                    String iid = ing.substring(0, x);
-                    int n;
-                    try {
-                        n = Integer.parseInt(ing.substring(x + 1));
-                    } catch (NumberFormatException ex) {
-                        continue;
-                    }
-                    int have = mc.player == null ? 0 : PoliciaAnalizador.count(mc.player.getInventory(), iid);
-                    if (have < n) {
-                        all = false;
-                    }
-                    ItemStack is = new ItemStack(PoliciaAnalizadorScreen.item(iid), n);
-                    g.fill(ix - 1, dy0 + 43, ix + 17, dy0 + 61, have >= n ? -14513374 : -10477022);
-                    g.renderItem(is, ix, dy0 + 44);
-                    g.renderItemDecorations(this.font, is, ix, dy0 + 44);
-                    g.drawString(this.font, Math.min(have, 99) + "/" + n, ix, dy0 + 64, have >= n ? -10428320 : -1525712, false);
-                    if (mx >= ix && mx < ix + 16 && my >= dy0 + 44 && my < dy0 + 60) {
-                        this.hoverStack = is;
-                    }
-                    ix += 30;
+                if (id.equals(this.selected)) {
+                    PoliciaAnalizadorScreen.outline(g, sx - 1, sy - 1, 18, 18, 0xFFFFFFFF);
+                    PoliciaAnalizadorScreen.outline(g, sx, sy, 16, 16, LENS);
                 }
-                g.drawString(this.font, all ? "Tenes todo: apreta Craftear" : "Te faltan materiales (rojo)", tx, dy0 + 78, all ? -10428320 : -1525712, false);
-                this.button(g, bx, dy0 + 8, 120, "Craftear", all, 3, mx, my);
-                if (!conf) {
-                    this.button(g, bx, dy0 + 32, 120, "Otra receta", true, 1, mx, my);
-                    this.button(g, bx, dy0 + 56, 120, "Confirmar receta", true, 2, mx, my);
+                if (mx >= sx - 1 && mx < sx + 17 && my >= sy - 1 && my < sy + 17) {
+                    hovered = it;
+                    g.fill(sx, sy, sx + 16, sy + 16, 0x80FFFFFF);
                 }
             }
         }
-        super.render(g, mx, my, pt);
-        Item hov = this.itemAt(lx0, this.py, lx1, gy1, ALL, this.scrollL, mx, my);
-        if (hov == null) {
-            hov = this.itemAt(rx0, this.py, rx1, gy1, this.known(), this.scrollR, mx, my);
+        if (this.shown.isEmpty()) {
+            String msg = t.kind == K_KNOWN ? "Todavia no analizaste nada" : "No hay objetos";
+            g.drawString(this.font, msg, gx + 81 - this.font.width(msg) / 2, gy + 40, TEXT, false);
         }
-        if (hov != null) {
-            g.renderTooltip(this.font, new ItemStack(hov), mx, my);
+        // Barra de desplazamiento (con la lente del Analizador).
+        int bx = x0 + 175;
+        g.fill(bx, gy - 1, bx + 14, gy + 89, S_DARK);
+        g.fill(bx + 1, gy, bx + 14, gy + 89, SLOT);
+        int ms = this.maxScroll();
+        int thumbY = gy + (ms == 0 ? 0 : (int) ((float) this.scroll / (float) ms * 74.0f));
+        if (ms > 0) {
+            PoliciaAnalizadorScreen.bevel(g, bx + 1, thumbY, bx + 13, thumbY + 15, LENS, 0xFFE6F7FF, LENS_D);
+        } else {
+            PoliciaAnalizadorScreen.bevel(g, bx + 1, thumbY, bx + 13, thumbY + 15, 0xFFB5A27A, 0xFFD8CBA9, 0xFF7A6A48);
+        }
+        // Leyenda / mision en curso, debajo de la grilla.
+        int ly = gy + 92;
+        if (LAST != null && !LAST.questItem.isEmpty()) {
+            String qn = new ItemStack(PoliciaAnalizadorScreen.item(LAST.questItem)).getHoverName().getString();
+            String line = "Mision: " + qn + " " + PoliciaAnalizadorScreen.progText(LAST.questType, LAST.questProg, LAST.questNeed);
+            g.fill(x0 + 8, ly + 3, x0 + 14, ly + 9, C_QUEST);
+            g.drawString(this.font, this.font.plainSubstrByWidth(line, PW - 26), x0 + 18, ly + 2, TEXT, false);
+            ly += 12;
+        }
+        g.pose().pushPose();
+        g.pose().translate((float) (x0 + 8), (float) (ly + 2), 0.0f);
+        g.pose().scale(0.75f, 0.75f, 1.0f);
+        int lx = 0;
+        int[] lc = new int[]{C_UNCONF, C_CONF, C_QUEST};
+        String[] ln = new String[]{"sin confirmar", "confirmada", "mision"};
+        for (int i = 0; i < 3; ++i) {
+            g.fill(lx, 1, lx + 7, 8, OUTLINE);
+            g.fill(lx + 1, 2, lx + 6, 7, lc[i]);
+            g.drawString(this.font, ln[i], lx + 10, 0, TEXT, false);
+            lx += 18 + this.font.width(ln[i]);
+        }
+        g.pose().popPose();
+        // Detalle del objeto elegido.
+        this.details(g, mx, my);
+        super.render(g, mx, my, pt);
+        // Tooltips arriba de todo.
+        if (hovered != null) {
+            g.renderTooltip(this.font, new ItemStack(hovered), mx, my);
         } else if (this.hoverStack != null) {
             g.renderTooltip(this.font, this.hoverStack, mx, my);
+        } else {
+            for (int i = first; i < last; ++i) {
+                int x = this.tabX(i);
+                if (mx >= x && mx < x + 26 && my >= py - 28 && my < py) {
+                    g.renderTooltip(this.font, Component.literal(TABS.get(i).name), mx, my);
+                }
+            }
         }
         this.hoverStack = null;
     }
 
     ItemStack hoverStack;
 
+    void details(GuiGraphics g, int mx, int my) {
+        int x0 = this.x0;
+        int dy = this.dy;
+        PoliciaAnalizadorScreen.bevel(g, x0, dy, x0 + PW, dy + DH, PANEL, P_LIGHT, P_DARK);
+        int bx = x0 + PW - 64;
+        if (this.selected.isEmpty()) {
+            List<FormattedCharSequence> ls = this.font.split(FormattedText.of("Elegi un objeto para ver su receta o la mision para aprenderlo. Sostener un objeto 2 s en la mano secundaria lo analiza al instante."), PW - 16);
+            for (int i = 0; i < ls.size() && i < 5; ++i) {
+                g.drawString(this.font, ls.get(i), x0 + 8, dy + 8 + i * 10, TEXT, false);
+            }
+            return;
+        }
+        Item it = PoliciaAnalizadorScreen.item(this.selected);
+        ItemStack big = new ItemStack(it);
+        PoliciaAnalizadorScreen.slot(g, x0 + 7, dy + 6);
+        g.renderItem(big, x0 + 8, dy + 7);
+        g.drawString(this.font, this.font.plainSubstrByWidth(big.getHoverName().getString(), bx - x0 - 32), x0 + 29, dy + 7, TEXT, false);
+        int st = this.state(this.selected);
+        if (st == 0 || st == 1) {
+            String[] q = PoliciaAnalizador.questFor(this.selected);
+            int type = Integer.parseInt(q[0]);
+            int need = PoliciaAnalizador.QUEST_NEED[type];
+            g.drawString(this.font, "Sin analizar", x0 + 29, dy + 17, 0xFF6B4A12, false);
+            List<FormattedCharSequence> ls = this.font.split(FormattedText.of(PoliciaAnalizador.QUEST_NAMES[type] + ": " + PoliciaAnalizadorScreen.questText(type, q[1], need)), bx - x0 - 12);
+            for (int i = 0; i < ls.size() && i < 3; ++i) {
+                g.drawString(this.font, ls.get(i), x0 + 8, dy + 29 + i * 10, 0xFF1F6B2E, false);
+            }
+            boolean otherQuest = LAST != null && !LAST.questItem.isEmpty() && st != 1;
+            if (st == 1) {
+                int pw = bx - x0 - 16;
+                float f = LAST.questNeed <= 0 ? 0.0f : (float) LAST.questProg / (float) LAST.questNeed;
+                g.fill(x0 + 8, dy + 60, x0 + 8 + pw, dy + 66, OUTLINE);
+                g.fill(x0 + 9, dy + 61, x0 + 9 + (int) ((float) (pw - 2) * f), dy + 65, C_QUEST);
+                this.button(g, bx, dy + 6, 58, "Cancelar", true, 5, mx, my);
+                g.drawString(this.font, PoliciaAnalizadorScreen.progText(type, LAST.questProg, LAST.questNeed), bx + 2, dy + 26, TEXT, false);
+            } else {
+                this.button(g, bx, dy + 6, 58, "Pedir mision", !otherQuest, 0, mx, my);
+                if (otherQuest) {
+                    g.drawString(this.font, "Ya tenes otra", bx + 2, dy + 24, 0xFF9A2A10, false);
+                    this.button(g, bx, dy + 36, 58, "Cancelarla", true, 5, mx, my);
+                }
+            }
+            return;
+        }
+        Map<String, List<String>> ingMap = new HashMap<String, List<String>>();
+        Map<String, Boolean> confMap = new HashMap<String, Boolean>();
+        PoliciaAnalizadorScreen.parse(LAST.recipeBlob.toString(), ingMap, confMap);
+        List<String> ings = ingMap.getOrDefault(this.selected, List.of());
+        boolean conf = st == 3;
+        g.drawString(this.font, conf ? "Receta confirmada" : "Receta sin confirmar", x0 + 29, dy + 17, conf ? 0xFF8A6A00 : 0xFFA4510E, false);
+        boolean all = !ings.isEmpty();
+        int ix = x0 + 8;
+        Minecraft mc = Minecraft.getInstance();
+        for (String ing : ings) {
+            int x = ing.lastIndexOf('x');
+            if (x <= 0) continue;
+            String iid = ing.substring(0, x);
+            int n;
+            try {
+                n = Integer.parseInt(ing.substring(x + 1));
+            } catch (NumberFormatException ex) {
+                continue;
+            }
+            int have = mc.player == null ? 0 : PoliciaAnalizador.count(mc.player.getInventory(), iid);
+            if (have < n) {
+                all = false;
+            }
+            ItemStack is = new ItemStack(PoliciaAnalizadorScreen.item(iid), n);
+            PoliciaAnalizadorScreen.slot(g, ix - 1, dy + 32);
+            if (have < n) {
+                g.fill(ix, dy + 33, ix + 16, dy + 49, 0x55FF2020);
+            }
+            g.renderItem(is, ix, dy + 33);
+            g.renderItemDecorations(this.font, is, ix, dy + 33);
+            String hv = Math.min(have, 99) + "/" + n;
+            g.pose().pushPose();
+            g.pose().translate((float) ix, (float) (dy + 53), 0.0f);
+            g.pose().scale(0.75f, 0.75f, 1.0f);
+            g.drawString(this.font, hv, 0, 0, have >= n ? 0xFF1F6B2E : 0xFF9A2A10, false);
+            g.pose().popPose();
+            if (mx >= ix && mx < ix + 16 && my >= dy + 33 && my < dy + 49) {
+                this.hoverStack = is;
+            }
+            ix += 22;
+        }
+        this.button(g, bx, dy + 6, 58, "Craftear", all, 3, mx, my);
+        if (!conf) {
+            this.button(g, bx, dy + 24, 58, "Otra receta", true, 1, mx, my);
+            this.button(g, bx, dy + 42, 58, "Confirmar", true, 2, mx, my);
+        } else {
+            g.drawString(this.font, "Fija para", bx + 4, dy + 28, TEXT, false);
+            g.drawString(this.font, "siempre", bx + 4, dy + 38, TEXT, false);
+        }
+    }
+
+    void click() {
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f));
+    }
+
+    void selectTab(int i) {
+        if (i == this.tab || i < 0 || i >= TABS.size()) {
+            return;
+        }
+        this.tab = i;
+        lastTab = i;
+        this.scroll = 0;
+        this.refresh();
+    }
+
     @Override
     public boolean mouseClicked(double mx, double my, int btn) {
         if (btn != 0) {
             return super.mouseClicked(mx, my, btn);
         }
-        int lx0 = this.px;
-        int lx1 = this.px + 250;
-        int rx0 = this.px + 260;
-        int rx1 = this.px + W;
-        int gy1 = this.py + 200;
-        Item l = this.itemAt(lx0, this.py, lx1, gy1, ALL, this.scrollL, (int) mx, (int) my);
-        if (l != null) {
-            this.selected = PoliciaAnalizadorScreen.id(l);
-            return true;
-        }
-        Item r = this.itemAt(rx0, this.py, rx1, gy1, this.known(), this.scrollR, (int) mx, (int) my);
-        if (r != null) {
-            this.selected = PoliciaAnalizadorScreen.id(r);
-            return true;
-        }
         for (int[] b : this.btns) {
             if (mx < b[0] || mx >= b[2] || my < b[1] || my >= b[3]) continue;
-            PoliciaAnalizadorScreen.act(b[4], b[4] == 5 ? "" : this.selected);
-            Minecraft.getInstance().getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK.value(), 1.0f));
+            this.click();
+            if (b[4] == 100) {
+                this.page = Math.max(0, this.page - 1);
+            } else if (b[4] == 101) {
+                this.page = Math.min(this.pages() - 1, this.page + 1);
+            } else {
+                PoliciaAnalizadorScreen.act(b[4], b[4] == 5 ? "" : this.selected);
+            }
+            return true;
+        }
+        // Pestanas.
+        int first = this.page * TABS_PER_PAGE;
+        int last = Math.min(TABS.size(), first + TABS_PER_PAGE);
+        for (int i = first; i < last; ++i) {
+            int x = this.tabX(i);
+            if (mx >= x && mx < x + 26 && my >= this.py - 28 && my < this.py) {
+                this.click();
+                this.selectTab(i);
+                return true;
+            }
+        }
+        // Grilla.
+        int gx = this.x0 + 9;
+        int gy = this.py + 18;
+        if (mx >= gx - 1 && mx < gx + COLS * 18 - 1 && my >= gy - 1 && my < gy + ROWS * 18 - 1) {
+            int c = (int) ((mx - gx + 1) / 18.0);
+            int r = (int) ((my - gy + 1) / 18.0);
+            int idx = (this.scroll + r) * COLS + c;
+            if (idx >= 0 && idx < this.shown.size()) {
+                this.selected = PoliciaAnalizadorScreen.id(this.shown.get(idx));
+                return true;
+            }
+        }
+        // Barra de desplazamiento.
+        int bx = this.x0 + 175;
+        if (mx >= bx && mx < bx + 14 && my >= gy && my < gy + 89) {
+            this.dragging = true;
+            this.dragTo(my);
             return true;
         }
         return super.mouseClicked(mx, my, btn);
     }
 
+    void dragTo(double my) {
+        int gy = this.py + 18;
+        float f = Mth.clamp((float) (my - gy - 7.5) / 74.0f, 0.0f, 1.0f);
+        this.scroll = Math.round(f * (float) this.maxScroll());
+    }
+
+    @Override
+    public boolean mouseDragged(double mx, double my, int btn, double dx, double dyy) {
+        if (this.dragging) {
+            this.dragTo(my);
+            return true;
+        }
+        return super.mouseDragged(mx, my, btn, dx, dyy);
+    }
+
+    @Override
+    public boolean mouseReleased(double mx, double my, int btn) {
+        this.dragging = false;
+        return super.mouseReleased(mx, my, btn);
+    }
+
     @Override
     public boolean mouseScrolled(double mx, double my, double delta) {
-        int cols = (250 - 4) / 20;
-        if (mx < (double) (this.px + 255)) {
-            int maxL = Math.max(0, (ALL.size() + cols - 1) / cols - 9);
-            this.scrollL = Math.max(0, Math.min(maxL, this.scrollL - (int) Math.signum(delta) * 2));
-        } else {
-            int rc = (W - 260 - 4) / 20;
-            int maxR = Math.max(0, (this.known().size() + rc - 1) / rc - 9);
-            this.scrollR = Math.max(0, Math.min(maxR, this.scrollR - (int) Math.signum(delta) * 2));
-        }
+        this.scroll = Mth.clamp(this.scroll - (int) Math.signum(delta), 0, this.maxScroll());
         return true;
+    }
+
+    @Override
+    public boolean keyPressed(int key, int scan, int mods) {
+        // Con el buscador abierto, las letras van al buscador (salvo ESC).
+        if (this.search.visible && this.search.isFocused() && key != 256) {
+            return this.search.keyPressed(key, scan, mods) || this.search.canConsumeInput() || super.keyPressed(key, scan, mods);
+        }
+        return super.keyPressed(key, scan, mods);
     }
 
     @Override

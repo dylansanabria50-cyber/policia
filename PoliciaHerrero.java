@@ -45,6 +45,22 @@ public class PoliciaHerrero {
     };
     static final int[] THRESH = new int[]{0, 15, 25, 35, 45, 55, 70, 85};
     static final int ANALIZADOR_XP = 35;
+    // Enfriamiento de cada habilidad (ticks). En las que duran un tiempo
+    // (yunques, marca, faro, vinculo, reparacion) empieza a correr recien
+    // cuando la habilidad TERMINA.
+    static final int[] CD = new int[]{500, 900, 400, 160, 1000, 1200, 1200, 900};
+
+    static void startCd(ServerPlayer p, int i) {
+        if (PoliciaHerrero.isHerrero(p)) {
+            p.getPersistentData().putInt("her_cd" + i, CD[i]);
+        }
+    }
+
+    // Lo que Reparacion Maestra puede arreglar: desgaste, el costo
+    // acumulado de yunque, y yunques astillados/danados.
+    static boolean repairable(ItemStack it) {
+        return !it.isEmpty() && (it.isDamageableItem() && it.getDamageValue() > 0 || it.getBaseRepairCost() > 0 || it.is(net.minecraft.world.item.Items.CHIPPED_ANVIL) || it.is(net.minecraft.world.item.Items.DAMAGED_ANVIL));
+    }
     static final UUID MARK_ARM = UUID.fromString("b4e8c231-7a5d-4f66-9e32-7c1b2d3e4f50");
 
     static HerSync CL = new HerSync();
@@ -68,6 +84,8 @@ public class PoliciaHerrero {
         m.anvilType = d.getInt("her_anvil_type");
         m.faroT = d.getInt("her_faro_t");
         m.linkT = d.getInt("her_link_t");
+        m.markT = d.getInt("her_mark_on");
+        m.repT = d.getInt("her_rep_t") > 0 || d.getInt("her_anvil_wait") > 0 ? 1 : 0;
         PoliciaMod.NET.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p), (Object) m);
     }
 
@@ -113,6 +131,8 @@ public class PoliciaHerrero {
         int anvilType;
         int faroT;
         int linkT;
+        int markT;
+        int repT;
 
         static void enc(HerSync m, net.minecraft.network.FriendlyByteBuf b) {
             b.writeVarInt(m.sel);
@@ -123,6 +143,8 @@ public class PoliciaHerrero {
             b.writeVarInt(m.anvilType);
             b.writeVarInt(m.faroT);
             b.writeVarInt(m.linkT);
+            b.writeVarInt(m.markT);
+            b.writeVarInt(m.repT);
         }
 
         static HerSync dec(net.minecraft.network.FriendlyByteBuf b) {
@@ -135,6 +157,8 @@ public class PoliciaHerrero {
             m.anvilType = b.readVarInt();
             m.faroT = b.readVarInt();
             m.linkT = b.readVarInt();
+            m.markT = b.readVarInt();
+            m.repT = b.readVarInt();
             return m;
         }
 
@@ -207,35 +231,52 @@ public class PoliciaHerrero {
         switch (s) {
             case 0: {
                 PoliciaHerrero.forgerShout(p);
-                d.putInt("her_cd0", 500);
+                PoliciaHerrero.startCd(p, 0);
                 break;
             }
             case 1: {
-                if (!PoliciaHerrero.placeAnvil(p, 0)) {
-                    return;
-                }
-                d.putInt("her_cd1", 900);
+                PoliciaHerrero.placeAnvil(p, 0);
                 break;
             }
             case 2: {
+                if (d.getInt("her_mark_on") > 0) {
+                    PoliciaMod.msg(p, "La Marca sigue activa: " + (d.getInt("her_mark_on") + 19) / 20 + " s");
+                    return;
+                }
                 if (!PoliciaHerrero.mark(p)) {
                     PoliciaMod.msg(p, "Marca del Herrero: sin objetivo a la vista");
                     return;
                 }
-                d.putInt("her_cd2", 400);
+                d.putInt("her_mark_on", 300);
                 break;
             }
             case 3: {
-                p.heal(6.0f);
-                if (p.level() instanceof ServerLevel sl) {
-                    sl.sendParticles((ParticleOptions) ParticleTypes.HEART, p.getX(), p.getY() + 1.4, p.getZ(), 6, 0.3, 0.3, 0.3, 0.02);
+                int slot = -1;
+                for (int i = 0; i < p.getInventory().getContainerSize(); ++i) {
+                    if (!p.getInventory().getItem(i).is(net.minecraft.world.item.Items.IRON_INGOT)) continue;
+                    slot = i;
+                    break;
                 }
-                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.6f);
-                PoliciaMod.msg(p, "Forja Interior: +3 corazones");
-                d.putInt("her_cd3", 700);
+                if (slot < 0) {
+                    PoliciaMod.msg(p, "Forja Interior: necesitas un lingote de hierro en el inventario");
+                    return;
+                }
+                p.getInventory().getItem(slot).shrink(1);
+                p.heal(4.0f);
+                if (p.level() instanceof ServerLevel sl) {
+                    sl.sendParticles((ParticleOptions) ParticleTypes.HEART, p.getX(), p.getY() + 1.4, p.getZ(), 5, 0.3, 0.3, 0.3, 0.02);
+                    sl.sendParticles((ParticleOptions) ParticleTypes.FLAME, p.getX(), p.getY() + 1.0, p.getZ(), 10, 0.3, 0.4, 0.3, 0.01);
+                }
+                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 0.5f, 1.6f);
+                PoliciaMod.msg(p, "Forja Interior: fundiste un lingote de hierro, +2 corazones");
+                PoliciaHerrero.startCd(p, 3);
                 break;
             }
             case 4: {
+                if (d.getInt("her_faro_t") > 0) {
+                    PoliciaMod.msg(p, "El Faro de Forja sigue encendido: " + (d.getInt("her_faro_t") + 19) / 20 + " s");
+                    return;
+                }
                 BlockPos fp = p.blockPosition();
                 if (!PoliciaHerrero.free(p, fp)) {
                     PoliciaMod.msg(p, "No hay espacio libre para el Faro de Forja");
@@ -245,23 +286,27 @@ public class PoliciaHerrero {
                 d.putLong("her_faro_pos", fp.asLong());
                 d.putInt("her_faro_t", 1200);
                 PoliciaMod.msg(p, "Faro de Forja encendido: cura y da inmunidad al fuego cerca suyo");
-                d.putInt("her_cd4", 1000);
                 break;
             }
             case 5: {
+                if (d.getInt("her_link_t") > 0) {
+                    PoliciaMod.msg(p, "El Vinculo de Acero sigue activo: " + (d.getInt("her_link_t") + 19) / 20 + " s");
+                    return;
+                }
                 if (!PoliciaHerrero.link(p)) {
                     PoliciaMod.msg(p, "Vinculo de Acero: necesitas otro jugador cerca");
                     return;
                 }
-                d.putInt("her_cd5", 1200);
                 break;
             }
             case 6: {
-                ItemStack it = p.getMainHandItem();
-                if (it.isEmpty() || !it.isDamageableItem() || it.getDamageValue() <= 0) {
-                    PoliciaMod.msg(p, "Reparacion Maestra: necesitas una herramienta o arma danada en la mano");
+                boolean off = !PoliciaHerrero.repairable(p.getMainHandItem()) && PoliciaHerrero.repairable(p.getOffhandItem());
+                ItemStack it = off ? p.getOffhandItem() : p.getMainHandItem();
+                if (!PoliciaHerrero.repairable(it)) {
+                    PoliciaMod.msg(p, "Reparacion Maestra: necesitas en la mano algo gastado (o con costo de yunque) para reparar");
                     return;
                 }
+                d.putBoolean("her_rep_off", off);
                 if (d.getInt("her_rep_t") > 0 || d.getInt("her_anvil_wait") > 0) {
                     PoliciaMod.msg(p, "Termina lo que estas forjando primero");
                     return;
@@ -270,14 +315,10 @@ public class PoliciaHerrero {
                 d.putInt("her_rep_t", 1);
                 PoliciaHerrero.anim(p, 1);
                 PoliciaMod.msg(p, "Reparacion Maestra: sacas el yunque y empezas a forjar...");
-                d.putInt("her_cd6", 1200);
                 break;
             }
             case 7: {
-                if (!PoliciaHerrero.placeAnvil(p, 1)) {
-                    return;
-                }
-                d.putInt("her_cd7", 900);
+                PoliciaHerrero.placeAnvil(p, 1);
                 break;
             }
         }
@@ -398,6 +439,7 @@ public class PoliciaHerrero {
             return;
         }
         d.putBoolean("her_anvil_on", false);
+        PoliciaHerrero.startCd(p, d.getInt("her_anvil_type") == 0 ? 1 : 7);
         BlockPos bp = BlockPos.of(d.getLong("her_anvil_pos"));
         String dim = d.getString("her_anvil_dim");
         ANVILS.remove(PoliciaHerrero.anvilKey(dim, bp));
@@ -487,11 +529,25 @@ public class PoliciaHerrero {
         if (d.getInt("her_link_t") <= 0 && !d.hasUUID("her_link_id")) {
             return;
         }
+        if (d.getInt("her_link_t") > 0 || d.hasUUID("her_link_id")) {
+            PoliciaHerrero.startCd(p, 5);
+        }
         d.putInt("her_link_t", 0);
         d.remove("her_link_id");
     }
 
     static void reset(ServerPlayer p) {
+        CompoundTag rd = p.getPersistentData();
+        if (rd.getInt("her_faro_t") > 0) {
+            PoliciaHerrero.startCd(p, 4);
+        }
+        if (rd.getInt("her_rep_t") > 0) {
+            PoliciaHerrero.startCd(p, 6);
+        }
+        if (rd.getInt("her_mark_on") > 0) {
+            rd.putInt("her_mark_on", 0);
+            PoliciaHerrero.startCd(p, 2);
+        }
         p.getPersistentData().putInt("her_anvil_wait", 0);
         p.getPersistentData().putInt("her_rep_t", 0);
         PoliciaHerrero.removeAnvil(p);
@@ -553,6 +609,12 @@ public class PoliciaHerrero {
             if (type == 0) {
                 if (p.blockPosition().distSqr(bp) < 64.0) {
                     p.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 30, 0, false, false, false));
+                    p.addEffect(new MobEffectInstance(MobEffects.HERO_OF_THE_VILLAGE, 30, 0, false, false, true));
+                }
+                if (p.tickCount % 10 == 0) {
+                    for (Mob m : p.level().getEntitiesOfClass(Mob.class, new net.minecraft.world.phys.AABB(bp).inflate(8.0), x -> x instanceof net.minecraft.world.entity.monster.Enemy && x.isAlive())) {
+                        m.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 0, false, true, false));
+                    }
                 }
             } else if (p.level() instanceof ServerLevel sl) {
                 for (Projectile proj : sl.getEntitiesOfClass(Projectile.class, new net.minecraft.world.phys.AABB(bp).inflate(4.0))) {
@@ -575,15 +637,26 @@ public class PoliciaHerrero {
                     p.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 30, 0, false, false, false));
                     p.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 30, 0, false, false, false));
                 }
-                if (ft == 0 && p.level().getBlockState(bp).is(Blocks.CAMPFIRE)) {
-                    p.level().setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
+                if (ft == 0) {
+                    if (p.level().getBlockState(bp).is(Blocks.CAMPFIRE)) {
+                        p.level().setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
+                    }
                     PoliciaMod.msg(p, "El Faro de Forja se apago");
+                    PoliciaHerrero.startCd(p, 4);
                 }
             }
         }
         int mt = d.getInt("her_marked_t");
         if (mt > 0) {
             d.putInt("her_marked_t", --mt);
+        }
+        int mo = d.getInt("her_mark_on");
+        if (mo > 0) {
+            d.putInt("her_mark_on", --mo);
+            if (mo == 0) {
+                PoliciaMod.msg(p, "La Marca del Herrero se borro");
+                PoliciaHerrero.startCd(p, 2);
+            }
         }
         int lt = d.getInt("her_link_t");
         if (lt > 0) {
@@ -624,14 +697,28 @@ public class PoliciaHerrero {
             }
             if (rt >= ANIM_REPAIR) {
                 d.putInt("her_rep_t", 0);
-                ItemStack it = p.getInventory().getItem(d.getInt("her_rep_slot"));
-                if (!it.isEmpty() && it.isDamageableItem() && it.getDamageValue() > 0) {
-                    it.setDamageValue(0);
+                PoliciaHerrero.startCd(p, 6);
+                boolean off = d.getBoolean("her_rep_off");
+                ItemStack it = off ? p.getOffhandItem() : p.getInventory().getItem(d.getInt("her_rep_slot"));
+                if (PoliciaHerrero.repairable(it)) {
+                    if (it.isDamageableItem()) {
+                        it.setDamageValue(0);
+                    }
+                    it.setRepairCost(0);
+                    if (it.is(net.minecraft.world.item.Items.CHIPPED_ANVIL) || it.is(net.minecraft.world.item.Items.DAMAGED_ANVIL)) {
+                        ItemStack nu = new ItemStack(net.minecraft.world.item.Items.ANVIL, it.getCount());
+                        if (off) {
+                            p.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, nu);
+                        } else {
+                            p.getInventory().setItem(d.getInt("her_rep_slot"), nu);
+                        }
+                        it = nu;
+                    }
                     PoliciaMod.msg(p, "Reparacion Maestra: " + it.getHoverName().getString() + " como nuevo");
                     PoliciaJefe.add(p, "repair", 1);
                     p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.8f);
                 } else {
-                    PoliciaMod.msg(p, "Reparacion Maestra: ya no tenias la herramienta en ese lugar");
+                    PoliciaMod.msg(p, "Reparacion Maestra: ya no tenias ese objeto en la mano");
                 }
                 if (p.level() instanceof ServerLevel sl) {
                     sl.sendParticles((ParticleOptions) ParticleTypes.POOF, ax, ay, az, 10, 0.25, 0.2, 0.25, 0.03);
@@ -639,6 +726,21 @@ public class PoliciaHerrero {
             } else {
                 d.putInt("her_rep_t", rt + 1);
             }
+        }
+    }
+
+    // Yunque Portatil: cerca del yunque los orbes de experiencia valen doble.
+    @SubscribeEvent
+    public void xp(net.minecraftforge.event.entity.player.PlayerXpEvent.PickupXp e) {
+        if (!(e.getEntity() instanceof ServerPlayer p) || !PoliciaHerrero.isHerrero(p)) {
+            return;
+        }
+        CompoundTag d = p.getPersistentData();
+        if (d.getInt("her_anvil_t") <= 0 || d.getInt("her_anvil_type") != 0) {
+            return;
+        }
+        if (p.blockPosition().distSqr(BlockPos.of(d.getLong("her_anvil_pos"))) < 64.0) {
+            p.giveExperiencePoints(e.getOrb().getValue());
         }
     }
 

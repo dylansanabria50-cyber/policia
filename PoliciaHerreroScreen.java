@@ -183,6 +183,9 @@ public class PoliciaHerreroScreen extends Screen {
             } else if (i == 8) {
                 st = "Pasiva (O)";
                 col = -10428320;
+            } else if (i < 8 && running(h, i)) {
+                st = "Activa";
+                col = 0xFFFFD24A;
             } else if (i < 8 && h.cd[i] > 0) {
                 st = (h.cd[i] + 19) / 20 + " s";
                 col = -8331009;
@@ -231,6 +234,31 @@ public class PoliciaHerreroScreen extends Screen {
     }
 
     // HUD de arriba a la derecha, con el mismo formato que los otros oficios.
+    // Si la habilidad esta funcionando ahora (su enfriamiento todavia no
+    // empezo: arranca cuando termina).
+    static boolean running(PoliciaHerrero.HerSync h, int i) {
+        return switch (i) {
+            case 1 -> h.anvilT > 0 && h.anvilType == 0;
+            case 7 -> h.anvilT > 0 && h.anvilType == 1;
+            case 2 -> h.markT > 0;
+            case 4 -> h.faroT > 0;
+            case 5 -> h.linkT > 0;
+            case 6 -> h.repT > 0;
+            default -> false;
+        };
+    }
+
+    static int runLeft(PoliciaHerrero.HerSync h, int i) {
+        return switch (i) {
+            case 1, 7 -> h.anvilT;
+            case 2 -> h.markT;
+            case 4 -> h.faroT;
+            case 5 -> h.linkT;
+            default -> 0;
+        };
+    }
+
+    // HUD de arriba a la derecha, con el mismo formato que los otros oficios.
     static void hud(GuiGraphics g, Minecraft mc, PoliciaMod.Sync ms, int sw, int sh) {
         PoliciaHerrero.HerSync h = PoliciaHerrero.CL;
         int xp = ms.xp;
@@ -246,21 +274,20 @@ public class PoliciaHerreroScreen extends Screen {
                 line += "  [" + need(i) + " XP]";
             } else if (i == 8) {
                 line += "  (pasiva, O)";
+            } else if (running(h, i)) {
+                line += "  (activa)";
             } else if (h.cd[i] > 0) {
                 line += "  (" + (h.cd[i] + 19) / 20 + " s)";
             }
             ls.add(line);
-            cs.add(op ? (chosen ? -1 : -5192482) : -9408400);
+            cs.add(op ? (running(h, i) ? 0xFFFFD24A : (chosen ? -1 : -5192482)) : -9408400);
         }
         int s = Math.max(0, Math.min(7, h.sel));
         String nm = PoliciaHerrero.SKILLS[s];
         String st;
-        if ((s == 1 || s == 7) && h.anvilT > 0 && h.anvilType == (s == 1 ? 0 : 1)) {
-            st = nm + " plantado: " + (h.anvilT + 19) / 20 + " s";
-        } else if (s == 4 && h.faroT > 0) {
-            st = "Faro encendido: " + (h.faroT + 19) / 20 + " s";
-        } else if (s == 5 && h.linkT > 0) {
-            st = "Vinculo activo: " + (h.linkT + 19) / 20 + " s";
+        if (running(h, s)) {
+            int left = runLeft(h, s);
+            st = nm + " activa" + (left > 0 ? ": " + (left + 19) / 20 + " s" : "") + " (el enfriamiento empieza al terminar)";
         } else if (h.cd[s] > 0) {
             st = nm + " en enfriamiento: " + (h.cd[s] + 19) / 20 + " s";
         } else {
