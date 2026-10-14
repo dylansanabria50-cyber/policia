@@ -77,7 +77,7 @@ public class PoliciaCamp {
         PoliciaStruct.set(sl, cx - 2, g + 1, cz, Blocks.OAK_FENCE);
         PoliciaStruct.set(sl, cx + 2, g + 1, cz, Blocks.OAK_FENCE);
         PoliciaStruct.set(sl, cx, g + 1, cz + 2, Blocks.OAK_FENCE);
-        Block block = bandit ? (desert ? Blocks.ORANGE_WOOL : Blocks.RED_WOOL) : (wool = Blocks.WHITE_WOOL);
+        wool = bandit ? (desert ? Blocks.ORANGE_WOOL : Blocks.RED_WOOL) : Blocks.WHITE_WOOL;
         Block wool2 = bandit ? (desert ? Blocks.YELLOW_WOOL : Blocks.BROWN_WOOL) : Blocks.LIGHT_GRAY_WOOL;
         PoliciaCamp.tent(sl, cx - 7, cz - 3, g, wool, 0, "minecraft:chests/simple_dungeon");
         PoliciaCamp.tent(sl, cx + 3, cz - 3, g, wool, 1, bandit ? "minecraft:chests/village/village_weaponsmith" : "minecraft:chests/village/village_toolsmith");
@@ -110,7 +110,7 @@ public class PoliciaCamp {
         }
         int mx = (xa + xb) / 2;
         int mz = (za + zb) / 2;
-        int n = door == 0 ? xb : (dx = door == 1 ? xa : mx);
+        dx = door == 0 ? xb : (door == 1 ? xa : mx);
         int dz = door == 2 ? zb : (door == 3 ? za : mz);
         PoliciaStruct.set(sl, dx, g + 1, dz, Blocks.AIR);
         PoliciaStruct.set(sl, dx, g + 2, dz, Blocks.AIR);
