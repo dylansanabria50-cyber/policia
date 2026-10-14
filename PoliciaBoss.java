@@ -297,14 +297,23 @@ public class PoliciaBoss {
         if (mine) {
             c.setItem(15, PoliciaBoss.named(Items.LEAD, "Dejar el oficio", "Pedir que te despidan"));
         } else if (jobless) {
-            c.setItem(15, PoliciaBoss.named(Items.WRITABLE_BOOK, "Unirme al oficio", "Convertirte en " + JOBNAME[j], "Solo si no tenes ningun oficio"));
+            PoliciaJefe.Def tr = PoliciaJefe.TRIALS[j];
+            PoliciaJefe.Def act = PoliciaJefe.active(sp);
+            if (act != null && act.id.equals(tr.id)) {
+                c.setItem(15, PoliciaJefe.done(sp) ? PoliciaBoss.named(Items.WRITABLE_BOOK, "Unirme al oficio", "Superaste la prueba!", "Clic para convertirte en " + JOBNAME[j]) : PoliciaBoss.named(Items.CLOCK, "Prueba de ingreso", tr.desc, "Progreso: " + PoliciaJefe.prog(sp) + "/" + tr.need));
+            } else {
+                c.setItem(15, PoliciaBoss.named(Items.WRITABLE_BOOK, "Unirme al oficio", "Convertirte en " + JOBNAME[j], "Antes tenes que superar una prueba de ingreso"));
+            }
         } else {
             c.setItem(15, PoliciaBoss.named(Items.BARRIER, "Dejar el oficio", "No eres de mi oficio (sos " + cur + ")", "Renuncia con tu jefe para poder unirte"));
+        }
+        if (mine) {
+            c.setItem(22, j == 0 ? PoliciaBoss.named(Items.BELL, "Misiones", "Las misiones de patrulla las da", "el Comisario, junto a la campana de la aldea") : PoliciaBoss.named(Items.MAP, "Misiones", "Trabajos del oficio con recompensa"));
         }
         PoliciaBoss.openMenu3(sp, NAMES[k], c, (p, slot) -> {
             if (slot == 11) {
                 p.closeContainer();
-                PoliciaBoss.talk(p, b);
+                PoliciaJefe.talk(p, b);
             } else if (slot == 13) {
                 if (!mine) {
                     PoliciaMod.msg(p, "Solo le vendo a quienes son " + JOBNAME[j]);
@@ -315,34 +324,18 @@ public class PoliciaBoss {
                 if (mine) {
                     PoliciaBoss.later(p, () -> PoliciaBoss.openFire(p, k));
                 } else if (PoliciaMod.job(p).isEmpty()) {
-                    PoliciaBoss.later(p, () -> PoliciaBoss.openJoin(p, k));
+                    p.closeContainer();
+                    PoliciaBoss.later(p, () -> PoliciaJefe.joinFlow(p, k));
                 } else {
                     PoliciaMod.msg(p, "Ya tenes un oficio: renuncia con tu jefe primero");
                 }
-            }
-        });
-    }
-
-    static void openJoin(ServerPlayer sp, int k) {
-        int j = PoliciaBoss.jobIdx(k);
-        SimpleContainer c = new SimpleContainer(27);
-        for (int i = 0; i < 27; ++i) {
-            c.setItem(i, PoliciaBoss.pane());
-        }
-        c.setItem(13, PoliciaBoss.named(Items.WRITABLE_BOOK, "Unirte al oficio", "Queres convertirte en " + JOBNAME[j] + "?", "Recibis el libro con sus habilidades y teclas."));
-        c.setItem(11, PoliciaBoss.named(Items.LIME_DYE, "SI, quiero unirme", new String[0]));
-        c.setItem(15, PoliciaBoss.named(Items.RED_DYE, "NO, todavia no", new String[0]));
-        PoliciaBoss.openMenu3(sp, NAMES[k], c, (p, slot) -> {
-            if (slot == 11) {
-                p.closeContainer();
-                if (!PoliciaMod.job(p).isEmpty()) {
-                    PoliciaMod.msg(p, "Ya tenes un oficio");
-                    return;
+            } else if (slot == 22 && mine) {
+                if (j == 0) {
+                    p.closeContainer();
+                    p.sendSystemMessage(Component.literal("<" + NAMES[k] + "> Las misiones te las da el Comisario de la aldea, junto a la campana."));
+                } else {
+                    PoliciaBoss.later(p, () -> PoliciaJefe.openMissions(p, k));
                 }
-                PoliciaOficio.assign(p, PoliciaOficio.JOBS[j], PoliciaOficio.LABEL[j], PoliciaOficio.HINT[j]);
-                p.sendSystemMessage(Component.literal("<" + NAMES[k] + "> Bienvenido al oficio. No me hagas quedar mal."));
-            } else if (slot == 15) {
-                p.closeContainer();
             }
         });
     }

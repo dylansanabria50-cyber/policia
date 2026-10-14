@@ -263,6 +263,7 @@ public class PoliciaLadron {
         p.getPersistentData().putInt("pol_xp", PoliciaMod.xp(p) + 3);
         sl.playSound(null, bp, SoundEvents.ARMOR_EQUIP_IRON, SoundSource.BLOCKS, 1.0f, 1.4f);
         PoliciaMod.msg(p, "Ganzua: abierto (" + chance + "%)");
+        PoliciaJefe.add(p, "lock", 1);
         PoliciaLadron.crime(p, 1, door ? "puerta forzada" : "cofre forzado");
     }
 
@@ -529,6 +530,7 @@ public class PoliciaLadron {
         }
         p.getPersistentData().putInt("pol_xp", PoliciaMod.xp(p) + 2);
         PoliciaMod.msg(p, "Carterismo exitoso (" + chance + "%)");
+        PoliciaJefe.add(p, "pick", 1);
         if (t instanceof AbstractVillager || t instanceof Player) {
             PoliciaLadron.crime(p, 1, "robo");
         }

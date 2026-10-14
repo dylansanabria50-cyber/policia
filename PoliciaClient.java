@@ -668,9 +668,42 @@ public class PoliciaClient {
         }
     }
 
+    static final String[] JOB_TAG = new String[]{"", "Policia", "Albanil", "Ladron", "Herrero Legendario"};
+
+    // Oficio escrito arriba del nombre del jugador: blanco para todos y
+    // dorado para el Herrero Legendario. Se dibuja como el cartel del
+    // nombre (se ve a traves de las paredes atenuado, como vanilla).
     static void render(RenderPlayerEvent.Post e) {
         Player p = e.getEntity();
         PoliciaMod.Sync s = STATE.get(p.getUUID());
+        if (s == null || s.jb < 1 || s.jb >= JOB_TAG.length) {
+            return;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (p.isInvisible() || mc.options.hideGui || p == mc.player && mc.options.getCameraType().isFirstPerson()) {
+            return;
+        }
+        if (mc.getEntityRenderDispatcher().distanceToSqr(p) > 4096.0) {
+            return;
+        }
+        String text = JOB_TAG[s.jb];
+        int color = s.jb == 4 ? 0xFFFFD24A : 0xFFFFFFFF;
+        PoseStack ps = e.getPoseStack();
+        ps.pushPose();
+        // El nombre va a la altura del jugador + 0.5; el oficio, una linea arriba.
+        float y = p.getBbHeight() + 0.5f + (p == mc.player ? 0.0f : 0.27f);
+        ps.translate(0.0f, y, 0.0f);
+        ps.mulPose(mc.getEntityRenderDispatcher().cameraOrientation());
+        ps.scale(-0.025f, -0.025f, 0.025f);
+        Matrix4f m = ps.last().pose();
+        int bg = (int) (mc.options.getBackgroundOpacity(0.25f) * 255.0f) << 24;
+        float x = (float) (-mc.font.width(text) / 2);
+        boolean see = !p.isDiscrete();
+        mc.font.drawInBatch(text, x, 0.0f, color & 0x00FFFFFF | 0x20000000, false, m, e.getMultiBufferSource(), see ? net.minecraft.client.gui.Font.DisplayMode.SEE_THROUGH : net.minecraft.client.gui.Font.DisplayMode.NORMAL, bg, e.getPackedLight());
+        if (see) {
+            mc.font.drawInBatch(text, x, 0.0f, color, false, m, e.getMultiBufferSource(), net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, e.getPackedLight());
+        }
+        ps.popPose();
     }
 
     static void drawFace(PoseStack ps, VertexConsumer vc, float w, float h, float z, int light, boolean flip) {

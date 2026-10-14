@@ -158,6 +158,7 @@ public class PoliciaMod {
         MinecraftForge.EVENT_BUS.register(new PoliciaAlbanil());
         PoliciaHerrero.init();
         PoliciaOficio.init();
+        PoliciaJefe.init();
         PoliciaAnalizador.init();
         PoliciaExtra.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaExtra::attrs);
@@ -695,7 +696,7 @@ public class PoliciaMod {
                 "pol_mdone", "pol_bdone", "pol_cerebro", "pol_lsu", "pol_lsi", "pol_lun", "pol_lse",
                 "pol_cin0", "pol_cin2", "pol_comp", "pol_party", "pol_hidearmor",
                 "her_sel", "her_cd0", "her_cd1", "her_cd2", "her_cd3", "her_cd4", "her_cd5", "her_cd6", "her_cd7", "her_cd8",
-                "her_an_known", "her_an_qitem", "her_an_qtype", "her_an_qprog", "her_an_qneed", "her_an_qtarget", "pol_chosen"}) {
+                "her_an_known", "her_an_qitem", "her_an_qtype", "her_an_qprog", "her_an_qneed", "her_an_qtarget", "pol_chosen", "jm_id", "jm_prog", "jm_acc"}) {
             if (!o.contains(k)) continue;
             n.put(k, o.get(k).copy());
         }

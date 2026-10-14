@@ -628,6 +628,7 @@ public class PoliciaHerrero {
                 if (!it.isEmpty() && it.isDamageableItem() && it.getDamageValue() > 0) {
                     it.setDamageValue(0);
                     PoliciaMod.msg(p, "Reparacion Maestra: " + it.getHoverName().getString() + " como nuevo");
+                    PoliciaJefe.add(p, "repair", 1);
                     p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.8f);
                 } else {
                     PoliciaMod.msg(p, "Reparacion Maestra: ya no tenias la herramienta en ese lugar");

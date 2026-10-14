@@ -189,6 +189,7 @@ public class PoliciaAnalizador {
             recipes.setDirty();
         }
         PoliciaAnalizador.addKnown(p, itemId);
+        PoliciaJefe.add(p, "analyze", 1);
         Item it = BuiltInRegistries.ITEM.get(new ResourceLocation(itemId));
         PoliciaAnalizador.title(p, "Analizaste: " + new ItemStack(it).getHoverName().getString());
         PoliciaAnalizador.send(p);
