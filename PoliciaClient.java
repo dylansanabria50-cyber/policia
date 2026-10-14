@@ -329,7 +329,7 @@ public class PoliciaClient {
             maxRight = w.getX() + w.getWidth();
         }
         PoliciaMod.Sync st = PoliciaClient.mine();
-        tb.visible = st != null && st.on && st.jb != 4;
+        tb.visible = st != null && st.on;
         tb.setX(maxRight + 2);
         tb.setY(top + 61);
         for (Object o : inv.children()) {
@@ -378,6 +378,11 @@ public class PoliciaClient {
     static boolean lad() {
         PoliciaMod.Sync s = PoliciaClient.mine();
         return s != null && s.jb == 3;
+    }
+
+    static boolean her() {
+        PoliciaMod.Sync s = PoliciaClient.mine();
+        return s != null && s.jb == 4;
     }
 
     static boolean alb() {
@@ -470,6 +475,11 @@ public class PoliciaClient {
         }
         for (Map.Entry<UUID, PoliciaMod.Sync> en : STATE.entrySet()) {
             UUID id = en.getKey();
+            if (en.getValue().jb == 4) {
+                // El Herrero no tiene skin propia todavia: conserva la del
+                // jugador en vez de ponerle la de policia por defecto.
+                continue;
+            }
             TEX_SKIN = en.getValue().jb == 3 ? TEX_LAD : (en.getValue().jb == 2 ? TEX_ALB : TEX_POL);
             PlayerInfo info = mc.getConnection().getPlayerInfo(id);
             if (info == null) continue;
@@ -774,9 +784,7 @@ public class PoliciaClient {
             return;
         }
         if (s.jb == 4) {
-            // El Herrero Legendario no usa el arbol de habilidades de
-            // policia: sus habilidades se desbloquean solas por XP (ver
-            // el libro que entrega el Martillo) y se manejan con B/J/K/O.
+            PoliciaHerreroScreen.hud(g, mc, s, sw, sh);
             return;
         }
         Entity entity = mc.player.getVehicle();
@@ -855,14 +863,14 @@ public class PoliciaClient {
 
     static class TreeButton extends Button {
         TreeButton() {
-            super(0, 0, 20, 18, Component.literal(""), b -> Minecraft.getInstance().setScreen(PoliciaClient.lad() ? new PoliciaLadronScreen() : (PoliciaClient.alb() ? new PoliciaAlbanilScreen() : new PoliciaTreeScreen())), DEFAULT_NARRATION);
+            super(0, 0, 20, 18, Component.literal(""), b -> Minecraft.getInstance().setScreen(PoliciaClient.her() ? new PoliciaHerreroScreen() : (PoliciaClient.lad() ? new PoliciaLadronScreen() : (PoliciaClient.alb() ? new PoliciaAlbanilScreen() : new PoliciaTreeScreen()))), DEFAULT_NARRATION);
             this.setTooltip(Tooltip.create(Component.literal("Rama de habilidades")));
         }
 
         @Override
         public void renderWidget(GuiGraphics g, int mx, int my, float pt) {
             super.renderWidget(g, mx, my, pt);
-            g.renderItem(PoliciaClient.lad() ? new ItemStack((ItemLike) PoliciaPlaca.GUANTE.get()) : (PoliciaClient.alb() ? new ItemStack((ItemLike) Items.WOODEN_PICKAXE) : new ItemStack((ItemLike) PoliciaShield.SHIELD.get())), this.getX() + 2, this.getY() + 1);
+            g.renderItem(PoliciaClient.her() ? new ItemStack((ItemLike) PoliciaPlaca.MARTILLO.get()) : PoliciaClient.lad() ? new ItemStack((ItemLike) PoliciaPlaca.GUANTE.get()) : (PoliciaClient.alb() ? new ItemStack((ItemLike) Items.WOODEN_PICKAXE) : new ItemStack((ItemLike) PoliciaShield.SHIELD.get())), this.getX() + 2, this.getY() + 1);
         }
     }
 

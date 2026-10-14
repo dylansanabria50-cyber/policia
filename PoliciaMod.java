@@ -207,6 +207,9 @@ public class PoliciaMod {
         if ("albanil".equals(job(p))) {
             PoliciaAlbanil.send(p);
         }
+        if ("herrero".equals(job(p))) {
+            PoliciaHerrero.send(p);
+        }
     }
 
     static void act(ServerPlayer p, int id) {

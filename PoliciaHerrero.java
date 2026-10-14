@@ -47,8 +47,67 @@ public class PoliciaHerrero {
     static final int ANALIZADOR_XP = 35;
     static final UUID MARK_ARM = UUID.fromString("b4e8c231-7a5d-4f66-9e32-7c1b2d3e4f50");
 
+    static HerSync CL = new HerSync();
+
     static void init() {
+        PoliciaMod.NET.registerMessage(8, HerSync.class, HerSync::enc, HerSync::dec, HerSync::handle);
         MinecraftForge.EVENT_BUS.register((Object) new PoliciaHerrero());
+    }
+
+    // Manda al cliente lo que necesita el HUD y la pantalla de habilidades
+    // del Herrero: habilidad elegida, enfriamientos y efectos activos.
+    static void send(ServerPlayer p) {
+        CompoundTag d = p.getPersistentData();
+        HerSync m = new HerSync();
+        m.sel = PoliciaHerrero.sel(p);
+        for (int i = 0; i < 8; ++i) {
+            m.cd[i] = d.getInt("her_cd" + i);
+        }
+        m.anvilT = d.getInt("her_anvil_t");
+        m.anvilType = d.getInt("her_anvil_type");
+        m.faroT = d.getInt("her_faro_t");
+        m.linkT = d.getInt("her_link_t");
+        PoliciaMod.NET.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p), (Object) m);
+    }
+
+    public static class HerSync {
+        int sel;
+        int[] cd = new int[8];
+        int anvilT;
+        int anvilType;
+        int faroT;
+        int linkT;
+
+        static void enc(HerSync m, net.minecraft.network.FriendlyByteBuf b) {
+            b.writeVarInt(m.sel);
+            for (int i = 0; i < 8; ++i) {
+                b.writeVarInt(m.cd[i]);
+            }
+            b.writeVarInt(m.anvilT);
+            b.writeVarInt(m.anvilType);
+            b.writeVarInt(m.faroT);
+            b.writeVarInt(m.linkT);
+        }
+
+        static HerSync dec(net.minecraft.network.FriendlyByteBuf b) {
+            HerSync m = new HerSync();
+            m.sel = b.readVarInt();
+            for (int i = 0; i < 8; ++i) {
+                m.cd[i] = b.readVarInt();
+            }
+            m.anvilT = b.readVarInt();
+            m.anvilType = b.readVarInt();
+            m.faroT = b.readVarInt();
+            m.linkT = b.readVarInt();
+            return m;
+        }
+
+        static void handle(HerSync m, java.util.function.Supplier<net.minecraftforge.network.NetworkEvent.Context> c) {
+            c.get().enqueueWork(() -> {
+                CL = m;
+            });
+            c.get().setPacketHandled(true);
+        }
     }
 
     static boolean isHerrero(Player p) {
@@ -81,13 +140,17 @@ public class PoliciaHerrero {
             if (s >= 0 && s < usable) {
                 d.putInt("her_sel", s);
                 PoliciaMod.msg(p, "Habilidad: " + SKILLS[s]);
+            } else if (s >= 0 && s < SKILLS.length - 1) {
+                PoliciaMod.msg(p, SKILLS[s] + ": se desbloquea con " + THRESH[s] + " XP");
             }
+            PoliciaHerrero.send(p);
             return;
         }
         if (id == 2) {
             int s = (PoliciaHerrero.sel(p) + 1) % usable;
             d.putInt("her_sel", s);
             PoliciaMod.msg(p, "Habilidad: " + SKILLS[s]);
+            PoliciaHerrero.send(p);
             return;
         }
         if (id != 1) {
@@ -330,6 +393,9 @@ public class PoliciaHerrero {
             return;
         }
         CompoundTag d = p.getPersistentData();
+        if (p.tickCount % 10 == 0) {
+            PoliciaHerrero.send(p);
+        }
         for (int i = 0; i < SKILLS.length - 1; ++i) {
             int c = d.getInt("her_cd" + i);
             if (c <= 0) continue;
