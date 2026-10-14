@@ -694,8 +694,7 @@ public class PoliciaMision {
             case 4:
             case 8: {
                 if (t % 20L == 0L && t > 60L) {
-                    boolean done;
-                    boolean bl = m.type == 8 ? m.killed : (done = PoliciaMision.alive(sl, m) == 0);
+                    boolean done = m.type == 8 ? m.killed : PoliciaMision.alive(sl, m) == 0;
                     if (done) {
                         PoliciaMision.finish(sp, sl, m, 1.0);
                         return;
