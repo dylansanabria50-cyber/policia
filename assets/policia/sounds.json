@@ -1,0 +1,5 @@
+{
+  "patrullero.sirena": {"subtitle": "policia.subtitle.sirena", "sounds": [{"name": "policia:sirena", "attenuation_distance": 48}]},
+  "musica.persecucion": {"sounds": [{"name": "policia:persecucion", "stream": true}]},
+  "musica.golpe": {"sounds": [{"name": "policia:golpe", "stream": true}]}
+}

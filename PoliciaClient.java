@@ -135,6 +135,7 @@ public class PoliciaClient {
         e.registerEntityRenderer((EntityType) PoliciaRefuerzo.AGENT.get(), PoliciaRefuerzoRender::new);
         e.registerEntityRenderer((EntityType) PoliciaAyudante.AYU.get(), PoliciaAyudanteRender::new);
         e.registerEntityRenderer((EntityType) PoliciaTractor.TRACTOR.get(), PoliciaTractorRender::new);
+        e.registerEntityRenderer((EntityType) PoliciaPatrullero.CAR.get(), PoliciaPatrulleroRender::new);
         e.registerEntityRenderer((EntityType) PoliciaBubble.BUBBLE.get(), PoliciaBubbleRender::new);
         e.registerEntityRenderer((EntityType) PoliciaBoss.BOSS.get(), PoliciaBossRender::new);
         e.registerEntityRenderer((EntityType) PoliciaMision.PJ.get(), PoliciaMisionRender::new);
@@ -316,7 +317,7 @@ public class PoliciaClient {
 
     static void hideHand(RenderHandEvent e) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player != null && (mc.player.getVehicle() instanceof PoliciaTank.TankEntity || mc.player.getVehicle() instanceof PoliciaHeli.HeliEntity || mc.player.getVehicle() instanceof PoliciaTractor.TractorEntity)) {
+        if (mc.player != null && (mc.player.getVehicle() instanceof PoliciaTank.TankEntity || mc.player.getVehicle() instanceof PoliciaHeli.HeliEntity || mc.player.getVehicle() instanceof PoliciaTractor.TractorEntity || mc.player.getVehicle() instanceof PoliciaPatrullero.Car)) {
             e.setCanceled(true);
         }
     }
@@ -394,7 +395,7 @@ public class PoliciaClient {
 
     static void noClicks(InputEvent.InteractionKeyMappingTriggered e) {
         Minecraft mc0 = Minecraft.getInstance();
-        if (mc0.player != null && (mc0.player.getVehicle() instanceof PoliciaHeli.HeliEntity || mc0.player.getVehicle() instanceof PoliciaTractor.TractorEntity)) {
+        if (mc0.player != null && (mc0.player.getVehicle() instanceof PoliciaHeli.HeliEntity || mc0.player.getVehicle() instanceof PoliciaTractor.TractorEntity || mc0.player.getVehicle() instanceof PoliciaPatrullero.Car)) {
             e.setCanceled(true);
             e.setSwingHand(false);
             return;

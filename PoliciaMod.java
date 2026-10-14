@@ -150,6 +150,9 @@ public class PoliciaMod {
         PoliciaHeli.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaPlaca.init();
         PoliciaPlano.init();
+        PoliciaPatrullero.init();
+        PoliciaDiario.init();
+        PoliciaSonido.init(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaLadron.init();
         PoliciaBoss.init();
         PoliciaStruct.init();
@@ -248,7 +251,9 @@ public class PoliciaMod {
             return;
         }
         if (id == 4) {
-            if (p.getVehicle() instanceof PoliciaTractor.TractorEntity) {
+            if (p.getVehicle() instanceof PoliciaPatrullero.Car) {
+                PoliciaPatrullero.siren(p);
+            } else if (p.getVehicle() instanceof PoliciaTractor.TractorEntity) {
                 PoliciaTractor.lamp(p);
             } else if ("albanil".equals(job(p))) {
                 PoliciaAlbanil.toggleLamp(p);

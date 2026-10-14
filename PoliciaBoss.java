@@ -111,6 +111,7 @@ public class PoliciaBoss {
         out.accept((ItemLike) PoliciaPlaca.GUANTE.get());
         out.accept((ItemLike) PoliciaPlaca.MARTILLO.get());
         out.accept((ItemLike) PoliciaPlano.PLANO.get());
+        out.accept((ItemLike) PoliciaPatrullero.KEY.get());
         out.accept((ItemLike) PoliciaShield.SHIELD.get());
         out.accept((ItemLike) VEST.get());
         for (String[] x : sk = new String[][]{{"refuerzo", "Refuerzo"}, {"k9", "Perro K9"}, {"esposas", "Esposas"}, {"sirena", "Sirena y torreta"}, {"dron", "Dron de vigilancia"}, {"burbuja", "Escudo de burbuja"}, {"pico", "Pico de albañil"}, {"muro", "Muro"}, {"refugio", "Refugio"}, {"silbido", "Silbido"}}) {
@@ -505,6 +506,7 @@ public class PoliciaBoss {
             ItemStack v = new ItemStack((ItemLike) VEST.get());
             v.setHoverName(Component.literal("Chaleco antibalas"));
             l.add(new Entry(v, 18));
+            l.add(new Entry(new ItemStack((ItemLike) PoliciaPatrullero.KEY.get()), 30));
             l.add(new Entry(PoliciaBoss.single("refuerzo", "Refuerzo"), 12));
             l.add(new Entry(PoliciaBoss.single("k9", "Perro K9"), 10));
             l.add(new Entry(PoliciaBoss.single("esposas", "Esposas"), 6));

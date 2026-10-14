@@ -21,5 +21,8 @@
  "entity.policia.tanque": "Tank",
  "entity.policia.tractor": "Tractor",
  "effect.policia.esposado": "Handcuffed",
- "itemGroup.policia.oficios": "Jobs"
+ "itemGroup.policia.oficios": "Jobs",
+ "item.policia.llave_patrullero": "Patrol Car Key",
+ "entity.policia.patrullero": "Patrol Car",
+ "policia.subtitle.sirena": "Police siren"
 }
