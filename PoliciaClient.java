@@ -196,7 +196,7 @@ public class PoliciaClient {
         }
 
         @Override
-        public void render(PoseStack ps, MultiBufferSource buf, int light, LivingEntity entity, float limbSwing, float limbSwingAmount, float pt, float ageInTicks, float netHeadYaw, float headPitch) {
+        public void render(PoseStack ps, MultiBufferSource buf, int light, Entity entity, float limbSwing, float limbSwingAmount, float pt, float ageInTicks, float netHeadYaw, float headPitch) {
             if (entity instanceof Player p) {
                 PoliciaMod.Sync s = STATE.get(p.getUUID());
                 if (s != null && s.hideArmor) {

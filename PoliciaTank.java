@@ -269,11 +269,6 @@ public class PoliciaTank {
         }
 
         @Override
-        public boolean isAffectedByFluids() {
-            return false;
-        }
-
-        @Override
         public void lerpTo(double x, double y, double z, float yr, float xr, int steps, boolean teleport) {
             this.lx = x;
             this.ly = y;

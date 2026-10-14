@@ -1008,8 +1008,9 @@ public class PoliciaAlbanil {
                 continue;
             }
             if (!MINE.contains(st.getBlock())) continue;
-            if (st.is(Blocks.CHEST) && (ct = lv.getBlockEntity(bp)) instanceof ChestBlockEntity) {
-                ChestBlockEntity cbe = (ChestBlockEntity) ct;
+            BlockEntity cbCheck;
+            if (st.is(Blocks.CHEST) && (cbCheck = lv.getBlockEntity(bp)) instanceof ChestBlockEntity) {
+                ChestBlockEntity cbe = (ChestBlockEntity) cbCheck;
                 CompoundTag full = cbe.saveWithoutMetadata();
                 CompoundTag keep = new CompoundTag();
                 keep.put("Items", (Tag) full.getList("Items", 10).copy());

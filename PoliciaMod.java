@@ -140,10 +140,6 @@ public class PoliciaMod {
     }
 
     public PoliciaMod() {
-        try {
-            software.bernie.geckolib.GeckoLib.initialize();
-        } catch (Throwable ignored) {
-        }
         NET.registerMessage(0, Act.class, Act::enc, Act::dec, Act::handle);
         NET.registerMessage(1, Sync.class, Sync::enc, Sync::dec, Sync::handle);
         MinecraftForge.EVENT_BUS.register(this);
