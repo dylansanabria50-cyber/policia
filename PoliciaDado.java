@@ -58,6 +58,7 @@ public class PoliciaDado {
         pd.last = rolls.get(rolls.size() - 1);
         pd.ticks = rolls.size() * PER_ROLL - 4;
         PENDING.put(p.getUUID(), pd);
+        PoliciaDado.freeze(p, t);
         int[] a = new int[rolls.size()];
         for (int i = 0; i < a.length; ++i) a[i] = rolls.get(i);
         PoliciaMod.NET.send(PacketDistributor.PLAYER.with(() -> p), new Roll(a));
@@ -82,6 +83,118 @@ public class PoliciaDado {
                 continue;
             }
             PoliciaLadron.pickResult(p, t, pd.last == 6, pd.sure, pd.last);
+            Freeze fz = FROZEN.get(p.getUUID());
+            if (fz != null) {
+                if (pd.last == 6 && p.containerMenu != p.inventoryMenu) {
+                    fz.phase = 2;
+                    fz.left = 1200;
+                } else {
+                    PoliciaDado.release(p.getUUID());
+                }
+            }
+        }
+    }
+
+    // ---- El objetivo queda quieto mirando hacia donde miraba ----
+    static final Map<UUID, Freeze> FROZEN = new HashMap<UUID, Freeze>();
+
+    static class Freeze {
+        LivingEntity t;
+        double x, y, z;
+        float yaw, pitch, head, body;
+        boolean setNoAi;
+        int phase = 1;
+        int left = 600;
+    }
+
+    static void freeze(ServerPlayer p, LivingEntity t) {
+        PoliciaDado.release(p.getUUID());
+        Freeze f = new Freeze();
+        f.t = t;
+        f.x = t.getX();
+        f.y = t.getY();
+        f.z = t.getZ();
+        f.yaw = t.getYRot();
+        f.pitch = t.getXRot();
+        f.head = t.getYHeadRot();
+        f.body = t.yBodyRot;
+        if (t instanceof net.minecraft.world.entity.Mob m) {
+            m.getNavigation().stop();
+            if (!m.isNoAi()) {
+                m.setNoAi(true);
+                m.getPersistentData().putBoolean("pol_frz", true);
+                f.setNoAi = true;
+            }
+        }
+        t.setDeltaMovement(0.0, Math.min(0.0, t.getDeltaMovement().y), 0.0);
+        FROZEN.put(p.getUUID(), f);
+    }
+
+    static void release(UUID thief) {
+        Freeze f = FROZEN.remove(thief);
+        if (f == null) return;
+        if (f.setNoAi && f.t instanceof net.minecraft.world.entity.Mob m) {
+            m.setNoAi(false);
+            m.getPersistentData().remove("pol_frz");
+        }
+        if (f.t instanceof ServerPlayer v) {
+            v.removeEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+            v.removeEffect(net.minecraft.world.effect.MobEffects.JUMP);
+        }
+    }
+
+    // Si el mundo se cerró con un mob congelado, se descongela al cargar.
+    @SubscribeEvent
+    public void join(net.minecraftforge.event.entity.EntityJoinLevelEvent e) {
+        if (!e.getLevel().isClientSide && e.getEntity() instanceof net.minecraft.world.entity.Mob m && m.getPersistentData().getBoolean("pol_frz")) {
+            boolean mine = false;
+            for (Freeze f : FROZEN.values()) {
+                if (f.t == m) mine = true;
+            }
+            if (!mine) {
+                m.setNoAi(false);
+                m.getPersistentData().remove("pol_frz");
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void hold(TickEvent.ServerTickEvent e) {
+        if (e.phase != TickEvent.Phase.START || FROZEN.isEmpty()) {
+            return;
+        }
+        Iterator<Map.Entry<UUID, Freeze>> it = FROZEN.entrySet().iterator();
+        ArrayList<UUID> done = new ArrayList<UUID>();
+        while (it.hasNext()) {
+            Map.Entry<UUID, Freeze> en = it.next();
+            Freeze f = en.getValue();
+            ServerPlayer p = e.getServer().getPlayerList().getPlayer(en.getKey());
+            LivingEntity t = f.t;
+            if (p == null || !p.isAlive() || t == null || !t.isAlive() || t.isRemoved() || --f.left <= 0
+                    || f.phase == 2 && p.containerMenu == p.inventoryMenu
+                    || f.phase == 1 && !PENDING.containsKey(en.getKey())) {
+                done.add(en.getKey());
+                continue;
+            }
+            t.setYRot(f.yaw);
+            t.setXRot(f.pitch);
+            t.setYHeadRot(f.head);
+            t.yBodyRot = f.body;
+            if (t instanceof ServerPlayer v) {
+                v.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, 10, 255, false, false));
+                v.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.JUMP, 10, 128, false, false));
+                if (v.distanceToSqr(f.x, f.y, f.z) > 0.04 || Math.abs(net.minecraft.util.Mth.wrapDegrees(v.getYRot() - f.yaw)) > 3.0f) {
+                    v.connection.teleport(f.x, f.y, f.z, f.yaw, f.pitch);
+                }
+            } else {
+                t.setDeltaMovement(0.0, Math.min(0.0, t.getDeltaMovement().y), 0.0);
+                if (t.distanceToSqr(f.x, t.getY(), f.z) > 0.01) {
+                    t.teleportTo(f.x, t.getY(), f.z);
+                }
+            }
+        }
+        for (UUID u : done) {
+            PoliciaDado.release(u);
         }
     }
 
