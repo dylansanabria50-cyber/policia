@@ -109,6 +109,7 @@ public class PoliciaClient {
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::camera);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::hideRider);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::hideHand);
+        MinecraftForge.EVENT_BUS.addListener(PoliciaHerreroAnim::firstPerson);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::render);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::screenInit);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::livingPre);
@@ -230,6 +231,47 @@ public class PoliciaClient {
         }
     }
 
+    // Camera tiene dos metodos protegidos (double, double, double): uno
+    // pone la posicion (setPosition) y otro la corre segun hacia donde mira
+    // (move). En el juego real sus nombres estan ofuscados, asi que se
+    // reconocen por lo que HACEN: el que deja la camara exactamente en el
+    // punto pedido es setPosition; el otro es move.
+    static void findCamMethods(Camera cam) {
+        try {
+            java.util.List<Method> cands = new java.util.ArrayList<Method>();
+            for (Method m : Camera.class.getDeclaredMethods()) {
+                Class<?>[] pt = m.getParameterTypes();
+                if (java.lang.reflect.Modifier.isStatic(m.getModifiers()) || m.getReturnType() != Void.TYPE || pt.length != 3) continue;
+                if (pt[0] != Double.TYPE || pt[1] != Double.TYPE || pt[2] != Double.TYPE) continue;
+                m.setAccessible(true);
+                cands.add(m);
+            }
+            Vec3 orig = cam.getPosition();
+            Method set = null;
+            Method mv = null;
+            for (Method m : cands) {
+                m.invoke(cam, 1234.5, 77.25, -321.75);
+                Vec3 now = cam.getPosition();
+                if (Math.abs(now.x - 1234.5) < 1.0E-6 && Math.abs(now.y - 77.25) < 1.0E-6 && Math.abs(now.z + 321.75) < 1.0E-6) {
+                    set = m;
+                } else {
+                    mv = m;
+                }
+                if (set != null) {
+                    set.invoke(cam, orig.x, orig.y, orig.z);
+                }
+            }
+            if (set != null) {
+                set.invoke(cam, orig.x, orig.y, orig.z);
+            }
+            CAM_SET = set;
+            CAM_MOVE = mv;
+        } catch (Throwable t) {
+            CAM_SET = null;
+            CAM_MOVE = null;
+        }
+    }
+
     static void camera(ViewportEvent.ComputeCameraAngles e) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.options.getCameraType().isFirstPerson()) {
@@ -240,18 +282,9 @@ public class PoliciaClient {
         }
         if (!camTried) {
             camTried = true;
-            try {
-                CAM_MOVE = ObfuscationReflectionHelper.findMethod(Camera.class, "move", Double.TYPE, Double.TYPE, Double.TYPE);
-            } catch (Throwable t) {
-                try {
-                    CAM_MOVE = Camera.class.getDeclaredMethod("move", Double.TYPE, Double.TYPE, Double.TYPE);
-                    CAM_MOVE.setAccessible(true);
-                } catch (Throwable t2) {
-                    CAM_MOVE = null;
-                }
-            }
+            PoliciaClient.findCamMethods(e.getCamera());
         }
-        if (CAM_MOVE == null) {
+        if (CAM_MOVE == null || CAM_SET == null) {
             return;
         }
         try {
@@ -268,22 +301,7 @@ public class PoliciaClient {
                 if (h.getType() == HitResult.Type.MISS) continue;
                 f = Math.min(f, Math.max(0.0, (eye.add(o).distanceTo(h.getLocation()) - 0.1) / total));
             }
-            if (!camSetTried) {
-                camSetTried = true;
-                try {
-                    CAM_SET = ObfuscationReflectionHelper.findMethod(Camera.class, "setPosition", Double.TYPE, Double.TYPE, Double.TYPE);
-                } catch (Throwable t) {
-                    try {
-                        CAM_SET = Camera.class.getDeclaredMethod("setPosition", Double.TYPE, Double.TYPE, Double.TYPE);
-                        CAM_SET.setAccessible(true);
-                    } catch (Throwable t2) {
-                        CAM_SET = null;
-                    }
-                }
-            }
-            if (CAM_SET != null) {
-                CAM_SET.invoke(cam, eye.x, eye.y, eye.z);
-            }
+            CAM_SET.invoke(cam, eye.x, eye.y, eye.z);
             CAM_MOVE.invoke(cam, -18.0 * f, 3.0 * f, 0.0);
         } catch (Throwable t) {
             CAM_MOVE = null;
@@ -319,6 +337,7 @@ public class PoliciaClient {
 
     static void overlays(RegisterGuiOverlaysEvent e) {
         e.registerAboveAll("policia", PoliciaClient::hud);
+        e.registerAboveAll("policia_forja", PoliciaHerreroAnim::forgeHud);
     }
 
     static void screenInit(ScreenEvent.Init.Post e) {
@@ -615,6 +634,11 @@ public class PoliciaClient {
         }
         while (K_USE.consumeClick()) {
             if (!free) continue;
+            if (PoliciaHerreroAnim.forging()) {
+                PoliciaHerreroAnim.press();
+                PoliciaClient.send(63);
+                continue;
+            }
             PoliciaClient.send(1);
         }
         while (K_NEXT.consumeClick()) {

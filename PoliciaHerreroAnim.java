@@ -193,4 +193,130 @@ public class PoliciaHerreroAnim {
             }
         }
     }
+
+    // ---------------- Primera persona ----------------
+    // Mientras dura la animacion, en vez de la mano normal se ve: el yunque
+    // que bajas desde arriba del hombro y, en Reparacion Maestra, el martillo
+    // golpeando con el yunque abajo.
+    static void firstPerson(net.minecraftforge.client.event.RenderHandEvent e) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) {
+            return;
+        }
+        float age = (float) mc.player.tickCount + e.getPartialTick();
+        float t = PoliciaHerreroAnim.time(mc.player, age);
+        if (t < 0.0f) {
+            return;
+        }
+        e.setCanceled(true);
+        if (e.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND) {
+            return;
+        }
+        int kind = PoliciaHerreroAnim.kind(mc.player);
+        PoseStack ps = e.getPoseStack();
+        MultiBufferSource buf = e.getMultiBufferSource();
+        int light = e.getPackedLight();
+        BlockState anvil = Blocks.ANVIL.defaultBlockState().setValue(AnvilBlock.FACING, Direction.EAST);
+        if (t < 16.0f) {
+            // El yunque baja desde arriba a la derecha hasta el frente.
+            float k = ease(t / 16.0f);
+            ps.pushPose();
+            ps.translate(Mth.lerp(k, 0.9f, 0.0f), Mth.lerp(k, 0.6f, -0.95f), Mth.lerp(k, -0.6f, -1.25f));
+            ps.mulPose(Axis.YP.rotationDegrees(Mth.lerp(k, 40.0f, 0.0f)));
+            ps.scale(0.55f, 0.55f, 0.55f);
+            ps.translate(-0.5f, 0.0f, -0.5f);
+            mc.getBlockRenderer().renderSingleBlock(anvil, ps, buf, light, OverlayTexture.NO_OVERLAY);
+            ps.popPose();
+            return;
+        }
+        if (kind != 1) {
+            return;
+        }
+        // Yunque abajo, al frente.
+        ps.pushPose();
+        ps.translate(0.0f, -0.95f, -1.25f);
+        ps.scale(0.55f, 0.55f, 0.55f);
+        ps.translate(-0.5f, 0.0f, -0.5f);
+        mc.getBlockRenderer().renderSingleBlock(anvil, ps, buf, light, OverlayTexture.NO_OVERLAY);
+        ps.popPose();
+        // Martillo: sube despacio y baja de golpe (misma curva que en F5).
+        float c = ((t - 16.0f) % 9.0f) / 9.0f;
+        float lift;
+        if (c < 0.6f) {
+            lift = ease(c / 0.6f);
+        } else if (c < 0.8f) {
+            float q = (c - 0.6f) / 0.2f;
+            lift = 1.0f - q * q;
+        } else {
+            lift = 0.0f;
+        }
+        ps.pushPose();
+        ps.translate(0.32f, -0.42f + 0.28f * lift, -0.78f + 0.12f * lift);
+        ps.mulPose(Axis.XP.rotationDegrees(-15.0f + 75.0f * lift));
+        ps.mulPose(Axis.ZP.rotationDegrees(-10.0f));
+        mc.getEntityRenderDispatcher().getItemInHandRenderer().renderItem(mc.player, new ItemStack(PoliciaPlaca.MARTILLO.get()), ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, false, ps, buf, light);
+        ps.popPose();
+    }
+
+    // ---------------- Minijuego de forja (cliente) ----------------
+    // Impactos del martillo en tiempo de animacion (her_rep_t - 1 del servidor).
+    static final float[] HITS = new float[]{22.0f, 31.0f, 40.0f};
+    static final java.util.List<Float> PRESSES = new java.util.ArrayList<Float>();
+
+    static float localTime(float pt) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || PoliciaHerreroAnim.kind(mc.player) != 1) {
+            return -1.0f;
+        }
+        return PoliciaHerreroAnim.time(mc.player, (float) mc.player.tickCount + pt);
+    }
+
+    static boolean forging() {
+        return PoliciaHerreroAnim.localTime(0.0f) >= 0.0f;
+    }
+
+    static void press() {
+        float t = PoliciaHerreroAnim.localTime(0.0f);
+        if (t < 2.0f) {
+            PRESSES.clear();
+        }
+        PRESSES.add(t);
+    }
+
+    static void forgeHud(net.minecraftforge.client.gui.overlay.ForgeGui gui, net.minecraft.client.gui.GuiGraphics g, float pt, int sw, int sh) {
+        float t = PoliciaHerreroAnim.localTime(pt);
+        if (t < 0.0f) {
+            PRESSES.clear();
+            return;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        int w = 180;
+        int x0 = sw / 2 - w / 2;
+        int y0 = sh / 2 + 34;
+        float from = 14.0f;
+        float to = 44.0f;
+        g.fill(x0 - 2, y0 - 2, x0 + w + 2, y0 + 12, 0xCC1A1206);
+        g.fill(x0, y0, x0 + w, y0 + 10, 0xFF4A3412);
+        for (float h : HITS) {
+            int hx = x0 + (int) ((h - from) / (to - from) * (float) w);
+            boolean got = false;
+            boolean tried = false;
+            for (float pr : PRESSES) {
+                if (Math.abs(pr - h) <= 4.5f) {
+                    tried = true;
+                    if (Math.abs(pr - h) <= 2.0f) {
+                        got = true;
+                    }
+                }
+            }
+            int zw = (int) (2.0f / (to - from) * (float) w);
+            int col = got ? 0xFF4CD964 : (tried ? 0xFFB03020 : 0xFFFFC04A);
+            g.fill(hx - zw, y0, hx + zw + 1, y0 + 10, col);
+            g.fill(hx, y0 - 1, hx + 1, y0 + 11, 0xFFFFFFFF);
+        }
+        int cx = x0 + (int) (Mth.clamp((t - from) / (to - from), 0.0f, 1.0f) * (float) w);
+        g.fill(cx - 1, y0 - 3, cx + 2, y0 + 13, 0xFF9FD8F0);
+        String txt = "Forja: apreta J cuando el martillo golpea";
+        g.drawString(mc.font, txt, sw / 2 - mc.font.width(txt) / 2, y0 + 15, 0xFFFFE08A, true);
+    }
 }

@@ -196,8 +196,80 @@ public class PoliciaHerrero {
         return p.getPersistentData().getInt("her_cd" + i);
     }
 
+    // Minijuego de forja: momentos (en ticks de her_rep_t) en que el
+    // martillo pega en el yunque durante Reparacion Maestra.
+    static final int[] STRIKES = new int[]{23, 32, 41};
+
+    static void strike(ServerPlayer p) {
+        CompoundTag d = p.getPersistentData();
+        int rt = d.getInt("her_rep_t");
+        if (rt <= 0) {
+            return;
+        }
+        int best = 0;
+        int bd = 99;
+        for (int i = 0; i < STRIKES.length; ++i) {
+            int dd = Math.abs(rt - STRIKES[i]);
+            if (dd < bd) {
+                bd = dd;
+                best = i;
+            }
+        }
+        int tried = d.getInt("her_rep_tried");
+        if ((tried >> best & 1) == 1) {
+            return;
+        }
+        d.putInt("her_rep_tried", tried | 1 << best);
+        if (bd <= 2) {
+            int hits = d.getInt("her_rep_hits") | 1 << best;
+            d.putInt("her_rep_hits", hits);
+            p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 1.0f, 1.8f);
+            p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.6f, 1.6f);
+            PoliciaMod.msg(p, "Golpe perfecto! (" + Integer.bitCount(hits) + "/3)");
+        } else {
+            PoliciaMod.msg(p, "Golpe fuera de tiempo");
+        }
+    }
+
+    // Aplica la calidad de forja segun los golpes perfectos: Irrompibilidad
+    // hasta el nivel de golpes perfectos (maximo III) y una linea en la
+    // descripcion del objeto.
+    static String quality(ItemStack it, int perfects) {
+        if (perfects <= 0 || it.isEmpty()) {
+            return "";
+        }
+        String extra = "";
+        if (it.isDamageableItem() && net.minecraft.world.item.enchantment.Enchantments.UNBREAKING.canEnchant(it)) {
+            java.util.Map<net.minecraft.world.item.enchantment.Enchantment, Integer> m = net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(it);
+            int cur = m.getOrDefault(net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, 0);
+            int lvl = Math.min(3, Math.max(cur, perfects));
+            if (lvl > cur) {
+                m.put(net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, lvl);
+                net.minecraft.world.item.enchantment.EnchantmentHelper.setEnchantments(m, it);
+                extra = " -> Irrompibilidad " + (lvl == 1 ? "I" : (lvl == 2 ? "II" : "III"));
+            }
+        }
+        int q = Math.max(it.getOrCreateTag().getInt("her_calidad"), perfects);
+        it.getOrCreateTag().putInt("her_calidad", q);
+        net.minecraft.nbt.ListTag lore = new net.minecraft.nbt.ListTag();
+        net.minecraft.nbt.CompoundTag disp = it.getOrCreateTagElement("display");
+        for (net.minecraft.nbt.Tag tg : disp.getList("Lore", 8)) {
+            if (!tg.getAsString().contains("Calidad de forja")) {
+                lore.add(tg);
+            }
+        }
+        String stars = "\u2605".repeat(q) + "\u2606".repeat(3 - q);
+        lore.add(net.minecraft.nbt.StringTag.valueOf(net.minecraft.network.chat.Component.Serializer.toJson(net.minecraft.network.chat.Component.literal("Calidad de forja: " + stars).withStyle(st -> st.withColor(0xFFD24A).withItalic(false)))));
+        disp.put("Lore", (net.minecraft.nbt.Tag) lore);
+        return " | Calidad " + q + "/3" + extra;
+    }
+
     static void act(ServerPlayer p, int id) {
         CompoundTag d = p.getPersistentData();
+        if (id == 63) {
+            PoliciaHerrero.strike(p);
+            return;
+        }
         int usable = Math.min(unlocked(p), SKILLS.length - 1);
         if (id >= 10 && id < 20) {
             int s = id - 10;
@@ -322,6 +394,8 @@ public class PoliciaHerrero {
                     return false;
                 }
                 d.putInt("her_rep_slot", p.getInventory().selected);
+                d.putInt("her_rep_hits", 0);
+                d.putInt("her_rep_tried", 0);
                 d.putInt("her_rep_t", 1);
                 PoliciaHerrero.anim(p, 1);
                 PoliciaMod.msg(p, "Reparacion Maestra: sacas el yunque y empezas a forjar...");
@@ -746,7 +820,8 @@ public class PoliciaHerrero {
                         }
                         it = nu;
                     }
-                    PoliciaMod.msg(p, "Reparacion Maestra: " + it.getHoverName().getString() + " como nuevo");
+                    String ql = PoliciaHerrero.quality(it, Integer.bitCount(d.getInt("her_rep_hits")));
+                    PoliciaMod.msg(p, "Reparacion Maestra: " + it.getHoverName().getString() + " como nuevo" + ql);
                     PoliciaJefe.add(p, "repair", 1);
                     p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.8f);
                 } else {
