@@ -329,7 +329,7 @@ public class PoliciaClient {
             maxRight = w.getX() + w.getWidth();
         }
         PoliciaMod.Sync st = PoliciaClient.mine();
-        tb.visible = st != null && st.on;
+        tb.visible = st != null && st.on && st.jb != 4;
         tb.setX(maxRight + 2);
         tb.setY(top + 61);
         for (Object o : inv.children()) {
@@ -771,6 +771,12 @@ public class PoliciaClient {
         }
         if (s.jb == 2) {
             PoliciaAlbanilScreen.hud(g, mc, s, sw, sh);
+            return;
+        }
+        if (s.jb == 4) {
+            // El Herrero Legendario no usa el arbol de habilidades de
+            // policia: sus habilidades se desbloquean solas por XP (ver
+            // el libro que entrega el Martillo) y se manejan con B/J/K/O.
             return;
         }
         Entity entity = mc.player.getVehicle();

@@ -184,7 +184,7 @@ public class PoliciaMod {
         m.c7 = PoliciaExtra.cd(p, 7);
         m.c8 = PoliciaExtra.cd(p, 8);
         m.c9 = PoliciaExtra.cd(p, 9);
-        m.jb = "albanil".equals(job(p)) ? 2 : (ID.equals(job(p)) ? 1 : 0);
+        m.jb = "albanil".equals(job(p)) ? 2 : (ID.equals(job(p)) ? 1 : ("herrero".equals(job(p)) ? 4 : 0));
         m.hideArmor = p.getPersistentData().getBoolean("pol_hidearmor");
         if ("ladron".equals(job(p))) {
             m.jb = 3;
