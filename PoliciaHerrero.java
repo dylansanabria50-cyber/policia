@@ -80,6 +80,7 @@ public class PoliciaHerrero {
     static void send(ServerPlayer p) {
         CompoundTag d = p.getPersistentData();
         HerSync m = new HerSync();
+        m.un = PoliciaHerrero.mask(p);
         m.sel = PoliciaHerrero.sel(p);
         for (int i = 0; i < 8; ++i) {
             m.cd[i] = d.getInt("her_cd" + i);
@@ -137,8 +138,10 @@ public class PoliciaHerrero {
         int linkT;
         int markT;
         int repT;
+        int un = 1;
 
         static void enc(HerSync m, net.minecraft.network.FriendlyByteBuf b) {
+            b.writeVarInt(m.un);
             b.writeVarInt(m.sel);
             for (int i = 0; i < 8; ++i) {
                 b.writeVarInt(m.cd[i]);
@@ -153,6 +156,7 @@ public class PoliciaHerrero {
 
         static HerSync dec(net.minecraft.network.FriendlyByteBuf b) {
             HerSync m = new HerSync();
+            m.un = b.readVarInt();
             m.sel = b.readVarInt();
             for (int i = 0; i < 8; ++i) {
                 m.cd[i] = b.readVarInt();
@@ -176,6 +180,59 @@ public class PoliciaHerrero {
 
     static boolean isHerrero(Player p) {
         return JOB.equals(PoliciaMod.job(p));
+    }
+
+    // Árbol de habilidades: costo en XP de oficio (se consume al
+    // desbloquear) y habilidad previa necesaria. El Grito es la raíz.
+    static final int[] COST = new int[]{0, 10, 10, 15, 15, 20, 20, 25, 25};
+    static final int[] PRE = new int[]{-1, 0, 0, 0, 3, 2, 3, 1, 0};
+
+    static int mask(ServerPlayer p) {
+        CompoundTag d = p.getPersistentData();
+        if (!d.contains("her_un")) {
+            // migración: lo que ya tenía por XP queda desbloqueado
+            int xp = PoliciaMod.xp(p);
+            int m = 1;
+            for (int i = 1; i < THRESH.length; ++i) {
+                if (xp < THRESH[i]) break;
+                m |= 1 << i;
+            }
+            if (xp >= ANALIZADOR_XP) m |= 1 << 8;
+            d.putInt("her_un", m);
+        }
+        return d.getInt("her_un") | 1;
+    }
+
+    static boolean has(ServerPlayer p, int i) {
+        return i == 0 || (PoliciaHerrero.mask(p) >> i & 1) == 1;
+    }
+
+    static void unlock(ServerPlayer p, int i) {
+        if (i < 0 || i >= SKILLS.length) return;
+        if (PoliciaHerrero.has(p, i)) {
+            PoliciaMod.msg(p, SKILLS[i] + " ya está desbloqueada");
+            return;
+        }
+        if (!PoliciaHerrero.has(p, PRE[i])) {
+            PoliciaMod.msg(p, "Primero desbloqueá " + SKILLS[PRE[i]]);
+            return;
+        }
+        int xp = PoliciaMod.xp(p);
+        if (xp < COST[i]) {
+            PoliciaMod.msg(p, SKILLS[i] + " cuesta " + COST[i] + " XP (tenés " + xp + ")");
+            return;
+        }
+        CompoundTag d = p.getPersistentData();
+        d.putInt("pol_xp", xp - COST[i]);
+        d.putInt("her_un", PoliciaHerrero.mask(p) | 1 << i);
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.8f, 1.4f);
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.2f);
+        PoliciaMod.msg(p, "§6Desbloqueaste " + SKILLS[i] + " (-" + COST[i] + " XP)");
+        if (i < 8) {
+            d.putInt("her_sel", i);
+        }
+        PoliciaMod.sync(p);
+        PoliciaHerrero.send(p);
     }
 
     static int unlocked(ServerPlayer p) {
@@ -270,20 +327,31 @@ public class PoliciaHerrero {
             PoliciaHerrero.strike(p);
             return;
         }
-        int usable = Math.min(unlocked(p), SKILLS.length - 1);
+        if (id >= 40 && id < 40 + SKILLS.length) {
+            PoliciaHerrero.unlock(p, id - 40);
+            return;
+        }
         if (id >= 10 && id < 20) {
             int s = id - 10;
-            if (s >= 0 && s < usable) {
+            if (s >= 0 && s < SKILLS.length - 1 && PoliciaHerrero.has(p, s)) {
                 d.putInt("her_sel", s);
                 PoliciaMod.msg(p, "Habilidad: " + SKILLS[s]);
             } else if (s >= 0 && s < SKILLS.length - 1) {
-                PoliciaMod.msg(p, SKILLS[s] + ": se desbloquea con " + THRESH[s] + " XP");
+                PoliciaMod.msg(p, SKILLS[s] + ": bloqueada (clic derecho en el árbol para desbloquearla, " + COST[s] + " XP)");
             }
             PoliciaHerrero.send(p);
             return;
         }
         if (id == 2) {
-            int s = (PoliciaHerrero.sel(p) + 1) % usable;
+            int cur = PoliciaHerrero.sel(p);
+            int s = cur;
+            for (int k = 1; k <= 8; ++k) {
+                int c = (cur + k) % 8;
+                if (PoliciaHerrero.has(p, c)) {
+                    s = c;
+                    break;
+                }
+            }
             d.putInt("her_sel", s);
             PoliciaMod.msg(p, "Habilidad: " + SKILLS[s]);
             PoliciaHerrero.send(p);
@@ -297,7 +365,7 @@ public class PoliciaHerrero {
             return;
         }
         int s = PoliciaHerrero.sel(p);
-        if (s >= usable) {
+        if (!PoliciaHerrero.has(p, s)) {
             s = 0;
         }
         if (PoliciaHerrero.cd(p, s) > 0) {

@@ -232,7 +232,7 @@ public class PoliciaStruct {
             double dd = 28.0 + sl.random.nextDouble() * 47.0;
             int cx = v.getX() + (int) (Math.cos(ang) * dd);
             int x0 = cx - W[k] / 2;
-            if (!PoliciaStruct.natural(sl, x0 - 1, (z0 = (cz = v.getZ() + (int) (Math.sin(ang) * dd)) - D[k] / 2) - 1, W[k] + 2, D[k] + 2) || !PoliciaStruct.place(sl, k, cx, cz, false)) continue;
+            if (!PoliciaStruct.natural(sl, x0 - 1, (z0 = (cz = v.getZ() + (int) (Math.sin(ang) * dd)) - D[k] / 2) - 1, W[k] + 2, D[k] + 2) || !PoliciaStruct.clear(sl, k, cx, cz, true) || !PoliciaStruct.place(sl, k, cx, cz, false)) continue;
             return true;
         }
         return false;
@@ -438,6 +438,44 @@ public class PoliciaStruct {
         Sites.get(sl).add(2, new BlockPos(x0 + 6, g + 1, z1 + 1));
     }
 
+    // Distancia mínima entre dos estructuras del MISMO tipo (el casino es
+    // el más espaciado) y entre estructuras de cualquier tipo.
+    static final int[] SAME = new int[]{0, 600, 1200, 700, 700, 700, 700, 0};
+    static final int ANY = 72;
+
+    // ¿Se puede construir acá sin chocar con otra estructura del mod ni con
+    // estructuras del juego (aldeas, templos, etc.)?
+    static boolean clear(ServerLevel sl, int k, int cx, int cz, boolean nearVillage) {
+        BlockPos c = new BlockPos(cx, 64, cz);
+        Sites st = Sites.get(sl);
+        for (int j = 0; j < KINDS; ++j) {
+            int r = j == k && SAME[k] > 0 ? SAME[k] : ANY;
+            if (st.near(j, c, r)) {
+                return false;
+            }
+        }
+        int hw = W[k] / 2 + 6;
+        int hd = D[k] / 2 + 6;
+        for (int[] o : new int[][]{{0, 0}, {-hw, -hd}, {hw, -hd}, {-hw, hd}, {hw, hd}, {0, -hd}, {0, hd}, {-hw, 0}, {hw, 0}}) {
+            BlockPos p = sl.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, new BlockPos(cx + o[0], 0, cz + o[1]));
+            try {
+                if (nearVillage) {
+                    if (sl.structureManager().getStructureWithPieceAt(p, net.minecraft.tags.StructureTags.VILLAGE).isValid()) {
+                        return false;
+                    }
+                } else if (sl.structureManager().hasAnyStructureAt(p)) {
+                    return false;
+                }
+            } catch (RuntimeException ex) {
+                return false;
+            }
+        }
+        if (!nearVillage && !sl.getEntitiesOfClass(Villager.class, new net.minecraft.world.phys.AABB(cx - 80, -64, cz - 80, cx + 80, 320, cz + 80)).isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
     static boolean place(ServerLevel sl, int k, int cx, int cz, boolean force) {
         int x0 = cx - W[k] / 2;
         int z0 = cz - D[k] / 2;
@@ -487,13 +525,15 @@ public class PoliciaStruct {
     static void tryGen(ServerPlayer sp, ServerLevel sl) {
         Sites st = Sites.get(sl);
         for (int k = 0; k < KINDS; ++k) {
-            if (k == 0 || k == 7 || st.near(k, sp.blockPosition(), 320) || sl.random.nextInt(100) >= 45) continue;
+            int chance = k == 2 ? 12 : 25;
+            if (k == 0 || k == 7 || st.near(k, sp.blockPosition(), SAME[k]) || sl.random.nextInt(100) >= chance) continue;
             for (int i = 0; i < 4; ++i) {
                 int z;
                 double ang = sl.random.nextDouble() * Math.PI * 2.0;
-                double d = 70.0 + sl.random.nextDouble() * 60.0;
+                double d = 90.0 + sl.random.nextDouble() * 60.0;
                 int x = sp.getBlockX() + (int) (Math.cos(ang) * d);
-                if (!PoliciaStruct.place(sl, k, x, z = sp.getBlockZ() + (int) (Math.sin(ang) * d), false)) continue;
+                z = sp.getBlockZ() + (int) (Math.sin(ang) * d);
+                if (!PoliciaStruct.clear(sl, k, x, z, false) || !PoliciaStruct.place(sl, k, x, z, false)) continue;
                 return;
             }
         }

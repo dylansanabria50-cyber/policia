@@ -77,7 +77,7 @@ public class PoliciaAnalizador {
     }
 
     static boolean active(ServerPlayer p) {
-        return PoliciaHerrero.isHerrero(p) && PoliciaMod.xp(p) >= PoliciaHerrero.ANALIZADOR_XP;
+        return PoliciaHerrero.isHerrero(p) && PoliciaHerrero.has(p, 8);
     }
 
     static class Recipe {
@@ -286,7 +286,7 @@ public class PoliciaAnalizador {
     static void act(ServerPlayer p, int kind, String item) {
         if (!PoliciaAnalizador.active(p)) {
             if (kind != 4) {
-                PoliciaMod.msg(p, "El Analizador del Forjador se desbloquea con " + PoliciaHerrero.ANALIZADOR_XP + " XP siendo herrero");
+                PoliciaMod.msg(p, "El Analizador del Forjador se desbloquea en el árbol de habilidades del herrero (" + PoliciaHerrero.COST[8] + " XP)");
             }
             PoliciaAnalizador.send(p);
             return;

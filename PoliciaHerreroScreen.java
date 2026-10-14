@@ -78,7 +78,7 @@ public class PoliciaHerreroScreen extends Screen {
     }
 
     static int need(int i) {
-        return i < PoliciaHerrero.THRESH.length ? PoliciaHerrero.THRESH[i] : PoliciaHerrero.ANALIZADOR_XP;
+        return PoliciaHerrero.COST[i];
     }
 
     static int xp() {
@@ -86,26 +86,30 @@ public class PoliciaHerreroScreen extends Screen {
         return s == null ? 0 : s.xp;
     }
 
-    // Igual que el servidor: las 8 activas se desbloquean en orden; la
-    // pasiva (Analizador) solo depende de su propio XP.
+    // Desbloqueada según el árbol (lo manda el servidor).
     static boolean open(int i, int xp) {
-        if (i == 8) {
-            return xp >= PoliciaHerrero.ANALIZADOR_XP;
-        }
-        for (int k = 0; k <= i; ++k) {
-            if (xp < PoliciaHerrero.THRESH[k]) {
-                return false;
-            }
-        }
-        return true;
+        return i == 0 || (PoliciaHerrero.CL.un >> i & 1) == 1;
     }
 
+    static boolean canBuy(int i, int xp) {
+        return !open(i, xp) && open(PoliciaHerrero.PRE[i], xp) && xp >= need(i);
+    }
+
+    // Árbol como el de policía: el Grito arriba y tres ramas.
+    //   Grito ── Analizador
+    //   Yunque Portátil   Forja Interior   Marca del Herrero
+    //   Yunque Guardián   Reparación · Faro   Vínculo de Acero
+    static final int[] CX = new int[]{150, 30, 270, 150, 190, 270, 110, 30, 270};
+    static final int[] ROW = new int[]{0, 1, 1, 1, 2, 2, 2, 2, 0};
+    int lastClick = -1;
+    long lastClickT;
+
     int nodeX(int i) {
-        return this.px + 112 + 40 + (i % 3) * 110;
+        return this.px + 112 + 8 + CX[i];
     }
 
     int nodeY(int i) {
-        return this.py + 40 + (i / 3) * 72;
+        return this.py + 40 + ROW[i] * 72;
     }
 
     void tag(GuiGraphics g, String text, int x, int y) {
@@ -116,16 +120,13 @@ public class PoliciaHerreroScreen extends Screen {
     }
 
     static String desc(int i) {
-        String[] pg = PoliciaBook.HERRERO;
-        if (i + 1 >= pg.length) {
-            return "";
+        String head = (i + 1) + ". ";
+        for (String t : PoliciaBook.HERRERO) {
+            if (!t.startsWith(head)) continue;
+            int nl = t.indexOf("\n\n");
+            return (nl >= 0 ? t.substring(nl + 2) : t).replace("\n", " ");
         }
-        String t = pg[i + 1];
-        int nl = t.indexOf("\n\n");
-        if (nl >= 0) {
-            t = t.substring(nl + 2);
-        }
-        return t.replace("\n", " ");
+        return "";
     }
 
     @Override
@@ -145,13 +146,23 @@ public class PoliciaHerreroScreen extends Screen {
         PoliciaLadronScreen.panel(g, rx, this.py, this.px + PW, this.py + PH);
         this.tag(g, "Habilidades", rx + 6, this.py - 6);
         g.drawString(this.font, "XP: " + xp, rx + 8, this.py + 10, -1523648, true);
-        g.drawString(this.font, "Se desbloquean solas con XP - clic para elegir", rx + 8, this.py + 21, -6642512, false);
-        for (int i = 0; i < 9; ++i) {
-            if (i % 3 == 2) continue;
-            int x0 = this.nodeX(i) + 24;
-            int x1 = this.nodeX(i + 1);
-            int y = this.nodeY(i) + 11;
-            g.fill(x0, y, x1, y + 2, open(i + 1, xp) ? -2068264 : -9815450);
+        g.drawString(this.font, "Clic: elegir · Clic derecho (o doble clic): desbloquear", rx + 8, this.py + 21, -6642512, false);
+        for (int i = 1; i < 9; ++i) {
+            int pre = PoliciaHerrero.PRE[i];
+            int col = open(i, xp) ? -2068264 : -9815450;
+            if (ROW[i] == ROW[pre]) {
+                int cy = this.nodeY(i) + 11;
+                g.fill(Math.min(this.nodeX(pre), this.nodeX(i)) + 25, cy, Math.max(this.nodeX(pre), this.nodeX(i)) - 1, cy + 2, col);
+                continue;
+            }
+            int x0 = this.nodeX(pre) + 11;
+            int x1 = this.nodeX(i) + 11;
+            int y0 = this.nodeY(pre) + 44;
+            int y1 = this.nodeY(i);
+            int ym = y1 - 10;
+            g.fill(x0, y0, x0 + 2, ym + 2, col);
+            g.fill(Math.min(x0, x1), ym, Math.max(x0, x1) + 2, ym + 2, col);
+            g.fill(x1, ym, x1 + 2, y1, col);
         }
         int hov = -1;
         for (int i = 0; i < 9; ++i) {
@@ -169,8 +180,12 @@ public class PoliciaHerreroScreen extends Screen {
             PoliciaHerreroScreen.drawIcon(g, i, nx + 4, y + 4);
             if (!op) {
                 g.fill(nx, y, nx + 24, y + 24, 0x77000000);
+                if (canBuy(i, xp)) {
+                    g.fill(nx - 1, y - 1, nx + 25, y, 0xFF55FF55);
+                    g.fill(nx - 1, y + 24, nx + 25, y + 25, 0xFF55FF55);
+                }
             }
-            List<FormattedCharSequence> nl = this.font.split(FormattedText.of(PoliciaHerrero.SKILLS[i]), 96);
+            List<FormattedCharSequence> nl = this.font.split(FormattedText.of(PoliciaHerrero.SKILLS[i]), 72);
             for (int k = 0; k < nl.size() && k < 2; ++k) {
                 int w = this.font.width(nl.get(k));
                 g.drawString(this.font, nl.get(k), nx + 12 - w / 2, y + 27 + k * 9, op ? -1 : -6250336);
@@ -179,7 +194,7 @@ public class PoliciaHerreroScreen extends Screen {
             int col;
             if (!op) {
                 st = need(i) + " XP";
-                col = -1525712;
+                col = canBuy(i, xp) ? 0xFF55FF55 : -1525712;
             } else if (i == 8) {
                 st = "Pasiva (O)";
                 col = -10428320;
@@ -208,7 +223,7 @@ public class PoliciaHerreroScreen extends Screen {
             g.drawString(this.font, lines.get(k), bx0 + 5, by0 + 15 + k * 9, -3616548, false);
         }
         boolean op = open(show, xp);
-        String foot = !op ? "Bloqueada - se desbloquea sola al llegar a " + need(show) + " XP (tenés " + xp + ")"
+        String foot = !op ? (!open(PoliciaHerrero.PRE[show], xp) ? "Bloqueada - primero desbloqueá " + PoliciaHerrero.SKILLS[PoliciaHerrero.PRE[show]] : "Bloqueada - clic derecho para desbloquear: " + need(show) + " XP (tenés " + xp + ")")
                 : (show == 8 ? "Desbloqueada - siempre activa, tecla O abre el Analizador" : "Desbloqueada - clic para elegirla, J para usarla");
         g.drawString(this.font, foot, bx0 + 5, by1 - 11, op ? -10428320 : -1525712, false);
         super.render(g, mx, my, pt);
@@ -216,12 +231,28 @@ public class PoliciaHerreroScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mx, double my, int btn) {
-        if (btn == 0) {
-            for (int i = 0; i < 8; ++i) {
+        if (btn == 0 || btn == 1) {
+            int xp = xp();
+            for (int i = 0; i < 9; ++i) {
                 int nx = this.nodeX(i);
                 int y = this.nodeY(i);
                 if (mx < nx || mx > nx + 24 || my < y || my > y + 24) continue;
-                PoliciaClient.send(10 + i);
+                long now = net.minecraft.Util.getMillis();
+                if (!open(i, xp)) {
+                    boolean second = btn == 1 || this.lastClick == i && now - this.lastClickT < 1500L;
+                    if (second) {
+                        PoliciaClient.send(40 + i);
+                        this.lastClick = -1;
+                    } else {
+                        this.lastClick = i;
+                        this.lastClickT = now;
+                        if (this.minecraft != null && this.minecraft.player != null) {
+                            this.minecraft.player.displayClientMessage(Component.literal(PoliciaHerrero.SKILLS[i] + ": clic derecho o clic otra vez para desbloquear (" + need(i) + " XP)"), true);
+                        }
+                    }
+                } else if (i < 8) {
+                    PoliciaClient.send(10 + i);
+                }
                 return true;
             }
         }
