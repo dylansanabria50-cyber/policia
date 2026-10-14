@@ -101,7 +101,7 @@ public class PoliciaHerrero {
 
     static void anim(ServerPlayer p, int kind) {
         PoliciaMod.NET.send(net.minecraftforge.network.PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> p), (Object) new HerAnim(p.getId(), kind));
-        p.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, kind == 1 ? ANIM_REPAIR : ANIM_PLACE, 3, false, false, false));
+        p.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, kind >= 1 ? ANIM_REPAIR : ANIM_PLACE, 3, false, false, false));
     }
 
     public static class HerAnim {

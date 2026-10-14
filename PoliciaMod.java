@@ -160,6 +160,7 @@ public class PoliciaMod {
         PoliciaOficio.init();
         PoliciaJefe.init();
         PoliciaPasivas.init();
+        PoliciaServicio.init();
         PoliciaAnalizador.init();
         PoliciaExtra.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaExtra::attrs);

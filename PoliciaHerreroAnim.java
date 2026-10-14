@@ -46,7 +46,7 @@ public class PoliciaHerreroAnim {
     }
 
     static int length(int kind) {
-        return kind == 1 ? PoliciaHerrero.ANIM_REPAIR : PoliciaHerrero.ANIM_PLACE;
+        return kind >= 1 ? PoliciaHerrero.ANIM_REPAIR : PoliciaHerrero.ANIM_PLACE;
     }
 
     // Tiempo de animacion en ticks (con fraccion), o -1 si no hay.
@@ -92,7 +92,7 @@ public class PoliciaHerreroAnim {
             m.leftArm.xRot = Mth.lerp(k, m.leftArm.xRot, -0.75f);
             m.leftArm.yRot = Mth.lerp(k, m.leftArm.yRot, -0.15f);
             m.head.xRot = Mth.lerp(k, -0.2f, 0.5f);
-        } else if (kind == 1) {
+        } else if (kind >= 1) {
             // Tres martillazos de 9 ticks: sube el martillo y lo baja de golpe.
             float c = ((t - 16.0f) % 9.0f) / 9.0f;
             float x;
@@ -176,7 +176,7 @@ public class PoliciaHerreroAnim {
                 ps.translate(0.1f, 0.7f, 0.0f);
                 PoliciaHerreroAnim.block(ps, buf, light, anvil, 0.45f);
                 ps.popPose();
-            } else if (kind == 1) {
+            } else if (kind >= 1) {
                 // Apoyado en el piso adelante (en Reparacion no queda un
                 // bloque real: es solo la escena), y el martillo en la mano.
                 ps.pushPose();
@@ -229,7 +229,7 @@ public class PoliciaHerreroAnim {
             ps.popPose();
             return;
         }
-        if (kind != 1) {
+        if (kind < 1) {
             return;
         }
         // Yunque abajo, al frente.

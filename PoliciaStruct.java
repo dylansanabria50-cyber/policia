@@ -194,7 +194,12 @@ public class PoliciaStruct {
         return true;
     }
 
+    // Comisaria y herreria aparecen junto a las aldeas.
     static boolean genNearVillage(ServerPlayer sp, ServerLevel sl) {
+        return PoliciaStruct.genNearVillage(sp, sl, 0);
+    }
+
+    static boolean genNearVillage(ServerPlayer sp, ServerLevel sl, int k) {
         List<Villager> vs = sl.getEntitiesOfClass(Villager.class, sp.getBoundingBox().inflate(90.0, 60.0, 90.0));
         BlockPos v = null;
         if (!vs.isEmpty()) {
@@ -217,7 +222,7 @@ public class PoliciaStruct {
         if (v == null) {
             return false;
         }
-        if (Sites.get(sl).near(0, v, 140)) {
+        if (Sites.get(sl).near(k, v, 140)) {
             return false;
         }
         for (int i = 0; i < 30; ++i) {
@@ -226,8 +231,8 @@ public class PoliciaStruct {
             double ang = sl.random.nextDouble() * Math.PI * 2.0;
             double dd = 28.0 + sl.random.nextDouble() * 47.0;
             int cx = v.getX() + (int) (Math.cos(ang) * dd);
-            int x0 = cx - W[0] / 2;
-            if (!PoliciaStruct.natural(sl, x0 - 1, (z0 = (cz = v.getZ() + (int) (Math.sin(ang) * dd)) - D[0] / 2) - 1, W[0] + 2, D[0] + 2) || !PoliciaStruct.place(sl, 0, cx, cz, false)) continue;
+            int x0 = cx - W[k] / 2;
+            if (!PoliciaStruct.natural(sl, x0 - 1, (z0 = (cz = v.getZ() + (int) (Math.sin(ang) * dd)) - D[k] / 2) - 1, W[k] + 2, D[k] + 2) || !PoliciaStruct.place(sl, k, cx, cz, false)) continue;
             return true;
         }
         return false;
@@ -482,7 +487,7 @@ public class PoliciaStruct {
     static void tryGen(ServerPlayer sp, ServerLevel sl) {
         Sites st = Sites.get(sl);
         for (int k = 0; k < KINDS; ++k) {
-            if (k == 0 || st.near(k, sp.blockPosition(), 320) || sl.random.nextInt(100) >= 45) continue;
+            if (k == 0 || k == 7 || st.near(k, sp.blockPosition(), 320) || sl.random.nextInt(100) >= 45) continue;
             for (int i = 0; i < 4; ++i) {
                 int z;
                 double ang = sl.random.nextDouble() * Math.PI * 2.0;
@@ -514,7 +519,8 @@ public class PoliciaStruct {
             }
             if (sp.tickCount % 200 == 133 && sp.serverLevel().dimension() == Level.OVERWORLD) {
                 try {
-                    PoliciaStruct.genNearVillage(sp, sp.serverLevel());
+                    PoliciaStruct.genNearVillage(sp, sp.serverLevel(), 0);
+                    PoliciaStruct.genNearVillage(sp, sp.serverLevel(), 7);
                 } catch (RuntimeException ex) {
                     ex.printStackTrace();
                 }
@@ -548,8 +554,9 @@ public class PoliciaStruct {
                             c.getSource().sendFailure(Component.literal("Use: comisaria, obra, casino, bandidos, ladrones, atalaya, cueva o herreria"));
                             return 0;
                         }
-                        if (k == 0 && PoliciaStruct.genNearVillage(p, p.serverLevel())) {
-                            c.getSource().sendSuccess(() -> Component.literal("Comisaria colocada junto a la aldea"), false);
+                        String vnm = k == 0 ? "Comisaria" : "Herreria";
+                        if ((k == 0 || k == 7) && PoliciaStruct.genNearVillage(p, p.serverLevel(), k)) {
+                            c.getSource().sendSuccess(() -> Component.literal(vnm + " colocada junto a la aldea"), false);
                             return 1;
                         }
                         Direction f = p.getDirection();
