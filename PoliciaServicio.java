@@ -24,6 +24,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 // van al herrero, que ademas gana XP de oficio y hace la animacion de forja.
 public class PoliciaServicio {
     static final int UPGRADE_PRICE = 8;
+    static final int ENCH_PRICE = 10;
 
     static void init() {
         MinecraftForge.EVENT_BUS.register((Object) new PoliciaServicio());
@@ -79,9 +80,13 @@ public class PoliciaServicio {
         c.setItem(13, show);
         c.setItem(11, rp > 0 ? PoliciaBoss.named(Items.ANVIL, "Reparar", "Lo deja como nuevo y le quita el costo de yunque", "Precio: " + rp + " esmeraldas") : PoliciaBoss.named(Items.BARRIER, "Reparar", "No está gastado"));
         c.setItem(15, up ? PoliciaBoss.named(Items.ENCHANTED_BOOK, "Mejorar", "+1 Irrompibilidad (tiene " + PoliciaServicio.unbreaking(it) + ", máximo 3)", "Precio: " + UPGRADE_PRICE + " esmeraldas") : PoliciaBoss.named(Items.BARRIER, "Mejorar", "No se puede mejorar más"));
+        boolean fw = PoliciaForja.weapon(it) && EnchantmentHelper.getItemEnchantmentLevel(PoliciaForja.FILO.get(), it) < 2;
+        boolean ar = PoliciaForja.armor(it) && EnchantmentHelper.getItemEnchantmentLevel(PoliciaForja.TEMPLE.get(), it) < 3;
+        c.setItem(20, fw ? PoliciaBoss.named(Items.BLAZE_POWDER, "Filo de fragua", "Prende fuego al golpear y suma daño", "Precio: " + ENCH_PRICE + " esmeraldas") : PoliciaBoss.named(Items.BARRIER, "Filo de fragua", "Solo armas (máx. II)"));
+        c.setItem(24, ar ? PoliciaBoss.named(Items.IRON_CHESTPLATE, "Temple", "Devuelve parte del daño al atacante", "Precio: " + ENCH_PRICE + " esmeraldas") : PoliciaBoss.named(Items.BARRIER, "Temple", "Solo armaduras (máx. III)"));
         c.setItem(22, PoliciaBoss.named(Items.EMERALD, "Tenés " + PoliciaBoss.emeralds(client) + " esmeraldas", "Las esmeraldas van para " + smith.getName().getString()));
         PoliciaBoss.openMenu3(client, "Herrero " + smith.getName().getString(), c, (p, slot) -> {
-            if (slot != 11 && slot != 15) {
+            if (slot != 11 && slot != 15 && slot != 20 && slot != 24) {
                 return;
             }
             p.closeContainer();
@@ -93,8 +98,10 @@ public class PoliciaServicio {
             if (cur.isEmpty()) {
                 return;
             }
-            int price = slot == 11 ? PoliciaServicio.repairPrice(cur) : UPGRADE_PRICE;
-            if (slot == 11 && price <= 0 || slot == 15 && !PoliciaServicio.canUpgrade(cur)) {
+            int price = slot == 11 ? PoliciaServicio.repairPrice(cur) : (slot == 15 ? UPGRADE_PRICE : ENCH_PRICE);
+            net.minecraft.world.item.enchantment.Enchantment own = slot == 20 ? PoliciaForja.FILO.get() : PoliciaForja.TEMPLE.get();
+            boolean ownOk = slot == 20 ? PoliciaForja.weapon(cur) : PoliciaForja.armor(cur);
+            if (slot == 11 && price <= 0 || slot == 15 && !PoliciaServicio.canUpgrade(cur) || (slot == 20 || slot == 24) && (!ownOk || EnchantmentHelper.getItemEnchantmentLevel(own, cur) >= own.getMaxLevel())) {
                 PoliciaMod.msg(p, slot == 11 ? "No está gastado" : "No se puede mejorar más");
                 return;
             }
@@ -110,13 +117,19 @@ public class PoliciaServicio {
                     cur.setDamageValue(0);
                 }
                 cur.setRepairCost(0);
-                what = "reparo";
-            } else {
+                what = "reparó";
+            } else if (slot == 15) {
                 Map<Enchantment, Integer> m = EnchantmentHelper.getEnchantments(cur);
                 m.put(Enchantments.UNBREAKING, Math.min(3, PoliciaServicio.unbreaking(cur) + 1));
                 EnchantmentHelper.setEnchantments(m, cur);
-                what = "mejoro";
+                what = "mejoró";
+            } else {
+                Map<Enchantment, Integer> m = EnchantmentHelper.getEnchantments(cur);
+                m.put(own, EnchantmentHelper.getItemEnchantmentLevel(own, cur) + 1);
+                EnchantmentHelper.setEnchantments(m, cur);
+                what = "encantó";
             }
+            PoliciaForja.sign(cur, smith);
             smith.getPersistentData().putInt("pol_xp", PoliciaMod.xp(smith) + 3);
             PoliciaHerrero.anim(smith, 2);
             p.level().playSound(null, smith.getX(), smith.getY(), smith.getZ(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 1.0f, 1.0f);

@@ -29,5 +29,9 @@
  "item.policia.kit_caja_fuerte": "Safe Kit",
  "item.policia.placas_refuerzo": "Reinforcement Plates",
  "item.policia.kit_falsificacion": "Forgery Kit",
- "item.policia.mapa_boveda": "Vault Map"
+ "item.policia.mapa_boveda": "Vault Map",
+ "enchantment.policia.filo_de_fragua": "Forge Edge",
+ "enchantment.policia.temple": "Temper",
+ "item.policia.contrato_aprendiz": "Apprentice Contract",
+ "entity.policia.aprendiz": "Apprentice"
 }

@@ -821,6 +821,7 @@ public class PoliciaHerrero {
                         it = nu;
                     }
                     String ql = PoliciaHerrero.quality(it, Integer.bitCount(d.getInt("her_rep_hits")));
+                    PoliciaForja.sign(it, p);
                     PoliciaMod.msg(p, "Reparación Maestra: " + it.getHoverName().getString() + " como nuevo" + ql);
                     PoliciaJefe.add(p, "repair", 1);
                     p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.8f);

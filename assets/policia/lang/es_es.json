@@ -29,5 +29,9 @@
  "item.policia.kit_caja_fuerte": "Kit de caja fuerte",
  "item.policia.placas_refuerzo": "Placas de refuerzo",
  "item.policia.kit_falsificacion": "Kit de falsificación",
- "item.policia.mapa_boveda": "Mapa de bóveda"
+ "item.policia.mapa_boveda": "Mapa de bóveda",
+ "enchantment.policia.filo_de_fragua": "Filo de fragua",
+ "enchantment.policia.temple": "Temple",
+ "item.policia.contrato_aprendiz": "Contrato de aprendiz",
+ "entity.policia.aprendiz": "Aprendiz"
 }

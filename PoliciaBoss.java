@@ -117,6 +117,7 @@ public class PoliciaBoss {
         out.accept((ItemLike) PoliciaCaja.PLACAS.get());
         out.accept((ItemLike) PoliciaMercado.KIT_FALSO.get());
         out.accept((ItemLike) PoliciaMercado.MAPA.get());
+        out.accept((ItemLike) PoliciaAprendiz.CONTRATO.get());
         out.accept((ItemLike) PoliciaShield.SHIELD.get());
         out.accept((ItemLike) VEST.get());
         for (String[] x : sk = new String[][]{{"refuerzo", "Refuerzo"}, {"k9", "Perro K9"}, {"esposas", "Esposas"}, {"sirena", "Sirena y torreta"}, {"dron", "Dron de vigilancia"}, {"burbuja", "Escudo de burbuja"}, {"pico", "Pico de albañil"}, {"muro", "Muro"}, {"refugio", "Refugio"}, {"silbido", "Silbido"}}) {
@@ -481,6 +482,7 @@ public class PoliciaBoss {
             l.add(new Entry(new ItemStack((ItemLike) Items.LAVA_BUCKET), 4));
             l.add(new Entry(new ItemStack((ItemLike) Items.ANVIL), 6));
             l.add(new Entry(new ItemStack((ItemLike) PoliciaCaja.PLACAS.get()), 4));
+            l.add(new Entry(new ItemStack((ItemLike) PoliciaAprendiz.CONTRATO.get()), 20));
             l.add(new Entry(new ItemStack((ItemLike) Items.SMITHING_TABLE), 3));
             l.add(new Entry(new ItemStack((ItemLike) Items.GRINDSTONE), 3));
             l.add(new Entry(new ItemStack((ItemLike) Items.BLAST_FURNACE), 5));
@@ -1020,9 +1022,9 @@ public class PoliciaBoss {
             for (int i = 0; i < 18; ++i) {
                 ItemStack s = this.box.getItem(i);
                 if (s.isEmpty()) continue;
-                total += PoliciaBoss.value(s) * (double) s.getCount();
+                total += PoliciaBoss.value(s) * (double) s.getCount() * (double) PoliciaLadron.dayMul(s);
             }
-            int em = (int) Math.floor(total);
+            int em = total < 1.0 ? 0 : PoliciaEstacion.scale(this.sp.serverLevel(), "ladron", (int) Math.floor(total));
             if (em < 1) {
                 PoliciaMod.msg(this.sp, "Eso no vale nada");
                 return;
