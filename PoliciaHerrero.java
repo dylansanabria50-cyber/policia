@@ -614,6 +614,10 @@ public class PoliciaHerrero {
                 if (p.tickCount % 10 == 0) {
                     for (Mob m : p.level().getEntitiesOfClass(Mob.class, new net.minecraft.world.phys.AABB(bp).inflate(8.0), x -> x instanceof net.minecraft.world.entity.monster.Enemy && x.isAlive())) {
                         m.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 0, false, true, false));
+                        // Marca al monstruo como afectado por este yunque (vale
+                        // un rato despues de salir del radio).
+                        m.getPersistentData().putUUID("her_anvil_by", p.getUUID());
+                        m.getPersistentData().putLong("her_anvil_until", p.level().getGameTime() + 60L);
                     }
                 }
             } else if (p.level() instanceof ServerLevel sl) {
@@ -729,18 +733,22 @@ public class PoliciaHerrero {
         }
     }
 
-    // Yunque Portatil: cerca del yunque los orbes de experiencia valen doble.
+    // Yunque Portatil: los monstruos afectados por el yunque (con su
+    // Lentitud) que mata el herrero sueltan el DOBLE de experiencia. La XP
+    // del oficio se suma sola con la de Minecraft, asi que tambien se duplica.
     @SubscribeEvent
-    public void xp(net.minecraftforge.event.entity.player.PlayerXpEvent.PickupXp e) {
-        if (!(e.getEntity() instanceof ServerPlayer p) || !PoliciaHerrero.isHerrero(p)) {
+    public void xpDrop(net.minecraftforge.event.entity.living.LivingExperienceDropEvent e) {
+        if (!(e.getAttackingPlayer() instanceof ServerPlayer p) || !PoliciaHerrero.isHerrero(p)) {
             return;
         }
-        CompoundTag d = p.getPersistentData();
-        if (d.getInt("her_anvil_t") <= 0 || d.getInt("her_anvil_type") != 0) {
+        CompoundTag t = e.getEntity().getPersistentData();
+        if (!t.hasUUID("her_anvil_by") || !t.getUUID("her_anvil_by").equals(p.getUUID()) || t.getLong("her_anvil_until") < p.level().getGameTime()) {
             return;
         }
-        if (p.blockPosition().distSqr(BlockPos.of(d.getLong("her_anvil_pos"))) < 64.0) {
-            p.giveExperiencePoints(e.getOrb().getValue());
+        e.setDroppedExperience(e.getDroppedExperience() * 2);
+        if (p.level() instanceof ServerLevel sl) {
+            LivingEntity m = e.getEntity();
+            sl.sendParticles((ParticleOptions) ParticleTypes.HAPPY_VILLAGER, m.getX(), m.getY() + 0.8, m.getZ(), 8, 0.3, 0.4, 0.3, 0.02);
         }
     }
 
