@@ -531,6 +531,7 @@ public class PoliciaLadron {
             }
             return;
         }
+        PoliciaEventos.picked(p, t);
         if (PoliciaGolpe.pickedPerista(p, t)) {
             p.getPersistentData().putInt("pol_xp", PoliciaMod.xp(p) + 2);
             return;
