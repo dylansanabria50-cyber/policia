@@ -488,10 +488,7 @@ public class PoliciaPatrullero {
             this.releasing = false;
             String nm = t.getDisplayName().getString();
             if (t instanceof ServerPlayer tp) {
-                tp.getPersistentData().putInt("pol_cuff", 1);
-                tp.getPersistentData().putInt("pol_wnt", 0);
-                PoliciaMod.msg(tp, "Te entregaron en la comisaría: se borraron tus estrellas");
-                PoliciaMod.sync(tp);
+                PoliciaJuicio.start(cop, tp);
             } else if (t instanceof Mob) {
                 sl.sendParticles(ParticleTypes.POOF, t.getX(), t.getY() + 1.0, t.getZ(), 12, 0.3, 0.5, 0.3, 0.02);
                 t.discard();

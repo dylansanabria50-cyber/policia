@@ -158,6 +158,8 @@ public class PoliciaMod {
         PoliciaMercado.init();
         PoliciaForja.init(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaAprendiz.init();
+        PoliciaContratos.init();
+        PoliciaJuicio.init();
         PoliciaSonido.init(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaLadron.init();
         PoliciaBoss.init();
@@ -716,7 +718,7 @@ public class PoliciaMod {
                 "pol_mdone", "pol_bdone", "pol_cerebro", "pol_lsu", "pol_lsi", "pol_lun", "pol_lse",
                 "pol_cin0", "pol_cin2", "pol_comp", "pol_party", "pol_hidearmor",
                 "her_sel", "her_cd0", "her_cd1", "her_cd2", "her_cd3", "her_cd4", "her_cd5", "her_cd6", "her_cd7", "her_cd8",
-                "her_an_known", "her_an_qitem", "her_an_qtype", "her_an_qprog", "her_an_qneed", "her_an_qtarget", "pol_chosen", "jm_id", "jm_prog", "jm_acc", "gh_cd", "enc_d0", "enc_d1", "enc_d2", "ord_cd", "ord_k", "ord_x", "ord_y", "ord_z", "ord_t", "ord_n", "ord_door", "ord_fence", "ord_gate", "ord_crop", "ord_stone", "ord_light", "ord_ymin", "ord_ymax"}) {
+                "her_an_known", "her_an_qitem", "her_an_qtype", "her_an_qprog", "her_an_qneed", "her_an_qtarget", "pol_chosen", "jm_id", "jm_prog", "jm_acc", "gh_cd", "jail_t", "jail_at", "bm_night", "insp_n", "insp_l", "insp_d", "insp_ty", "insp_y0", "insp_y1", "insp_next", "enc_d0", "enc_d1", "enc_d2", "ord_cd", "ord_k", "ord_x", "ord_y", "ord_z", "ord_t", "ord_n", "ord_door", "ord_fence", "ord_gate", "ord_crop", "ord_stone", "ord_light", "ord_ymin", "ord_ymax"}) {
             if (!o.contains(k)) continue;
             n.put(k, o.get(k).copy());
         }
