@@ -280,7 +280,15 @@ public class PoliciaJefe {
             }
             c.setItem(22, PoliciaBoss.named(Items.PAPER, "Elegi una mision", "Las ofertas cambian cada dia"));
         }
+        if (job == 2) {
+            c.setItem(20, PoliciaGolpe.card(sp, 1));
+            c.setItem(24, PoliciaGolpe.card(sp, 2));
+        }
         PoliciaBoss.openMenu3(sp, "Misiones - " + PoliciaBoss.NAMES[bossKind], c, (p, slot) -> {
+            if (job == 2 && (slot == 20 || slot == 24)) {
+                PoliciaGolpe.click(p, slot == 20 ? 1 : 2);
+                return;
+            }
             Def a = PoliciaJefe.active(p);
             if (a != null) {
                 boolean here = a.job == job && !PoliciaJefe.isTrial(a);

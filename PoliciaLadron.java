@@ -531,6 +531,10 @@ public class PoliciaLadron {
             }
             return;
         }
+        if (PoliciaGolpe.pickedPerista(p, t)) {
+            p.getPersistentData().putInt("pol_xp", PoliciaMod.xp(p) + 2);
+            return;
+        }
         MutableComponent title = Component.literal("Bolsillos de " + t.getDisplayName().getString());
         if (t instanceof Player) {
             Player vp = (Player) t;
