@@ -42,9 +42,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 // decorativos exactos son una aproximacion razonable; la disposicion, los
 // NPC y la logica de generacion son fieles al original.
 public class PoliciaStruct {
-    static final String[] SN = new String[]{"comisaria", "obra", "casino", "bandidos", "ladrones", "atalaya", "cueva"};
-    static final int[] W = new int[]{31, 17, 13, 19, 19, 11, 15};
-    static final int[] D = new int[]{23, 13, 13, 19, 19, 11, 15};
+    static final String[] SN = new String[]{"comisaria", "obra", "casino", "bandidos", "ladrones", "atalaya", "cueva", "herreria"};
+    static final int[] W = new int[]{31, 17, 13, 19, 19, 11, 15, 13};
+    static final int[] D = new int[]{23, 13, 13, 19, 19, 11, 15, 11};
+    static final int KINDS = 8;
     static final int[] AGX = new int[]{10, 12, 10, 12, 14, 16, 18, 20, 15};
     static final int[] AGZ = new int[]{5, 5, 9, 9, 9, 9, 9, 9, 10};
 
@@ -244,6 +245,64 @@ public class PoliciaStruct {
         Sites.get(sl).add(0, new BlockPos(x0 + 18, g + 1, z0 + 15));
     }
 
+    // Herreria del Maestro herrero: taller de piedra con el frente abierto,
+    // forja con lava, yunques, mesa de herreria y un mostrador detras del
+    // cual atiende el jefe del oficio.
+    static void herreria(ServerLevel sl, int x0, int z0, int g) {
+        PoliciaStruct.prepare(sl, x0 - 1, z0 - 1, 15, 13, g);
+        int x1 = x0 + 12;
+        int z1 = z0 + 10;
+        PoliciaStruct.fill(sl, x0, g, z0, x1, g, z1, Blocks.POLISHED_ANDESITE);
+        for (int x = x0; x <= x1; x += 2) {
+            for (int z = z0 + (x & 2) / 2; z <= z1; z += 2) {
+                PoliciaStruct.set(sl, x, g, z, Blocks.STONE_BRICKS);
+            }
+        }
+        // Paredes: fondo y costados (el frente queda abierto con dos postes).
+        PoliciaStruct.fill(sl, x0, g + 1, z0, x1, g + 4, z0, Blocks.STONE_BRICKS);
+        PoliciaStruct.fill(sl, x0, g + 1, z0, x0, g + 4, z1 - 3, Blocks.STONE_BRICKS);
+        PoliciaStruct.fill(sl, x1, g + 1, z0, x1, g + 4, z1 - 3, Blocks.STONE_BRICKS);
+        PoliciaStruct.fill(sl, x0, g + 1, z1, x0, g + 4, z1, Blocks.STRIPPED_SPRUCE_LOG);
+        PoliciaStruct.fill(sl, x1, g + 1, z1, x1, g + 4, z1, Blocks.STRIPPED_SPRUCE_LOG);
+        PoliciaStruct.fill(sl, x0 + 3, g + 2, z0, x0 + 4, g + 3, z0, Blocks.IRON_BARS);
+        PoliciaStruct.fill(sl, x1 - 4, g + 2, z0, x1 - 3, g + 3, z0, Blocks.IRON_BARS);
+        PoliciaStruct.fill(sl, x0, g + 2, z0 + 4, x0, g + 3, z0 + 5, Blocks.IRON_BARS);
+        // Techo con borde de madera oscura.
+        PoliciaStruct.fill(sl, x0 - 1, g + 5, z0 - 1, x1 + 1, g + 5, z1 + 1, Blocks.DARK_OAK_PLANKS);
+        PoliciaStruct.fill(sl, x0, g + 5, z0, x1, g + 5, z1, Blocks.DEEPSLATE_TILES);
+        // Forja: chimenea de ladrillos con lava y altos hornos.
+        PoliciaStruct.fill(sl, x0 + 1, g + 1, z0 + 1, x0 + 3, g + 1, z0 + 2, Blocks.BRICKS);
+        PoliciaStruct.set(sl, x0 + 2, g + 1, z0 + 1, Blocks.LAVA_CAULDRON);
+        PoliciaStruct.fill(sl, x0 + 1, g + 2, z0 + 1, x0 + 3, g + 4, z0 + 1, Blocks.BRICKS);
+        PoliciaStruct.fill(sl, x0 + 1, g + 5, z0 + 1, x0 + 3, g + 8, z0 + 2, Blocks.BRICKS);
+        PoliciaStruct.set(sl, x0 + 2, g + 8, z0 + 1, Blocks.CAMPFIRE);
+        PoliciaStruct.set(sl, x0 + 1, g + 2, z0 + 2, Blocks.BLAST_FURNACE.defaultBlockState().setValue(net.minecraft.world.level.block.FurnaceBlock.FACING, net.minecraft.core.Direction.SOUTH));
+        PoliciaStruct.set(sl, x0 + 3, g + 2, z0 + 2, Blocks.BLAST_FURNACE.defaultBlockState().setValue(net.minecraft.world.level.block.FurnaceBlock.FACING, net.minecraft.core.Direction.SOUTH));
+        // Mesas de trabajo al fondo a la derecha.
+        PoliciaStruct.set(sl, x1 - 1, g + 1, z0 + 1, Blocks.SMITHING_TABLE);
+        PoliciaStruct.set(sl, x1 - 2, g + 1, z0 + 1, Blocks.GRINDSTONE.defaultBlockState().setValue(net.minecraft.world.level.block.GrindstoneBlock.FACE, net.minecraft.world.level.block.state.properties.AttachFace.FLOOR));
+        PoliciaStruct.set(sl, x1 - 3, g + 1, z0 + 1, Blocks.CRAFTING_TABLE);
+        PoliciaStruct.chest(sl, x1 - 1, g + 1, z0 + 3, "minecraft:chests/village/village_weaponsmith");
+        PoliciaStruct.set(sl, x1 - 1, g + 1, z0 + 4, Blocks.BARREL);
+        // Yunques del taller.
+        PoliciaStruct.set(sl, x0 + 4, g + 1, z0 + 4, Blocks.ANVIL);
+        PoliciaStruct.set(sl, x1 - 4, g + 1, z0 + 4, Blocks.CHIPPED_ANVIL);
+        // Mostrador: el maestro atiende detras.
+        for (int x = x0 + 3; x <= x1 - 3; ++x) {
+            if (x == x0 + 6) continue;
+            PoliciaStruct.set(sl, x, g + 1, z0 + 7, Blocks.SPRUCE_PLANKS);
+        }
+        PoliciaStruct.set(sl, x0 + 4, g + 2, z0 + 7, Blocks.IRON_BLOCK);
+        PoliciaStruct.set(sl, x1 - 4, g + 2, z0 + 7, Blocks.LANTERN);
+        // Faroles colgando del techo.
+        BlockState hang = Blocks.LANTERN.defaultBlockState().setValue(net.minecraft.world.level.block.LanternBlock.HANGING, true);
+        PoliciaStruct.set(sl, x0 + 3, g + 4, z0 + 5, hang);
+        PoliciaStruct.set(sl, x1 - 3, g + 4, z0 + 5, hang);
+        PoliciaStruct.set(sl, x0 + 6, g + 4, z1 - 1, hang);
+        PoliciaStruct.npc(sl, PoliciaBoss.HERRERO_BOSS, (double) x0 + 6.5, (double) g + 1.0, (double) z0 + 5.5, 0.0f, null, 0);
+        Sites.get(sl).add(7, new BlockPos(x0 + 6, g + 1, z1 + 1));
+    }
+
     static void obra(ServerLevel sl, int x0, int z0, int g) {
         int x;
         PoliciaStruct.prepare(sl, x0 - 1, z0 - 1, 19, 15, g);
@@ -409,6 +468,10 @@ public class PoliciaStruct {
                 PoliciaCamp.build(sl, 3, x0, z0, g);
                 break;
             }
+            case 7: {
+                PoliciaStruct.herreria(sl, x0, z0, g);
+                break;
+            }
             default: {
                 PoliciaStruct.casino(sl, x0, z0, g);
             }
@@ -418,7 +481,7 @@ public class PoliciaStruct {
 
     static void tryGen(ServerPlayer sp, ServerLevel sl) {
         Sites st = Sites.get(sl);
-        for (int k = 0; k < 7; ++k) {
+        for (int k = 0; k < KINDS; ++k) {
             if (k == 0 || st.near(k, sp.blockPosition(), 320) || sl.random.nextInt(100) >= 45) continue;
             for (int i = 0; i < 4; ++i) {
                 int z;
@@ -477,12 +540,12 @@ public class PoliciaStruct {
                         ServerPlayer p = c.getSource().getPlayerOrException();
                         String t = StringArgumentType.getString(c, "tipo");
                         int k = -1;
-                        for (int i = 0; i < 7; ++i) {
+                        for (int i = 0; i < KINDS; ++i) {
                             if (!SN[i].equals(t)) continue;
                             k = i;
                         }
                         if (k < 0) {
-                            c.getSource().sendFailure(Component.literal("Use: comisaria, obra, casino, bandidos, ladrones, atalaya o cueva"));
+                            c.getSource().sendFailure(Component.literal("Use: comisaria, obra, casino, bandidos, ladrones, atalaya, cueva o herreria"));
                             return 0;
                         }
                         if (k == 0 && PoliciaStruct.genNearVillage(p, p.serverLevel())) {
@@ -501,7 +564,7 @@ public class PoliciaStruct {
         final List<List<Long>> l = new ArrayList<>();
 
         Sites() {
-            for (int i = 0; i < 7; ++i) {
+            for (int i = 0; i < KINDS; ++i) {
                 this.l.add(new ArrayList<>());
             }
         }
@@ -512,7 +575,7 @@ public class PoliciaStruct {
 
         static Sites load(CompoundTag t) {
             Sites s = new Sites();
-            for (int i = 0; i < 7; ++i) {
+            for (int i = 0; i < KINDS; ++i) {
                 for (long v : t.getLongArray("k" + i)) {
                     s.l.get(i).add(v);
                 }
@@ -522,7 +585,7 @@ public class PoliciaStruct {
 
         @Override
         public CompoundTag save(CompoundTag t) {
-            for (int i = 0; i < 7; ++i) {
+            for (int i = 0; i < KINDS; ++i) {
                 long[] a = new long[this.l.get(i).size()];
                 for (int j = 0; j < a.length; ++j) {
                     a[j] = this.l.get(i).get(j);

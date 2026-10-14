@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 // Renderiza a los NPC del jefe de banda y su entorno (capataz, perista,
 // ladron, policia infiltrado, ayudante), eligiendo skin segun el tipo.
 public class PoliciaBossRender extends MobRenderer<PoliciaBoss.BossNpc, PoliciaBossRender.Mdl> {
-    static final String[] NAMES = new String[]{"jefe_policia", "capataz", "jefe_ladrones", "perista", "ladron", "policia", "ayudante"};
+    static final String[] NAMES = new String[]{"jefe_policia", "capataz", "jefe_ladrones", "perista", "ladron", "policia", "ayudante", "maestro_herrero"};
 
     public PoliciaBossRender(EntityRendererProvider.Context ctx) {
         super(ctx, new Mdl(ctx.bakeLayer(ModelLayers.PLAYER)), 0.5f);
