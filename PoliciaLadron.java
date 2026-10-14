@@ -545,6 +545,11 @@ public class PoliciaLadron {
         }
         p.getPersistentData().putInt("pol_xp", PoliciaMod.xp(p) + 2);
         PoliciaMod.msg(p, "Carterismo exitoso (" + chance + "%)");
+        if (PoliciaMod.on(p) && p.getRandom().nextInt(100) < 30) {
+            // Pasiva Mano rapida.
+            PoliciaBoss.give(p, new ItemStack(Items.EMERALD));
+            PoliciaMod.msg(p, "Mano rapida: te llevaste una esmeralda extra");
+        }
         if (sure) {
             p.getPersistentData().putInt("pol_tmp_pick", 0);
             PoliciaMod.msg(p, "Usaste el Carterismo maestro");

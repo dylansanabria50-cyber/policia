@@ -45,10 +45,21 @@ public class PoliciaXray {
         }
     }
 
-    static boolean active() {
+    // Menas que muestran los ayudantes (radio 4, segun su nivel).
+    static boolean helpers() {
         PoliciaAlbanil.AlbSync s = PoliciaAlbanil.CL;
         PoliciaMod.Sync ms = PoliciaClient.mine();
         return s != null && s.ht > 0 && s.hl >= 1 && ms != null && ms.jb == 2;
+    }
+
+    // Pasiva Ojo de minero: con el modo albanil activo ve todas las menas a 3 bloques.
+    static boolean eye() {
+        PoliciaMod.Sync ms = PoliciaClient.mine();
+        return ms != null && ms.jb == 2 && ms.on;
+    }
+
+    static boolean active() {
+        return PoliciaXray.helpers() || PoliciaXray.eye();
     }
 
     static float[] color(String p) {
@@ -98,7 +109,9 @@ public class PoliciaXray {
         if (mc.player.tickCount % 5 != 0) {
             return;
         }
-        int lv = Math.max(1, Math.min(3, PoliciaAlbanil.CL.hl));
+        boolean hp = PoliciaXray.helpers();
+        boolean ey = PoliciaXray.eye();
+        int lv = hp ? Math.max(1, Math.min(3, PoliciaAlbanil.CL.hl)) : 0;
         POS.clear();
         COL.clear();
         BlockPos c = mc.player.blockPosition();
@@ -113,7 +126,9 @@ public class PoliciaXray {
                     ResourceLocation key = ForgeRegistries.BLOCKS.getKey(st.getBlock());
                     if (key == null) continue;
                     String p = key.getPath();
-                    boolean ok = lv == 1 ? p.contains("coal") : (lv == 2 ? !p.contains("diamond") && !p.contains("debris") && !p.contains("netherite") : true);
+                    boolean byHelpers = hp && (lv == 1 ? p.contains("coal") : (lv == 2 ? !p.contains("diamond") && !p.contains("debris") && !p.contains("netherite") : true));
+                    boolean byEye = ey && Math.abs(dx) <= 3 && Math.abs(dy) <= 3 && Math.abs(dz) <= 3;
+                    boolean ok = byHelpers || byEye;
                     if (!ok) continue;
                     POS.add(bp);
                     COL.add(color(p));

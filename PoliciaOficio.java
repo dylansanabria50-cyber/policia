@@ -38,6 +38,7 @@ public class PoliciaOficio {
     // Al entrar: los que ya tenian oficio (mundos viejos) no vuelven a ver
     // la ventana; los demas la reciben hasta que elijan.
     static void login(ServerPlayer p) {
+        PoliciaBook.refresh(p);
         CompoundTag d = p.getPersistentData();
         if (d.getBoolean("pol_chosen")) {
             return;
