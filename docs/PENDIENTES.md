@@ -9,6 +9,8 @@ Todavía NO implementar: primero se siguen sumando ideas.
 - Sonidos: generar .ogg a partir de los sonidos sintetizados de la vista previa.
 
 ## Movimientos base del personaje (pestaña Movimiento de la vista previa)
+- Aplicar a TODOS los jugadores (solo visual).
+- Primera persona: brazo propio con balanceo al caminar, retraso al girar, hundida al aterrizar, leve inclinación al doblar, sacudida al recibir daño y FOV más amplio al correr.
 - Quieto (respira, cambia el peso, mira), caminar y correr sin que patinen los pies, inclinación por aceleración y en curvas, arrancar/frenar con derrape, salto y caída con física de Minecraft, aterrizaje con amortiguación, caminar agachado con freno en el borde, escalera, nado y empuje al recibir golpes.
 
 ## Habilidades nuevas aprobadas
