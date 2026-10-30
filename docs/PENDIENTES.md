@@ -40,3 +40,8 @@ Todavía NO implementar: primero se siguen sumando ideas.
 - Armero (sin animar aún): perchero que guarda y repara solo la armadura que dejes ahí.
 - Fundición de emergencia (sin animar aún): derrite herramientas rotas y las devuelve como lingotes.
 - Horno portátil: horno a su lado que funde minerales al instante mientras dure.
+
+## Modo RPG (aprobado: 1, 4 y 6)
+- Niveles y atributos: nivel 1–50 con barra de XP; puntos en Fuerza, Vitalidad, Agilidad, Destreza e Ingenio; atributo principal por oficio (Policía Vitalidad, Albañil Fuerza, Ladrón Agilidad, Herrero Destreza).
+- Misiones e historia: NPC con ! y ? que dan misiones con diálogo y elecciones; diarias por oficio; historia principal por capítulos; jefes con barra grande y fases.
+- Mundo: zonas con nivel recomendado; ciudad central con gremios de cada oficio; tienda, banco y tablero de misiones.
