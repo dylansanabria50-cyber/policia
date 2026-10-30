@@ -10,6 +10,7 @@ Todavía NO implementar: primero se siguen sumando ideas.
 
 ## Habilidades nuevas aprobadas
 ### Policía
+- Dominio de la ley: expansión de dominio (cúpula oscura) con patrulleros en círculo, sirenas, reflectores y policías; los enemigos no pueden salir y los golpes del policía son certeros; al final la cúpula se rompe.
 - Cámara de seguridad: cámara en una pared; con una tecla ves lo que ella ve (vista tipo CCTV con REC).
 ### Albañil
 - Ascensor de obra: plataforma que sube y baja por un andamio, con cadenas, polea y contrapeso.
