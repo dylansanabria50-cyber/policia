@@ -63,3 +63,28 @@ Vista previa: "Pueblo de Oficios" v2.
 - **Día y noche.** Reloj con efectos por franja:
   - de noche: sigilo del ladrón y mercado negro;
   - de día: patrullas dobles y obras.
+
+### Pulido de la tanda 2 (aprobada: "me gustaron todas")
+Ajustes visuales y de animación incluidos en "Pueblo de Oficios" v3:
+- **Mapa.**
+  - Pergamino con bosques, montañas nevadas, río, mar con olas y un barco, y sombras de nubes.
+  - Humo de chimeneas, bandera en el pueblo actual y ruta resaltada al pasar el cursor, con escalas y pasaje.
+  - El carruaje tiene caballo, ruedas que giran, polvo y sonido de cascos, y el mapa se oscurece de noche.
+- **Mazmorra.**
+  - Pelea en tiempo real: el golem anticipa el golpe, salta y lanza una onda que daña al grupo.
+  - Fase 2 con brasas y ojos rojos; la habilidad "Mil espadas" tiene enfriamiento.
+  - Al morir se desarma en bloques, y aparece el cofre con rayos de luz.
+- **Subasta.**
+  - Monedas que vuelan, rivales que pujan solos y +10 s si alguien puja al final.
+  - Sello VENDIDO, precios del mercado en vivo, gráfico que se dibuja con valores al pasar el cursor y noticias que se desplazan.
+- **Golpe al banco.** Escena en corte animada:
+  - el túnel se excava y la bóveda se abre;
+  - el herrero hace chispas y el patrullero llega con sirena;
+  - huida, con final de éxito o de captura.
+- **Casa.**
+  - Cartel que se balancea y sale volando al comprar, confeti, el dueño entra y la chimenea humea.
+  - Ventanas encendidas de noche; mejoras de huerta, farol y establo.
+- **Día y noche.**
+  - Panorama del pueblo con sol y luna en arco, estrellas, nubes, molino, faroles y luciérnagas.
+  - De día patrullas; de noche, un ladrón y un policía con farol.
+  - Reloj de 24 h y ciclo rápido. La hora es compartida: el mapa, la casa y el golpe cambian con ella.
