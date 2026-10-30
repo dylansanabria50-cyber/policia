@@ -8,6 +8,9 @@ Todavía NO implementar: primero se siguen sumando ideas.
 - Tractor: mismo modelo que la vista previa (cabina con vidrios, ruedas que giran, pala con brazos, carga de tierra visible, faros con G, humo y polvo). Mantener inventario y controles actuales.
 - Sonidos: generar .ogg a partir de los sonidos sintetizados de la vista previa.
 
+## Movimientos base del personaje (pestaña Movimiento de la vista previa)
+- Quieto (respira, cambia el peso, mira), caminar y correr sin que patinen los pies, inclinación por aceleración y en curvas, arrancar/frenar con derrape, salto y caída con física de Minecraft, aterrizaje con amortiguación, caminar agachado con freno en el borde, escalera, nado y empuje al recibir golpes.
+
 ## Habilidades nuevas aprobadas
 ### Policía
 - Dominio de la ley: expansión de dominio (cúpula oscura) con patrulleros en círculo, sirenas, reflectores y policías; los enemigos no pueden salir y los golpes del policía son certeros; al final la cúpula se rompe.
