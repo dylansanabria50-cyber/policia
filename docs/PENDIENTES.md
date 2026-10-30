@@ -23,4 +23,5 @@ Todavía NO implementar: primero se siguen sumando ideas.
 ### Herrero
 - Lluvia de metal: golpea el yunque y caen lingotes al rojo del cielo sobre un área marcada.
 - Golem de hierro forjado: lo arma a martillazos (piernas, cuerpo, brazos, cabeza), pelea 40 s.
+- Campana de bronce: campana mágica; cada martillazo manda una onda dorada que marea a los mobs y repara el equipo de los aliados.
 - Horno portátil: horno a su lado que funde minerales al instante mientras dure.
