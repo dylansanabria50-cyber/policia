@@ -30,6 +30,7 @@ Todavía NO implementar: primero se siguen sumando ideas.
 - Mil espadas: portales dorados detrás de él de los que salen espadas forjadas disparadas al enemigo.
 - Rueda de adaptación: 3 martillazos forjan una rueda de hierro con runas (diseño propio) que flota sobre la cabeza; cada tipo de daño recibido la hace girar un paso y reduce ese daño (4 pasos = inmune). Dura 60 s, enfriamiento 150 s.
 - Escudo de mil placas: decenas de placas de hierro orbitan alrededor y vuelan solas a bloquear flechas y golpes; al final forman un capullo y estallan.
+- Forja del tiempo: repara un objeto rebobinando el tiempo; aparece un reloj que gira al revés, la imagen se tiñe y los pedazos vuelven por el mismo camino hasta unirse.
 - Campana de bronce: campana mágica; cada martillazo manda una onda dorada que marea a los mobs y repara el equipo de los aliados.
 - Armero (sin animar aún): perchero que guarda y repara solo la armadura que dejes ahí.
 - Fundición de emergencia (sin animar aún): derrite herramientas rotas y las devuelve como lingotes.
