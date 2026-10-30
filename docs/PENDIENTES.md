@@ -14,15 +14,19 @@ Todavía NO implementar: primero se siguen sumando ideas.
 ### Albañil
 - Ascensor de obra: plataforma que sube y baja por un andamio, con cadenas, polea y contrapeso.
 - Taladro de túnel: vehículo perforador (como el tractor: orugas, cabina, cabeza giratoria, cinta de escombros atrás) que abre un túnel de 3 × 3 de 10 bloques y deja antorchas.
+- Puño de tierra: golpea el suelo, corre una grieta y sale una mano gigante de piedra que atrapa al mob, lo levanta y lo aplasta.
+- Torre instantánea: una torre de piedra sube rapidísimo con el albañil arriba, con cámara girando.
 - Grúa torre: levanta un bloque grande o un cofre y lo deja donde mires; el gancho se balancea como péndulo.
 ### Ladrón
 - Señuelo: muñeco inflable con su forma que atrae mobs y policía 8 s, después revienta.
 - Trampa de alarma: hilo casi invisible entre dos ganchos; si alguien lo cruza suena la alarma y el intruso brilla.
 - Tirolesa: cuerda entre dos puntos altos para deslizarse rápido colgando de una mano (péndulo, frena al final).
+- Paso sombra: desaparece en un remolino de hojas y reaparece a la espalda del enemigo.
 - Bolsa sin fondo: 9 casillas secretas que no se pierden si la policía lo atrapa.
 ### Herrero
 - Lluvia de metal: golpea el yunque y caen lingotes al rojo del cielo sobre un área marcada.
 - Golem de hierro forjado: lo arma a martillazos (piernas, cuerpo, brazos, cabeza), pelea 40 s.
+- Mil espadas: portales dorados detrás de él de los que salen espadas forjadas disparadas al enemigo.
 - Campana de bronce: campana mágica; cada martillazo manda una onda dorada que marea a los mobs y repara el equipo de los aliados.
 - Armero (sin animar aún): perchero que guarda y repara solo la armadura que dejes ahí.
 - Fundición de emergencia (sin animar aún): derrite herramientas rotas y las devuelve como lingotes.
