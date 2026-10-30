@@ -49,7 +49,7 @@ Todavía NO implementar: primero se siguen sumando ideas.
 - Tablero del pueblo: tablero de madera viejo en cada aldea con papeles colgados; clic derecho abre pantalla completa; cada papel (SE BUSCA, RECOMPENSA, SE NECESITA, PEDIDO, AVISO, MAZMORRA, TRANSPORTE, SUBASTA) tiene imagen, texto, objetivos, recompensas y requisitos; Aceptar pone sello y lo suma a Misiones activas. Vista previa: artefacto "Pueblo de Oficios".
 - Diálogo con decisiones (texto letra por letra, 3 opciones, finales distintos, barras de reputación Policía/Ladrones/Pueblo), cartel de evento del mundo con objetivos por oficio y tabla de puntos en vivo, ficha de personaje con reparto de puntos y estadísticas derivadas. Vista previa: "Pueblo de Oficios".
 
-## Vistas previas RPG (tanda 2) — en revisión
+## Vistas previas RPG (tanda 2) — APROBADAS (todas, con el pulido)
 Vista previa: "Pueblo de Oficios" v2.
 - **Mapa de viaje en carruaje.** Mapa de pergamino con pueblos y caminos. Las paradas se desbloquean al visitar el pueblo. El pasaje se cobra según la distancia y el carruaje anima el viaje.
 - **Mazmorra "Cueva del Eco".**
