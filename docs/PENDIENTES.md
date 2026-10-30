@@ -13,7 +13,7 @@ Todavía NO implementar: primero se siguen sumando ideas.
 - Cámara de seguridad: cámara en una pared; con una tecla ves lo que ella ve (vista tipo CCTV con REC).
 ### Albañil
 - Ascensor de obra: plataforma que sube y baja por un andamio, con cadenas, polea y contrapeso.
-- Taladro de túnel: cava un túnel de 2 × 1 de 10 bloques en línea recta, con antorchas a los costados.
+- Taladro de túnel: vehículo perforador (como el tractor: orugas, cabina, cabeza giratoria, cinta de escombros atrás) que abre un túnel de 3 × 3 de 10 bloques y deja antorchas.
 - Grúa torre: levanta un bloque grande o un cofre y lo deja donde mires; el gancho se balancea como péndulo.
 ### Ladrón
 - Señuelo: muñeco inflable con su forma que atrae mobs y policía 8 s, después revienta.
