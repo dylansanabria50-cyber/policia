@@ -45,3 +45,4 @@ Todavía NO implementar: primero se siguen sumando ideas.
 - Niveles y atributos: nivel 1–50 con barra de XP; puntos en Fuerza, Vitalidad, Agilidad, Destreza e Ingenio; atributo principal por oficio (Policía Vitalidad, Albañil Fuerza, Ladrón Agilidad, Herrero Destreza).
 - Misiones e historia: NPC con ! y ? que dan misiones con diálogo y elecciones; diarias por oficio; historia principal por capítulos; jefes con barra grande y fases.
 - Mundo: zonas con nivel recomendado; ciudad central con gremios de cada oficio; tienda, banco y tablero de misiones.
+- (aprobado) Cadenas de misiones por oficio, decisiones con consecuencias, misiones en grupo, eventos del mundo; mazmorras, día/noche con efectos, transporte y viaje rápido, casas propias, economía. Ver plan en la conversación del 30/10/2026; reutilizar PoliciaJefe, PoliciaBoard, PoliciaEventos, PoliciaDiario, PoliciaMercado, PoliciaContratos, PoliciaStruct, PoliciaCamp.
