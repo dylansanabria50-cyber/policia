@@ -280,4 +280,14 @@ Diseño, nombres y sonidos propios; solo inspiración.
   - 3c: 25 sonidos .ogg grabados del sintetizador de la vista previa en `assets/policia/sounds/anim/` (registrados como `policia:anim.<nombre>`), usados en las animaciones.
   - Jar instalado en la instancia PRUEBA 01 (mods). El jar anterior quedó en `PRUEBA 01/respaldos-policia/policia-1.0.0-antes-etapa3.jar` y en la rama `respaldos`.
   - Falta para más adelante: sonido de motor en bucle del tractor (AbstractTickableSoundInstance).
-- Próxima: etapa 4 (nivel y logros).
+- **Etapa 4 — HECHA**: XP RPG (matar según la vida, menas, habilidades, logros), subida de nivel con título/partículas/fanfarria, Destreza = crítico, Ingenio = +XP, ficha de personaje (tecla I) y barra de nivel en el HUD, 17 logros propios (advancements).
+- **Etapa 5 — HECHA**: zonas con nivel (estructuras del mod o distancia al spawn; título al cruzar, +50 % de daño si te supera por 5, monstruos escalados), misiones diarias por oficio (3 por día de juego, premio, cofre del día y racha; HUD a la derecha), diario de misiones y marcadores ! / ? sobre el jefe de tu oficio. El tablero y el diálogo con decisiones ya existían.
+- **Etapa 6 — HECHA**: árbol de habilidades nuevas por oficio (ficha → Habilidades), puntos = 1 + nivel/3, tecla Z (Mayús+Z cambia).
+  - 6a Policía: Cámara de seguridad, Dominio de la ley. Albañil: Grúa torre, Ascensor, Taladro de túnel, Puño de tierra, Torre instantánea.
+  - 6b Ladrón: Señuelo, Trampa de alarma, Bolsa sin fondo, Tirolesa, Paso sombra. Herrero: Lluvia de metal, Horno portátil, Armero, Gólem forjado, Fundición de emergencia, Campana de bronce, Forja del tiempo, Rueda de adaptación, Escudo de mil placas, Mil espadas.
+  - 6c Oficios nuevos Médico y Mercader (ventana de oficios con 7 tarjetas, guías, diarias, comando /oficio) con sus 8 habilidades y las especiales aprobadas (Babosa curandera, Píldora monstruo, Cartas de mercancía, Puerta del tesoro, Tienda del otro mundo).
+- **Etapa 7 — HECHA**: rarezas Común→Legendario (al fabricar y en la forja; suman daño/armadura, color, estrellas y marca), minijuego de forja (agachado + clic en yunque con lingote y el objeto en la otra mano), 4 anillos con casillero en la ficha.
+- **Etapa 8 — HECHA**: paradas de carruaje en las aldeas (se descubren al entrar), mapa de viaje (tecla M), casa propia con Escritura de terreno (17×17 protegido, /casa invitar/echar/abandonar), franjas del día con efectos por oficio y reloj en el HUD.
+- **Etapa 9 — HECHA**: mazmorra Cueva del Eco (bajo tierra a ~400 bloques del spawn) con el Guardián del Eco (fases, onda, ecos), cofre de botín, revive a los 3 días; se revela al nivel 10.
+- Cada etapa se instala en PRUEBA 01; los jars quedan en la rama `respaldos`.
+- Próxima: etapa 10 (comercio, subasta, gremios, tienda y banco).
