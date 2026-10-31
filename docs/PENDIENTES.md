@@ -275,4 +275,9 @@ Diseño, nombres y sonidos propios; solo inspiración.
   - `PoliciaAnimCliente`: las reproduce; mensaje 1 de `policia:red` (AnimPlay) avisa a todos los que ven al jugador.
   - Solo se anima si la habilidad se usó de verdad (no en "en enfriamiento").
   - Animadas: transformación (modo); Policía (escudo, refuerzo, tanque, heli, esposas, K9, sirena, dron, burbuja); Ladrón (silbido, humo, salto, instinto, polvo/ganzúa, escape); Albañil (pico, muro/refugio, ayudante, linterna, tractor); Herrero (grito, marca, forja interior, faro, vínculo, analizador; yunque/reparación/guardián ya tenían la suya).
-- Próximas: etapa 3b (tractor con el modelo de la vista previa) y 3c (sonidos .ogg propios generados del sintetizador de la vista previa).
+- **Etapas 3b y 3c — HECHAS (31/10/2026, commit 6a63de2 en main, compila OK).**
+  - 3b: `PoliciaTractorRender` con el modelo de la vista previa (ruedas traseras grandes, cabina con vidrio, brazo de dos vigas con pistones, pala que se mantiene derecha, baliza y faros). Misma lógica de excavación.
+  - 3c: 25 sonidos .ogg grabados del sintetizador de la vista previa en `assets/policia/sounds/anim/` (registrados como `policia:anim.<nombre>`), usados en las animaciones.
+  - Jar instalado en la instancia PRUEBA 01 (mods). El jar anterior quedó en `PRUEBA 01/respaldos-policia/policia-1.0.0-antes-etapa3.jar` y en la rama `respaldos`.
+  - Falta para más adelante: sonido de motor en bucle del tractor (AbstractTickableSoundInstance).
+- Próxima: etapa 4 (nivel y logros).
