@@ -15,7 +15,7 @@ import net.minecraftforge.client.gui.overlay.ForgeGui;
 // equipa con un clic. La equipada se usa con Z.
 public class PoliciaHabScreen extends Screen {
     static final int W = 330;
-    static final int H = 236;
+    static final int H = 250;
     int x0;
     int y0;
     int pagina;
@@ -40,7 +40,7 @@ public class PoliciaHabScreen extends Screen {
     @Override
     protected void init() {
         this.x0 = (this.width - W) / 2;
-        this.y0 = (this.height - H) / 2;
+        this.y0 = Math.max(2, (this.height - H) / 2);
         this.rebuildWidgets2();
     }
 

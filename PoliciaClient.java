@@ -367,6 +367,16 @@ public class PoliciaClient {
             e.addListener((GuiEventListener) new TreeButton());
             e.addListener((GuiEventListener) new ArmorHideButton());
         }
+        // Desde el arbol clasico de cada oficio se llega a las habilidades
+        // nuevas (las de la etapa 6, que se usan con Z).
+        if (e.getScreen() instanceof PoliciaHerreroScreen || e.getScreen() instanceof PoliciaLadronScreen
+                || e.getScreen() instanceof PoliciaAlbanilScreen || e.getScreen() instanceof PoliciaTreeScreen) {
+            int w = 150;
+            e.addListener((GuiEventListener) net.minecraft.client.gui.components.Button.builder(
+                    net.minecraft.network.chat.Component.literal("§e★ Habilidades nuevas (Z)"),
+                    b -> Minecraft.getInstance().setScreen(new PoliciaHabScreen()))
+                    .bounds((e.getScreen().width - w) / 2, 2, w, 16).build());
+        }
     }
 
     static void screenPre(ScreenEvent.Render.Pre e) {

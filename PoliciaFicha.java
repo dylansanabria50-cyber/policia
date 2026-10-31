@@ -13,7 +13,7 @@ import net.minecraftforge.client.gui.overlay.ForgeGui;
 // Lee la copia de datos RPG que manda el servidor (PoliciaRPG.CLIENTE).
 public class PoliciaFicha extends Screen {
     static final int W = 300;
-    static final int H = 222;
+    static final int H = 252;
     static final int[] COLOR = {0xFFE0563B, 0xFF4CC274, 0xFF47A8E5, 0xFFE7B84A, 0xFFA77BE8};
     static final String[] EFECTO = {
             "+2 % de daño cuerpo a cuerpo por punto",
@@ -37,7 +37,7 @@ public class PoliciaFicha extends Screen {
     @Override
     protected void init() {
         this.x0 = (this.width - W) / 2;
-        this.y0 = (this.height - H) / 2;
+        this.y0 = Math.max(2, (this.height - H) / 2);
         for (int i = 0; i < 5; i++) {
             final int idx = i;
             this.mas[i] = this.addRenderableWidget(Button.builder(Component.literal("+"), b -> PoliciaRed.CH.sendToServer(new PoliciaRed.SubirAtributo(idx)))
@@ -165,8 +165,8 @@ public class PoliciaFicha extends Screen {
         int in = d.getInt("ingenio") - PoliciaRPG.BASE_ATRIBUTO;
         CompoundTag c = d.getCompound("cont");
         String st = "§7Vida §f+" + vi * 0.5f + "❤  §7Daño §f+" + fu * 2 + "%  §7Vel. §f+" + ag * 0.5f + "%  §7Crít. §f" + de + "%  §7XP §f+" + Math.max(0, in) * 2 + "%";
-        g.drawCenteredString(this.font, st, x + W / 2, y + H - 46, 0xFFFFFF);
-        g.drawCenteredString(this.font, "§8Habilidades usadas: " + c.getInt("habilidades") + " · Enemigos: " + c.getInt("muertes") + " · Menas: " + c.getInt("menas"), x + W / 2, y + H - 36, 0xFFFFFF);
+        g.drawCenteredString(this.font, st, x + W / 2, y + H - 52, 0xFFFFFF);
+        g.drawCenteredString(this.font, "§8Habilidades usadas: " + c.getInt("habilidades") + " · Enemigos: " + c.getInt("muertes") + " · Menas: " + c.getInt("menas"), x + W / 2, y + H - 40, 0xFFFFFF);
         super.render(g, mx, my, pt);
     }
 
