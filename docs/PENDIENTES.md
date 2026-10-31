@@ -180,3 +180,26 @@ Vista previa: "Pueblo de Oficios" v7.
   - Banco: bóveda con la pila de oro según el saldo. Depositar y retirar con monedas que vuelan, interés del 2 % por día y cuenta del gremio.
   - Préstamo de 500 que se devuelve en 600 a los 5 días, con recargo si vence.
   - Asalto del ladrón: alarma, el ladrón se lleva oro, el seguro te devuelve el 80 % de tu cuenta y queda un SE BUSCA en el tablero.
+
+## Bienvenida / tutorial (tanda 7) — aprobada la idea, vista previa en revisión
+Vista previa: "Pueblo de Oficios" v8, sección "Tu primer día en la comarca".
+1. **Llegada en carruaje.** Paisaje que se desplaza; Don Anselmo, el cochero, presenta en 3 frases los problemas de la comarca (robos, el puente caído, la herrería sin aprendiz). Al bajar se desbloquea la primera parada.
+2. **Plaza de los oficios.** Cuatro puestos con toldo y maestro, cada uno con «!».
+   - Al acercarte, el maestro hace una demostración en un globo: policía atrapa al ladrón, albañil levanta una pared, ladrón abre el cofre y desaparece en humo, herrero forja con 3 martillazos.
+   - Se pueden ver todos los puestos (quedan con ✓).
+3. **Contrato del oficio.** Papel con la firma que se dibuja sola y el sello del gremio. Regla: cambiar de oficio una vez por semana de juego, pagando 500 pesos.
+4. **Primera misión guiada por oficio.**
+   - Policía: seguir 7 huellas y esposar al ladrón detrás del barril.
+   - Albañil: poner las 8 tablas del puente.
+   - Ladrón: avanzar en sigilo solo cuando el guardia mira para otro lado y robar la llave.
+   - Herrero: 3 martillazos en la zona justa.
+   - Al terminar: ¡NIVEL 2! con rayos y confeti, +1 punto de habilidad y +50 pesos.
+5. **Recorrido.** Kit de bienvenida por oficio + 100 pesos. Tres pasos con flecha: tablero, diario (J) y árbol (K), que llevan a cada sistema y lo resaltan.
+- Otros detalles:
+  - Botón **Saltar tutorial**: elegís oficio y recibís el kit.
+  - **Consejos del maestro** cada pocos minutos durante la primera hora.
+  - **Brote verde 🌱** junto al nombre de los jugadores nuevos.
+  - En multijugador el tutorial es individual.
+
+## Oficios nuevos (propuestos, a elegir)
+Médico/Curandero, Mercader, Granjero, Bombero, Explorador/Cazador. Recomendados: Médico, Mercader y Granjero.
