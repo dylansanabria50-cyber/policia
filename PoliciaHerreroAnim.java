@@ -131,6 +131,8 @@ public class PoliciaHerreroAnim {
             super.setupAnim(e, limbSwing, limbAmount, ageInTicks, headYaw, headPitch);
             float t = PoliciaHerreroAnim.time(e, ageInTicks);
             if (t < 0.0f) {
+                // Sin animacion del herrero: movimientos mejorados (etapa 2).
+                PoliciaMovimiento.pose(this, e, ageInTicks);
                 return;
             }
             PoliciaHerreroAnim.pose(this, t, PoliciaHerreroAnim.kind(e));

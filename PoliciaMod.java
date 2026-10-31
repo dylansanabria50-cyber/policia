@@ -142,6 +142,10 @@ public class PoliciaMod {
     public PoliciaMod() {
         NET.registerMessage(0, Act.class, Act::enc, Act::dec, Act::handle);
         NET.registerMessage(1, Sync.class, Sync::enc, Sync::dec, Sync::handle);
+        // Etapa 1 del modo RPG: canal nuevo, datos del jugador y opciones.
+        PoliciaRed.init();
+        PoliciaRPG.init();
+        PoliciaConfig.init();
         MinecraftForge.EVENT_BUS.register(this);
         PoliciaShield.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
         PoliciaTank.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -712,7 +716,7 @@ public class PoliciaMod {
         CompoundTag o = e.getOriginal().getPersistentData();
         CompoundTag n = e.getEntity().getPersistentData();
         for (String k : new String[]{
-                "pol_on", "pol_xp", "pol_sel", "pol_un", "pol_ver", "pol_rl", "pol_job", "pol_hcd_t",
+                "rpg", "pol_on", "pol_xp", "pol_sel", "pol_un", "pol_ver", "pol_rl", "pol_job", "pol_hcd_t",
                 "alb_lv", "alb_pl", "alb_hl", "alb_ench", "alb_mode", "alb_bank", "alb_lu", "alb_tu",
                 "alb_tinv", "alb_sel", "alb_chest", "alb_inner", "alb_c0", "alb_c1",
                 "pol_mdone", "pol_bdone", "pol_cerebro", "pol_lsu", "pol_lsi", "pol_lun", "pol_lse",

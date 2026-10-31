@@ -110,6 +110,7 @@ public class PoliciaClient {
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::hideRider);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::hideHand);
         MinecraftForge.EVENT_BUS.addListener(PoliciaHerreroAnim::firstPerson);
+        PoliciaMovimiento.init();
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::render);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::screenInit);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::livingPre);
