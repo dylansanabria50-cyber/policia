@@ -129,10 +129,11 @@ public class PoliciaHerreroAnim {
         @Override
         public void setupAnim(AbstractClientPlayer e, float limbSwing, float limbAmount, float ageInTicks, float headYaw, float headPitch) {
             super.setupAnim(e, limbSwing, limbAmount, ageInTicks, headYaw, headPitch);
+            this.head.zRot = 0.0f;
             float t = PoliciaHerreroAnim.time(e, ageInTicks);
             if (t < 0.0f) {
                 // Sin animacion del herrero: movimientos mejorados (etapa 2).
-                PoliciaMovimiento.pose(this, e, ageInTicks);
+                PoliciaMovimiento.pose(this, e, limbSwing, limbAmount, ageInTicks);
                 // Animaciones de habilidades (etapa 3).
                 PoliciaAnimCliente.pose(this, e, ageInTicks);
                 return;

@@ -44,6 +44,8 @@ public class PoliciaMovimiento {
         double px, py, pz;
         float yaw, spd, acc, vy, run;
         float lean, leanV, bank, bankV, sq, sqV, hurt;
+        // giro del cuerpo (grados/s, suavizado) y tiempo quieto (s)
+        float yr, quieto;
         boolean ground = true;
         int hurtPrev;
     }
@@ -99,6 +101,7 @@ public class PoliciaMovimiento {
             vy = 0.0f;
         }
         float yr = Mth.wrapDegrees(yaw - s.yaw) / dt;
+        s.yr += (Mth.clamp(yr, -720.0f, 720.0f) - s.yr) * Math.min(1.0f, dt * 8.0f);
         s.px = x;
         s.py = y;
         s.pz = z;
@@ -135,6 +138,7 @@ public class PoliciaMovimiento {
             s.hurt = 1.0f;
         }
         s.hurtPrev = e.hurtTime;
+        s.quieto = s.spd < 0.3f && g ? s.quieto + dt : 0.0f;
         s.hurt = Math.max(0.0f, s.hurt - dt * 3.0f);
     }
 
@@ -168,6 +172,26 @@ public class PoliciaMovimiento {
         if (Math.abs(s.bank) > 0.01f) {
             ps.mulPose(new Quaternionf().rotationAxis((float) Math.toRadians(s.bank), fx, 0.0f, fz));
         }
+        float I = PoliciaConfig.intensidad();
+        boolean libre = p.onGround() && !p.isPassenger() && !p.isSwimming() && !p.isFallFlying() && !p.onClimbable();
+        if (libre) {
+            // Paso: el cuerpo sube cuando las piernas se juntan y baja con
+            // las piernas abiertas; la cadera se mece de lado a lado.
+            float ph = p.walkAnimation.position(e.getPartialTick()) * 0.6662f;
+            float amt = Math.min(1.0f, p.walkAnimation.speed(e.getPartialTick()));
+            if (amt > 0.02f && !p.isCrouching()) {
+                float bob = (Math.abs(Mth.sin(ph)) - 0.5f) * 0.06f * (1.0f + 0.7f * s.run) * amt * I;
+                ps.translate(0.0f, bob, 0.0f);
+                ps.mulPose(new Quaternionf().rotationAxis((float) Math.toRadians(Mth.sin(ph) * 2.2f * amt * I), fx, 0.0f, fz));
+            }
+            // Quieto: pasa el peso de una pierna a la otra.
+            float k = Mth.clamp(s.quieto - 1.0f, 0.0f, 1.0f);
+            if (k > 0.0f) {
+                float w = Mth.sin((p.tickCount + e.getPartialTick()) * 0.04f) * k * I;
+                ps.translate(-Mth.cos(yaw) * 0.025f * w, 0.0f, -Mth.sin(yaw) * 0.025f * w);
+                ps.mulPose(new Quaternionf().rotationAxis((float) Math.toRadians(1.2f * w), fx, 0.0f, fz));
+            }
+        }
         if (Math.abs(s.sq) > 0.001f) {
             ps.scale(1.0f + s.sq * 0.5f, 1.0f - s.sq, 1.0f + s.sq * 0.5f);
         }
@@ -182,7 +206,7 @@ public class PoliciaMovimiento {
 
     // Lo llama el modelo del jugador (PoliciaHerreroAnim.AnimModel) despues
     // de la animacion normal de Minecraft.
-    static void pose(PlayerModel<?> m, AbstractClientPlayer e, float age) {
+    static void pose(PlayerModel<?> m, AbstractClientPlayer e, float limbSwing, float limbAmount, float age) {
         if (!PoliciaConfig.mov()) {
             return;
         }
@@ -193,6 +217,24 @@ public class PoliciaMovimiento {
         float I = PoliciaConfig.intensidad();
         boolean g = e.onGround();
         boolean golpeando = m.attackTime > 0.0f;
+        boolean usando = e.isUsingItem();
+        float ph = limbSwing * 0.6662f;
+        float amt = Math.min(1.0f, limbAmount);
+        // Torso que gira con cada brazada (el hombro acompana al brazo que
+        // va adelante). Los hombros se recolocan como hace Minecraft al pegar.
+        if (g && amt > 0.05f && !golpeando && !usando && !e.isPassenger() && !e.isSwimming()) {
+            float tw = Mth.cos(ph) * (0.07f + 0.05f * s.run) * amt * I;
+            m.body.yRot += tw;
+            m.rightArm.z = Mth.sin(m.body.yRot) * 5.0f;
+            m.rightArm.x = -Mth.cos(m.body.yRot) * 5.0f;
+            m.leftArm.z = -Mth.sin(m.body.yRot) * 5.0f;
+            m.leftArm.x = Mth.cos(m.body.yRot) * 5.0f;
+            m.rightArm.yRot += tw;
+            m.leftArm.yRot += tw;
+            // piernas un poco hacia afuera y brazos que no rozan el cuerpo
+            m.rightLeg.zRot += 0.02f * amt;
+            m.leftLeg.zRot -= 0.02f * amt;
+        }
         // Correr: brazos y piernas mas amplios, codos un poco afuera.
         if (s.run > 0.05f && g && !golpeando && !e.isCrouching()) {
             float k = 1.0f + 0.3f * s.run * I;
@@ -203,8 +245,21 @@ public class PoliciaMovimiento {
             m.rightLeg.xRot *= 1.0f + 0.12f * s.run * I;
             m.leftLeg.xRot *= 1.0f + 0.12f * s.run * I;
         }
-        // La cabeza se adelanta hacia donde dobla.
+        // La cabeza se adelanta hacia donde dobla y compensa la inclinacion
+        // del cuerpo (la mirada queda derecha).
         m.head.yRot += Mth.clamp(s.bank * 0.025f, -0.22f, 0.22f);
+        m.head.xRot -= (float) Math.toRadians(s.lean) * 0.55f;
+        // (zRot de la cabeza no lo reinicia Minecraft: se asigna, no se suma)
+        m.head.zRot = -(float) Math.toRadians(s.bank) * 0.5f;
+        // Girar en el lugar: pasitos cortos.
+        if (g && s.spd < 0.4f && Math.abs(s.yr) > 50.0f && !e.isCrouching() && !golpeando) {
+            float k = Mth.clamp((Math.abs(s.yr) - 50.0f) / 150.0f, 0.0f, 1.0f) * Math.min(1.0f, I);
+            float st = Mth.sin(age * 0.9f);
+            m.rightLeg.xRot += st * 0.32f * k;
+            m.leftLeg.xRot -= st * 0.32f * k;
+            m.rightArm.xRot -= st * 0.12f * k;
+            m.leftArm.xRot += st * 0.12f * k;
+        }
         // Quieto: respira.
         if (s.spd < 0.3f && g && !e.isCrouching() && !golpeando) {
             float b = Mth.sin(age * 0.067f);
@@ -233,7 +288,17 @@ public class PoliciaMovimiento {
             m.head.xRot = Math.min(m.head.xRot, -0.2f);
         } else if (!g && !e.isSwimming() && !e.isFallFlying() && !e.isPassenger() && !golpeando) {
             // En el aire: brazos arriba al subir, abiertos al caer fuerte.
-            if (s.vy > 1.0f) {
+            if (s.vy > 1.0f && s.spd > 4.5f) {
+                // Salto corriendo: zancada en el aire, una pierna adelante y
+                // la otra atras, brazos opuestos.
+                float k = Math.min(1.0f, I);
+                m.rightLeg.xRot = Mth.lerp(k, m.rightLeg.xRot, -0.75f);
+                m.leftLeg.xRot = Mth.lerp(k, m.leftLeg.xRot, 0.55f);
+                m.rightArm.xRot = Mth.lerp(k, m.rightArm.xRot, 0.6f);
+                m.leftArm.xRot = Mth.lerp(k, m.leftArm.xRot, -0.9f);
+                m.rightArm.zRot += 0.1f * I;
+                m.leftArm.zRot -= 0.1f * I;
+            } else if (s.vy > 1.0f) {
                 m.rightArm.xRot -= 0.3f * I;
                 m.leftArm.xRot -= 0.3f * I;
                 m.rightArm.zRot += 0.15f * I;
