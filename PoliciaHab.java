@@ -282,6 +282,22 @@ public class PoliciaHab {
             }
         }
 
+        // /oficio: si no tenes oficio (desempleado o renunciaste), vuelve a
+        // abrir la ventana para elegir uno (incluye Medico y Mercader).
+        @SubscribeEvent
+        public void comandos(net.minecraftforge.event.RegisterCommandsEvent e) {
+            e.getDispatcher().register(net.minecraft.commands.Commands.literal("oficio").executes(c -> {
+                ServerPlayer p = c.getSource().getPlayerOrException();
+                if (!PoliciaMod.job(p).isEmpty()) {
+                    PoliciaMod.msg(p, "Ya tenés oficio (" + PoliciaFicha.oficio(PoliciaMod.job(p)) + "): renunciá con tu jefe para elegir otro");
+                    return 0;
+                }
+                p.getPersistentData().putBoolean("pol_chosen", false);
+                PoliciaOficio.login(p);
+                return 1;
+            }));
+        }
+
         @SubscribeEvent
         public void parar(ServerStoppingEvent e) {
             TAREAS.clear();

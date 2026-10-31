@@ -68,6 +68,9 @@ public class PoliciaMisionesCliente {
         }
         CompoundTag d = d();
         String oficio = d.getString("oficio");
+        if ("medico".equals(oficio) || "mercader".equals(oficio)) {
+            return;
+        }
         int mio = jefeDe(oficio);
         if (mio >= 0 && mio != k) {
             return;

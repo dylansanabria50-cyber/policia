@@ -76,6 +76,18 @@ public class PoliciaDiarias {
             new Def("h4", "mena", 20, "Picá 20 menas"),
             new Def("h5", "fundir:minecraft:gold_ingot", 12, "Fundí 12 lingotes de oro"),
             new Def("h6", "craftear:diamond_", 1, "Fabricá un objeto de diamante")};
+    static final Def[] MEDICO = {
+            new Def("m1", "habilidad", 6, "Usá 6 habilidades de médico"),
+            new Def("m2", "habilidad:med_vendaje", 4, "Vendá a 4 heridos"),
+            new Def("m3", "monstruo", 8, "Protegé el pueblo: derrotá 8 monstruos"),
+            new Def("m4", "habilidad:med_mortero", 2, "Prepará 2 pociones en el mortero"),
+            new Def("m5", "tronco", 16, "Juntá leña para el hospital: 16 troncos")};
+    static final Def[] MERCADER = {
+            new Def("c1", "habilidad", 6, "Usá 6 habilidades de mercader"),
+            new Def("c2", "habilidad:mer_balanza", 5, "Tasá 5 objetos con la balanza"),
+            new Def("c3", "habilidad:mer_regateo", 2, "Regateá con 2 aldeanos"),
+            new Def("c4", "mena", 10, "Conseguí mercadería: picá 10 menas"),
+            new Def("c5", "monstruo", 8, "Cuidá la ruta: derrotá 8 monstruos")};
     static final Def[] GENERAL = {
             new Def("g1", "monstruo", 10, "Derrotá 10 monstruos"),
             new Def("g2", "mena", 10, "Picá 10 menas"),
@@ -93,12 +105,14 @@ public class PoliciaDiarias {
             case "albanil" -> ALBANIL;
             case "ladron" -> LADRON;
             case "herrero" -> HERRERO;
+            case "medico" -> MEDICO;
+            case "mercader" -> MERCADER;
             default -> GENERAL;
         };
     }
 
     static Def buscar(String id) {
-        for (Def[] g : new Def[][]{POLICIA, ALBANIL, LADRON, HERRERO, GENERAL}) {
+        for (Def[] g : new Def[][]{POLICIA, ALBANIL, LADRON, HERRERO, MEDICO, MERCADER, GENERAL}) {
             for (Def d : g) {
                 if (d.id.equals(id)) {
                     return d;

@@ -17,13 +17,15 @@ import net.minecraftforge.network.PacketDistributor;
 // queda guardado en "pol_chosen" y la ventana no vuelve a salir.
 public class PoliciaOficio {
     // Mismo orden que las opciones de la ventana; la ultima es DESEMPLEADO.
-    static final String[] JOBS = new String[]{"policia", "albanil", "ladron", "herrero", ""};
-    static final String[] LABEL = new String[]{"policía", "albañil", "ladrón", "herrero legendario", ""};
+    static final String[] JOBS = new String[]{"policia", "albanil", "ladron", "herrero", "medico", "mercader", ""};
+    static final String[] LABEL = new String[]{"policía", "albañil", "ladrón", "herrero legendario", "médico", "mercader", ""};
     static final String[] HINT = new String[]{
             "Pulsa B para activar el modo policía",
             "Pulsa B para activar el modo albañil",
             "Pulsa B para activar el modo ladrón",
             "Pulsa B para activar el modo herrero",
+            "Abrí la ficha (I) → Habilidades, desbloqueá Vendaje rápido y usalo con Z",
+            "Abrí la ficha (I) → Habilidades, desbloqueá Puesto instantáneo y usalo con Z",
             ""
     };
 

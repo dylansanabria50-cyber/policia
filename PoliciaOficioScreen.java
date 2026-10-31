@@ -21,16 +21,20 @@ import net.minecraft.world.level.ItemLike;
 // el personaje vanilla).
 public class PoliciaOficioScreen extends Screen {
     static boolean pending;
-    static final String[] NAMES = new String[]{"Policía", "Albañil", "Ladrón", "Herrero", "DESEMPLEADO"};
+    static final String[] NAMES = new String[]{"Policía", "Albañil", "Ladrón", "Herrero", "Médico", "Mercader", "DESEMPLEADO"};
     static final String[] DESC = new String[]{
             "Escudo, refuerzos, tanque y helicóptero",
             "Muros, refugios, ayudantes y tractor",
             "Carterismo, sigilo y escapes",
             "Yunques, forja y el Analizador",
+            "Vendas, curas y el hospital de campaña",
+            "Puestos, regateo y caravanas",
             "Seguís vanilla, sin ningún cambio"
     };
-    static final int[] ACCENT = new int[]{0xFF3A6FD8, 0xFFE0A030, 0xFF8A4FD0, 0xFFD06A2A, 0xFF8A8A8A};
-    static final int CW = 76;
+    static final int[] ACCENT = new int[]{0xFF3A6FD8, 0xFFE0A030, 0xFF8A4FD0, 0xFFD06A2A, 0xFF3FBF6A, 0xFFE0C040, 0xFF8A8A8A};
+    static final int N = NAMES.length;
+    static final int SIN = N - 1;
+    static final int CW = 60;
     static final int CH = 112;
     static final int GAP = 6;
     float ticks;
@@ -47,6 +51,8 @@ public class PoliciaOficioScreen extends Screen {
             case 1 -> new ItemStack((ItemLike) PoliciaPlaca.BALDE.get());
             case 2 -> new ItemStack((ItemLike) PoliciaPlaca.GUANTE.get());
             case 3 -> new ItemStack((ItemLike) PoliciaPlaca.MARTILLO.get());
+            case 4 -> new ItemStack((ItemLike) Items.GOLDEN_APPLE);
+            case 5 -> new ItemStack((ItemLike) Items.EMERALD);
             default -> new ItemStack((ItemLike) Items.GRASS_BLOCK);
         };
     }
@@ -69,7 +75,7 @@ public class PoliciaOficioScreen extends Screen {
     }
 
     int panelW() {
-        return 5 * CW + 4 * GAP + 24;
+        return N * CW + (N - 1) * GAP + 24;
     }
 
     int panelH() {
@@ -138,7 +144,7 @@ public class PoliciaOficioScreen extends Screen {
         String sub = "Elegí bien: solo se elige una vez";
         g.drawString(this.font, sub, (this.width - this.font.width(sub)) / 2, y0 + 36, 0xFFB8B8C8, false);
         int hover = -1;
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < N; ++i) {
             // Cada tarjeta aparece 3 ticks despues de la anterior.
             float ck = easeOutBack((t - 8.0f - (float) i * 3.0f) / 10.0f);
             float ca = easeOut((t - 8.0f - (float) i * 3.0f) / 6.0f);
@@ -176,7 +182,7 @@ public class PoliciaOficioScreen extends Screen {
             }
             g.pose().popPose();
             String nm = NAMES[i];
-            g.drawString(this.font, nm, (CW - this.font.width(nm)) / 2, 56, alpha(i == 4 ? 0xFFD0D0D0 : 0xFFFFFFFF, a), true);
+            g.drawString(this.font, nm, (CW - this.font.width(nm)) / 2, 56, alpha(i == SIN ? 0xFFD0D0D0 : 0xFFFFFFFF, a), true);
             List<FormattedCharSequence> lines = this.font.split(FormattedText.of(DESC[i]), CW - 8);
             for (int l = 0; l < lines.size() && l < 3; ++l) {
                 int lw = this.font.width(lines.get(l));
@@ -184,7 +190,7 @@ public class PoliciaOficioScreen extends Screen {
             }
             g.pose().popPose();
         }
-        String foot = hover >= 0 ? (hover == 4 ? "Seguir sin oficio" : "Elegir " + NAMES[hover]) : (this.picked >= 0 ? "¡Buena elección!" : "Hacé clic en una tarjeta");
+        String foot = hover >= 0 ? (hover == SIN ? "Seguir sin oficio" : "Elegir " + NAMES[hover]) : (this.picked >= 0 ? "¡Buena elección!" : "Hacé clic en una tarjeta");
         g.drawString(this.font, foot, (this.width - this.font.width(foot)) / 2, y0 + ph - 14, 0xFFE7C066, false);
         g.pose().popPose();
     }
@@ -194,13 +200,13 @@ public class PoliciaOficioScreen extends Screen {
         if (btn != 0 || this.picked >= 0 || this.ticks < 14.0f) {
             return true;
         }
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < N; ++i) {
             int cx = this.cardX(i);
             int cy = this.cardY();
             if (mx < cx || mx >= cx + CW || my < cy || my >= cy + CH) continue;
             this.picked = i;
             this.pickedAt = this.ticks;
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(i == 4 ? SoundEvents.UI_BUTTON_CLICK.value() : SoundEvents.PLAYER_LEVELUP, 1.0f));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(i == SIN ? SoundEvents.UI_BUTTON_CLICK.value() : SoundEvents.PLAYER_LEVELUP, 1.0f));
             return true;
         }
         return true;

@@ -249,6 +249,10 @@ public class PoliciaMod {
                 msg(p, "Estas desempleado: no tenés ningún oficio");
                 return;
             }
+            if ("medico".equals(job(p)) || "mercader".equals(job(p))) {
+                msg(p, "Tu oficio no tiene modo: abrí la ficha (I) → Habilidades y usá Z");
+                return;
+            }
             d.putBoolean("pol_on", !on(p));
             if (!on(p)) {
                 d.putInt("pol_shield", 0);
@@ -301,7 +305,7 @@ public class PoliciaMod {
             sync(p);
             return;
         }
-        if (id >= 70 && id <= 74) {
+        if (id >= 70 && id <= 76) {
             PoliciaOficio.choose(p, id - 70);
             return;
         }
@@ -315,6 +319,12 @@ public class PoliciaMod {
         }
         if ("herrero".equals(job(p))) {
             PoliciaHerrero.act(p, id);
+            return;
+        }
+        if ("medico".equals(job(p)) || "mercader".equals(job(p))) {
+            if (id == 1 || id == 2) {
+                msg(p, "Tus habilidades se usan con Z (Mayús + Z cambia). Ficha: tecla I");
+            }
             return;
         }
         if (id == 30) {

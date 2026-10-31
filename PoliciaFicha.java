@@ -91,6 +91,8 @@ public class PoliciaFicha extends Screen {
             case "albanil" -> "Albañil";
             case "ladron" -> "Ladrón";
             case "herrero" -> "Herrero";
+            case "medico" -> "Médico";
+            case "mercader" -> "Mercader";
             default -> Character.toUpperCase(o.charAt(0)) + o.substring(1);
         };
     }

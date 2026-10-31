@@ -577,5 +577,115 @@ public class PoliciaAnim {
                 .snd(20, PoliciaSonido.anim("magic"), 1.0f, 0.9f)
                 .ring(10, ParticleTypes.ENCHANT, 40, 1.4f, 0.1f)
                 .shake(80, 1.0f);
+
+        // ---------- Etapa 6c: Medico y Mercader ----------
+        def("med_vendaje", 26)
+                .k(k(5).crouch(0.35f).lean(18).ra(-1.2f, 0.3f, 0).la(-1.0f, -0.3f, 0).legs(-1.2f, 0.2f))
+                .k(k(18).crouch(0.35f).lean(18).ra(-1.0f, -0.2f, 0).la(-1.2f, 0.2f, 0).legs(-1.2f, 0.2f))
+                .k(k(26))
+                .snd(6, PoliciaSonido.anim("heal"), 1.0f, 1.0f);
+        def("med_antidoto", 22)
+                .k(k(5).ra(-1.5f, -0.3f, 0).la(-1.5f, 0.3f, 0).h(0.25f, 0))
+                .k(k(16).ra(-1.4f, -0.4f, 0).la(-1.4f, 0.4f, 0).h(0.25f, 0))
+                .k(k(22))
+                .snd(5, PoliciaSonido.anim("zap"), 1.0f, 1.4f);
+        def("med_nube", 20)
+                .k(k(5).ra(-2.7f, 0, 0.2f).h(-0.2f, 0))
+                .k(k(9).ra(-0.6f, 0, 0).lean(8))
+                .k(k(20))
+                .snd(9, PoliciaSonido.anim("puff"), 1.0f, 1.4f);
+        def("med_mortero", 30)
+                .k(k(5).crouch(0.35f).lean(18).ra(-1.2f, 0.3f, 0).la(-1.0f, -0.3f, 0).legs(-1.2f, 0.2f))
+                .k(k(22).crouch(0.35f).lean(18).ra(-1.0f, -0.2f, 0).la(-1.2f, 0.2f, 0).legs(-1.2f, 0.2f))
+                .k(k(30))
+                .snd(6, PoliciaSonido.anim("crumble"), 1.0f, 1.0f);
+        def("med_burbuja", 24)
+                .k(k(5).ra(-1.5f, -0.3f, 0).la(-1.5f, 0.3f, 0).h(0.25f, 0))
+                .k(k(18).ra(-1.4f, -0.4f, 0).la(-1.4f, 0.4f, 0).h(0.25f, 0))
+                .k(k(24))
+                .snd(5, PoliciaSonido.anim("pulse"), 1.0f, 1.3f);
+        def("med_reanimar", 34)
+                .k(k(5).crouch(0.35f).lean(18).ra(-1.2f, 0.3f, 0).la(-1.0f, -0.3f, 0).legs(-1.2f, 0.2f))
+                .k(k(26).crouch(0.35f).lean(18).ra(-1.0f, -0.2f, 0).la(-1.2f, 0.2f, 0).legs(-1.2f, 0.2f))
+                .k(k(34))
+                .snd(6, PoliciaSonido.anim("beep"), 1.0f, 1.0f);
+        def("med_hospital", 28)
+                .k(k(5).crouch(0.35f).lean(18).ra(-1.2f, 0.3f, 0).la(-1.0f, -0.3f, 0).legs(-1.2f, 0.2f))
+                .k(k(20).crouch(0.35f).lean(18).ra(-1.0f, -0.2f, 0).la(-1.2f, 0.2f, 0).legs(-1.2f, 0.2f))
+                .k(k(28))
+                .snd(6, PoliciaSonido.anim("thud"), 1.0f, 1.0f);
+        def("med_lazo", 26)
+                .k(k(5).ra(-1.5f, -0.3f, 0).la(-1.5f, 0.3f, 0).h(0.25f, 0))
+                .k(k(20).ra(-1.4f, -0.4f, 0).la(-1.4f, 0.4f, 0).h(0.25f, 0))
+                .k(k(26))
+                .snd(5, PoliciaSonido.anim("heal"), 1.0f, 0.9f);
+        def("med_babosa", 30)
+                .k(k(6).ra(-2.9f, 0, 0.5f).la(-2.9f, 0, -0.5f).h(-0.5f, 0))
+                .k(k(24).ra(-2.9f, 0, 0.7f).la(-2.9f, 0, -0.7f).h(-0.5f, 0))
+                .k(k(30))
+                .snd(6, PoliciaSonido.anim("magic"), 1.0f, 0.7f);
+        def("med_pildora", 26)
+                .k(k(6).ra(-2.2f, 0.5f, 0).h(-0.4f, 0))
+                .k(k(12).ra(-0.4f, 0, 0).h(0.2f, 0).crouch(0.1f))
+                .k(k(18).ra(-2.6f, 0, 0.8f).la(-2.6f, 0, -0.8f).h(-0.4f, 0).lean(-6))
+                .k(k(26))
+                .snd(18, PoliciaSonido.anim("roar"), 0.6f, 1.5f)
+                .shake(18, 0.6f);
+        def("mer_puesto", 22)
+                .k(k(5).ra(-2.7f, 0, 0.2f).h(-0.2f, 0))
+                .k(k(9).ra(-0.6f, 0, 0).lean(8))
+                .k(k(22))
+                .snd(9, PoliciaSonido.anim("thud"), 1.0f, 1.3f);
+        def("mer_balanza", 22)
+                .k(k(5).ra(-1.5f, -0.3f, 0).la(-1.5f, 0.3f, 0).h(0.25f, 0))
+                .k(k(16).ra(-1.4f, -0.4f, 0).la(-1.4f, 0.4f, 0).h(0.25f, 0))
+                .k(k(22))
+                .snd(5, PoliciaSonido.anim("chain"), 1.0f, 1.5f);
+        def("mer_regateo", 30)
+                .k(k(5).ra(-1.2f, -0.6f, 0).h(0, 0.3f))
+                .k(k(12).ra(-1.2f, 0.4f, 0.3f).la(-1.0f, 0.3f, 0).h(0, -0.3f))
+                .k(k(20).ra(-1.4f, 0, 0).h(0.1f, 0))
+                .k(k(30))
+                .snd(20, PoliciaSonido.anim("chime"), 0.6f, 1.6f);
+        def("mer_mochila", 14)
+                .k(k(5).ra(-1.5f, -0.3f, 0).la(-1.5f, 0.3f, 0).h(0.25f, 0))
+                .k(k(8).ra(-1.4f, -0.4f, 0).la(-1.4f, 0.4f, 0).h(0.25f, 0))
+                .k(k(14))
+                .snd(5, PoliciaSonido.anim("puff"), 1.0f, 1.6f);
+        def("mer_caravana", 26)
+                .k(k(6).ra(-2.9f, 0, 0.5f).la(-2.9f, 0, -0.5f).h(-0.5f, 0))
+                .k(k(20).ra(-2.9f, 0, 0.7f).la(-2.9f, 0, -0.7f).h(-0.5f, 0))
+                .k(k(26))
+                .snd(6, PoliciaSonido.anim("crank"), 1.0f, 1.2f);
+        def("mer_monedas", 22)
+                .k(k(5).ra(-2.7f, 0, 0.2f).h(-0.2f, 0))
+                .k(k(9).ra(-0.6f, 0, 0).lean(8))
+                .k(k(22))
+                .snd(9, PoliciaSonido.anim("chime"), 1.0f, 1.4f);
+        def("mer_contrato", 28)
+                .k(k(5).ra(-1.5f, -0.3f, 0).la(-1.5f, 0.3f, 0).h(0.25f, 0))
+                .k(k(22).ra(-1.4f, -0.4f, 0).la(-1.4f, 0.4f, 0).h(0.25f, 0))
+                .k(k(28))
+                .snd(5, PoliciaSonido.anim("click"), 1.0f, 0.9f);
+        def("mer_propina", 20)
+                .k(k(5).ra(-2.7f, 0, 0.2f).h(-0.2f, 0))
+                .k(k(9).ra(-0.6f, 0, 0).lean(8))
+                .k(k(20))
+                .snd(9, PoliciaSonido.anim("chime"), 1.0f, 1.8f);
+        def("mer_cartas", 18)
+                .k(k(5).ra(-2.7f, 0, 0.2f).h(-0.2f, 0))
+                .k(k(9).ra(-0.6f, 0, 0).lean(8))
+                .k(k(18))
+                .snd(9, PoliciaSonido.anim("whoosh"), 1.0f, 1.5f);
+        def("mer_tesoro", 40)
+                .k(k(6).ra(-2.9f, 0, 0.5f).la(-2.9f, 0, -0.5f).h(-0.5f, 0))
+                .k(k(34).ra(-2.9f, 0, 0.7f).la(-2.9f, 0, -0.7f).h(-0.5f, 0))
+                .k(k(40))
+                .snd(6, PoliciaSonido.anim("warp"), 1.0f, 0.8f);
+        def("mer_tienda", 30)
+                .k(k(6).ra(-2.9f, 0, 0.5f).la(-2.9f, 0, -0.5f).h(-0.5f, 0))
+                .k(k(24).ra(-2.9f, 0, 0.7f).la(-2.9f, 0, -0.7f).h(-0.5f, 0))
+                .k(k(30))
+                .snd(6, PoliciaSonido.anim("warp"), 1.0f, 0.6f);
     }
 }
