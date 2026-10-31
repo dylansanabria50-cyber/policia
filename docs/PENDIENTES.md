@@ -89,7 +89,7 @@ Ajustes visuales y de animación incluidos en "Pueblo de Oficios" v3:
   - De día patrullas; de noche, un ladrón y un policía con farol.
   - Reloj de 24 h y ciclo rápido. La hora es compartida: el mapa, la casa y el golpe cambian con ella.
 
-## Vistas previas RPG (tanda 3: interfaz del aventurero) — en revisión
+## Vistas previas RPG (tanda 3: interfaz del aventurero) — APROBADAS
 Vista previa: "Pueblo de Oficios" v4.
 - **Inventario y equipo.**
   - Mochila de 24 casilleros, con arrastrar y soltar (también en el celular).
