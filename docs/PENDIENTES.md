@@ -111,7 +111,7 @@ Vista previa: "Pueblo de Oficios" v4.
   - La XP vuela hasta la barra. Al subir de nivel aparece una pantalla con rayos, confeti y fanfarria, con las recompensas.
   - Avisos de logro y 8 logros con progreso, conectados a las otras vistas: jefe, casa, golpe, forja, habilidades y misiones.
 
-## Vistas previas RPG (tanda 4: vida en la comarca) — en revisión
+## Vistas previas RPG (tanda 4: vida en la comarca) — APROBADAS
 Vista previa: "Pueblo de Oficios" v5.
 - **Comercio entre jugadores.**
   - Ventana con dos ofertas y pesos, y un medidor de valor (Parejo / Te conviene / Das de más).
