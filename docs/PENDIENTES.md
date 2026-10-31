@@ -256,3 +256,17 @@ Vistas previas: "Animaciones de Oficios" v25, con las pestañas Médico y Mercad
 - **Mercader · Cartas de mercancía** (inspirada en las cartas de Hunter x Hunter): guarda cualquier objeto en una carta brillante y lo saca al instante tirando la carta al suelo.
 - **Mercader · Tienda del otro mundo** (inspirada en las tiendas mágicas de los isekai): se abre una ventana flotante de tienda y lo que compra cae del cielo en un paquete con paracaídas.
 Diseño, nombres y sonidos propios; solo inspiración.
+
+## Implementación en el mod
+- **Etapas 1 y 2 — HECHAS (31/10/2026, commit 1f9287a en main, compila OK).**
+  - Respaldo del jar anterior: rama `respaldos`, archivo `policia-antes-etapa1.jar`.
+  - Etapa 1 (base):
+    - `PoliciaRPG`: nivel 1-50, XP, puntos y 5 atributos en la clave persistente `rpg`, copiada en onClone. Comando `/rpg`, `/rpg subir <atributo>` y `/rpg xp <n>` (este último solo para operadores).
+    - `PoliciaMundo`: SavedData `policia_mundo`, organizado por secciones.
+    - `PoliciaRed`: canal `policia:red`; mensaje 0 = RpgSync.
+    - `PoliciaConfig`: archivo `config/policia-cliente.toml`.
+  - Etapa 2 (`PoliciaMovimiento`, solo visual, para todos los jugadores):
+    - Inclinación al acelerar y al frenar, ladeo en curvas con la cabeza que se adelanta, aplastado al aterrizar y estirada al saltar.
+    - Respiración quieto, brazos más amplios al correr, escalera, brazos en el aire y empujón al recibir un golpe.
+    - Primera persona: brazo con resorte al girar, hundida al aterrizar, brazo atrás y líneas de velocidad al correr, cámara que se inclina en curvas.
+- Próxima: etapa 3 (animaciones de las 39 habilidades + tractor + sonidos .ogg).
