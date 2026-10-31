@@ -201,5 +201,25 @@ Vista previa: "Pueblo de Oficios" v8, sección "Tu primer día en la comarca".
   - **Brote verde 🌱** junto al nombre de los jugadores nuevos.
   - En multijugador el tutorial es individual.
 
-## Oficios nuevos (propuestos, a elegir)
-Médico/Curandero, Mercader, Granjero, Bombero, Explorador/Cazador. Recomendados: Médico, Mercader y Granjero.
+## Oficios nuevos — elegidos: MÉDICO y MERCADER (en revisión)
+Quedan para más adelante: Granjero, Bombero, Explorador/Cazador.
+Vistas previas: "Animaciones de Oficios" v25, con las pestañas Médico y Mercader. En la bienvenida de "Pueblo de Oficios" v9, la plaza tiene 6 puestos.
+
+### Médico (bando neutral: atiende a todos)
+- Aspecto: guardapolvo blanco con cruz roja, estetoscopio y gorro.
+- **Vendaje rápido**: se arrodilla junto al herido, le envuelve el brazo en tres vueltas de venda, la barra de vida se llena y el paciente se levanta y saluda.
+- **Reanimar**: vecino desmayado y monitor en línea plana. Masaje cardíaco, paletas («¡DESPEJEN!»), descarga con chispas, y el monitor vuelve a latir; el vecino se sienta y se levanta.
+- **Nube curativa**: lanza una poción rosa que estalla en una nube; los aliados que están adentro recuperan vida y se enderezan.
+- **Antídoto**: vecino envenenado (brillo verde, tambalea). Jeringa con antídoto, el veneno sale en burbujas y aparece «¡SANO!».
+- Primera misión: vendar las 4 heridas de un vecino que se cayó del andamio. Kit: pociones, vendas, libreta.
+
+### Mercader
+- Aspecto: sombrero de ala ancha, chaleco, cinturón con bolsa de monedas.
+- **Puesto instantáneo**: tira un fardo que se despliega en un puesto con toldo a rayas, cajones de fruta y cartel «ABIERTO»; llegan clientes.
+- **Regateo**: 150 → 80 → 130 → 100 → «120 y te regalo una manzana» → «¡Trato hecho!». Se dan la mano y las monedas vuelan.
+- **Caravana**: llega la mula con el carro, descarga los cajones apilados y suma la ganancia del viaje.
+- **Lluvia de monedas**: tira una moneda al cofre de la suerte, el cofre tiembla y brilla, y revienta en una fuente de monedas (×10).
+- Primera misión: atender 3 clientes eligiendo precio (si cobrás de más, el cliente se va) y juntar al menos 60 pesos. Kit: bolsa, cofre de mercancía, mapa de rutas.
+
+### Pendiente para estos dos oficios
+- Árbol de habilidades propio (con habilidad suprema), libro del oficio, sede en la ciudad de los gremios (hospital y casa de comercio) y diarias propias.
