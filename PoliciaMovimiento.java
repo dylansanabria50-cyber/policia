@@ -148,8 +148,9 @@ public class PoliciaMovimiento {
         if (p.isSleeping()) {
             return;
         }
-        if (!PoliciaConfig.mov()) {
-            // Sin movimientos mejorados igual se ven las animaciones de habilidades.
+        if (!PoliciaConfig.mov() || PoliciaAnimCliente.enGui) {
+            // Sin movimientos mejorados (o en una pantalla, como el muñeco
+            // del arbol) igual se ven las animaciones de habilidades.
             if (PoliciaAnimCliente.activo(p)) {
                 e.getPoseStack().pushPose();
                 PUSHED.add(p.getId());
@@ -207,7 +208,7 @@ public class PoliciaMovimiento {
     // Lo llama el modelo del jugador (PoliciaHerreroAnim.AnimModel) despues
     // de la animacion normal de Minecraft.
     static void pose(PlayerModel<?> m, AbstractClientPlayer e, float limbSwing, float limbAmount, float age) {
-        if (!PoliciaConfig.mov()) {
+        if (!PoliciaConfig.mov() || PoliciaAnimCliente.enGui) {
             return;
         }
         St s = ST.get(e.getId());

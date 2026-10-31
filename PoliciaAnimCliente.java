@@ -33,6 +33,137 @@ public class PoliciaAnimCliente {
     static void init() {
         MinecraftForge.EVENT_BUS.addListener(PoliciaAnimCliente::tick);
         MinecraftForge.EVENT_BUS.addListener(PoliciaAnimCliente::camara);
+        MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST, false, net.minecraftforge.client.event.ScreenEvent.Render.Pre.class, e -> enGui = true);
+        MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST, true, net.minecraftforge.client.event.ScreenEvent.Render.Post.class, e -> enGui = false);
+    }
+
+    // ---------------- Vista previa en los arboles de habilidades ----------------
+    // Mientras se dibuja una pantalla (enGui), el muñeco del jugador repite la
+    // animacion de la habilidad que se esta mirando. Las particulas se dibujan
+    // en 2D alrededor del muñeco (guiFx) y los sonidos suenan bajitos.
+    static boolean enGui;
+    static int prevIdx = -1;
+    static long prevStart;
+    static long prevPedido;
+    static float prevUltT = -1.0f;
+    static long gfxT;
+    static final java.util.List<float[]> GFX = new java.util.ArrayList<float[]>();
+
+    // La pantalla la llama en cada cuadro con la habilidad que muestra
+    // (null = ninguna).
+    static void preview(String id) {
+        Integer i = id == null ? null : PoliciaAnim.IDX.get(id);
+        int n = i == null ? -1 : i;
+        long ahora = System.currentTimeMillis();
+        if (n != prevIdx) {
+            prevIdx = n;
+            prevStart = ahora;
+            prevUltT = -1.0f;
+            GFX.clear();
+        }
+        prevPedido = ahora;
+    }
+
+    static boolean previewActivo(Entity e) {
+        Minecraft mc = Minecraft.getInstance();
+        return enGui && prevIdx >= 0 && e == mc.player && System.currentTimeMillis() - prevPedido < 400;
+    }
+
+    // Tiempo de la vista previa: la animacion y despues una pausa, en bucle.
+    static float previewT() {
+        PoliciaAnim.Def d = PoliciaAnim.DEFS.get(prevIdx);
+        float t = (System.currentTimeMillis() - prevStart) / 50.0f;
+        return t % (d.len + 18);
+    }
+
+    static int colorDe(net.minecraft.core.particles.ParticleOptions p) {
+        var t = p.getType();
+        if (t == net.minecraft.core.particles.ParticleTypes.FLAME || t == net.minecraft.core.particles.ParticleTypes.LAVA) {
+            return 0xFFA040;
+        }
+        if (t == net.minecraft.core.particles.ParticleTypes.ENCHANT) {
+            return 0xB070FF;
+        }
+        if (t == net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK) {
+            return 0x80E0FF;
+        }
+        if (t == net.minecraft.core.particles.ParticleTypes.NOTE || t == net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER) {
+            return 0x60F060;
+        }
+        if (t == net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE) {
+            return 0x606060;
+        }
+        if (t == net.minecraft.core.particles.ParticleTypes.CLOUD || t == net.minecraft.core.particles.ParticleTypes.POOF || t == net.minecraft.core.particles.ParticleTypes.WHITE_ASH) {
+            return 0xD0D0D0;
+        }
+        if (t == net.minecraft.core.particles.ParticleTypes.END_ROD) {
+            return 0xFFFFD0;
+        }
+        return 0xFFFFFF;
+    }
+
+    // Particulas, sonidos y "temblor" de la vista previa. cx/pies: donde
+    // estan los pies del muñeco; esc: pixeles por bloque.
+    static void guiFx(net.minecraft.client.gui.GuiGraphics g, int cx, int pies, float esc) {
+        long ahora = System.currentTimeMillis();
+        float dt = gfxT == 0 ? 0.0f : Math.min(0.1f, (ahora - gfxT) / 1000.0f);
+        gfxT = ahora;
+        if (prevIdx >= 0 && ahora - prevPedido < 400) {
+            PoliciaAnim.Def d = PoliciaAnim.DEFS.get(prevIdx);
+            float t = previewT();
+            if (t < prevUltT) {
+                prevUltT = -1.0f;
+            }
+            for (PoliciaAnim.Cue c : d.cues) {
+                if (c.t > prevUltT && c.t <= t) {
+                    if (c.snd != null) {
+                        try {
+                            Minecraft.getInstance().getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(c.snd.get(), c.pitch, c.vol * 0.3f));
+                        } catch (Throwable ignored) {
+                        }
+                    }
+                    if (c.fx != null) {
+                        int col = colorDe(c.fx);
+                        int n = Math.min(24, c.n);
+                        for (int i = 0; i < n; i++) {
+                            float x;
+                            float y;
+                            float vx;
+                            float vy;
+                            if (c.ring) {
+                                double a = i * Math.PI * 2.0 / n;
+                                x = cx + (float) Math.cos(a) * c.spread * esc * 0.7f;
+                                y = pies - c.up * esc + (float) Math.sin(a) * c.spread * esc * 0.18f;
+                                vx = (float) Math.cos(a) * 25.0f;
+                                vy = -8.0f;
+                            } else {
+                                x = cx + c.fwd * esc * 0.5f + (RND.nextFloat() - 0.5f) * 2.0f * c.spread * esc;
+                                y = pies - c.up * esc + (RND.nextFloat() - 0.5f) * 2.0f * c.spread * esc;
+                                vx = (RND.nextFloat() - 0.5f) * 60.0f * (0.3f + c.speed * 4.0f);
+                                vy = -RND.nextFloat() * 40.0f * (0.3f + c.speed * 4.0f);
+                            }
+                            GFX.add(new float[]{x, y, vx, vy, 0.0f, 0.6f + RND.nextFloat() * 0.5f, col});
+                        }
+                    }
+                }
+            }
+            prevUltT = t;
+        }
+        java.util.Iterator<float[]> it = GFX.iterator();
+        while (it.hasNext()) {
+            float[] p = it.next();
+            p[4] += dt;
+            if (p[4] >= p[5]) {
+                it.remove();
+                continue;
+            }
+            p[0] += p[2] * dt;
+            p[1] += p[3] * dt;
+            p[3] += 30.0f * dt;
+            int a = (int) (255 * (1.0f - p[4] / p[5]));
+            int col = a << 24 | ((int) p[6] & 0xFFFFFF);
+            g.fill((int) p[0], (int) p[1], (int) p[0] + 2, (int) p[1] + 2, col);
+        }
     }
 
     static void start(int entityId, int idx) {
@@ -48,6 +179,9 @@ public class PoliciaAnimCliente {
     }
 
     static PoliciaAnim.Def def(Entity e) {
+        if (previewActivo(e)) {
+            return PoliciaAnim.DEFS.get(prevIdx);
+        }
         int[] a = ACT.get(e.getId());
         return a == null ? null : PoliciaAnim.DEFS.get(a[0]);
     }
@@ -57,6 +191,10 @@ public class PoliciaAnimCliente {
     }
 
     static float time(Entity e, float age) {
+        if (previewActivo(e)) {
+            float t = previewT();
+            return t <= PoliciaAnim.DEFS.get(prevIdx).len ? t : -1.0f;
+        }
         int[] a = ACT.get(e.getId());
         if (a == null) {
             return -1.0f;

@@ -155,6 +155,39 @@ public class PoliciaHabScreen extends Screen {
             g.drawCenteredString(this.font, "§7" + (this.pagina + 1) + " / " + ((l.size() + 3) / 4), x + 165, y + H - 21, 0xFFFFFF);
         }
         super.render(g, mx, my, pt);
+        // Vista previa: al pasar el mouse por una tarjeta, tu personaje hace
+        // la habilidad en un cuadrito al costado.
+        PoliciaHab.Def mira = null;
+        for (int i = desde; i < Math.min(l.size(), desde + 4); i++) {
+            int ry = y + 36 + (i - desde) * 44;
+            if (mx >= x + 8 && mx <= x + W - 8 && my >= ry && my <= ry + 40) {
+                mira = l.get(i);
+            }
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mira != null && mira.anim != null && !mira.anim.isEmpty() && mc.player != null) {
+            int bw = 92;
+            int bh = 128;
+            int bx = x + W + 6;
+            if (bx + bw > this.width) {
+                bx = x - bw - 6;
+            }
+            if (bx < 0) {
+                bx = Math.min(this.width - bw - 2, mx + 14);
+            }
+            int by = Math.max(2, Math.min(this.height - bh - 2, my - bh / 2));
+            g.fill(bx - 2, by - 2, bx + bw + 2, by + bh + 2, 0xFF2E4A6B);
+            g.fill(bx, by, bx + bw, by + bh, 0xF0101820);
+            g.drawCenteredString(this.font, "§b▶ Vista previa", bx + bw / 2, by + 4, 0xFFFFFF);
+            PoliciaAnimCliente.preview(mira.anim);
+            net.minecraft.client.gui.screens.inventory.InventoryScreen.renderEntityInInventoryFollowsMouse(g, bx + bw / 2, by + bh - 12, 42, (float) (bx + bw / 2 - mx) * 0.2f, (float) (by + 40 - my) * 0.2f, mc.player);
+            g.pose().pushPose();
+            g.pose().translate(0, 0, 500);
+            PoliciaAnimCliente.guiFx(g, bx + bw / 2, by + bh - 12, 42.0f);
+            g.pose().popPose();
+        } else {
+            PoliciaAnimCliente.preview(null);
+        }
     }
 
     // ---------------- HUD: la habilidad equipada (Z) ----------------

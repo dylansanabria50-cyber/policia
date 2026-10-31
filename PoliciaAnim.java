@@ -426,6 +426,60 @@ public class PoliciaAnim {
                 .fx(10, ParticleTypes.ENCHANT, 12, 1.0f, 1.5f, 0.3f, 0.3f)
                 .snd(6, PoliciaSonido.anim("scan"), 0.9f, 1.0f);
 
+        // ---------- Solo para la vista previa del arbol ----------
+        // (habilidades que en el juego usan otra animacion o son pasivas)
+        def("lad_carterismo", 30)
+                .k(k(6).crouch(0.2f).lean(14).h(0.3f, 0))
+                .k(k(12).crouch(0.2f).lean(18).ra(-1.3f, 0.3f, 0).h(0.35f, 0))
+                .k(k(20).crouch(0.2f).lean(14).ra(-0.6f, 0.2f, 0).h(0.2f, 0.3f))
+                .k(k(30))
+                .fx(14, ParticleTypes.CRIT, 4, 0.8f, 0.9f, 0.2f, 0.05f);
+        def("lad_suerte", 28).right(it(Items.GOLD_NUGGET))
+                .k(k(5).ra(-1.2f, 0, 0))
+                .k(k(9).ra(-2.4f, 0, 0).h(-0.5f, 0))
+                .k(k(18).ra(-1.4f, 0, 0).h(0.2f, 0))
+                .k(k(28))
+                .snd(9, () -> SoundEvents.NOTE_BLOCK_CHIME.value(), 0.6f, 1.8f)
+                .fx(10, ParticleTypes.HAPPY_VILLAGER, 6, 0.3f, 2.2f, 0.3f, 0.05f);
+        def("lad_ganzua", 32).right(it(Items.TRIPWIRE_HOOK))
+                .k(k(6).crouch(0.18f).lean(10).ra(-1.4f, 0.2f, 0).la(-1.2f, -0.2f, 0).h(0.35f, 0))
+                .k(k(12).crouch(0.18f).lean(10).ra(-1.5f, 0.35f, 0).la(-1.2f, -0.2f, 0).h(0.35f, 0))
+                .k(k(18).crouch(0.18f).lean(10).ra(-1.4f, 0.15f, 0).la(-1.2f, -0.2f, 0).h(0.35f, 0))
+                .k(k(24).crouch(0.18f).lean(10).ra(-1.5f, 0.35f, 0).la(-1.2f, -0.2f, 0).h(0.35f, 0))
+                .k(k(32))
+                .snd(12, () -> SoundEvents.IRON_TRAPDOOR_OPEN, 0.5f, 1.8f)
+                .snd(24, () -> SoundEvents.IRON_DOOR_OPEN, 0.6f, 1.4f);
+        def("her_yunque", 34).left(it(Items.ANVIL))
+                .k(k(8).la(-2.8f, 0, -0.2f).h(-0.3f, 0))
+                .k(k(16).la(-2.8f, 0, -0.2f).h(-0.3f, 0))
+                .k(k(22).la(-0.6f, 0, 0).crouch(0.15f).lean(14))
+                .k(k(34))
+                .snd(22, () -> SoundEvents.ANVIL_LAND, 0.6f, 1.0f)
+                .fx(22, ParticleTypes.POOF, 10, 1.0f, 0.1f, 0.4f, 0.05f)
+                .shake(22, 0.5f);
+        def("her_reparar", 44).right(it(Items.IRON_AXE))
+                .k(k(6).ra(-2.8f, 0, 0).crouch(0.08f))
+                .k(k(10).ra(-0.6f, 0, 0).lean(10).crouch(0.08f))
+                .k(k(16).ra(-2.8f, 0, 0).crouch(0.08f))
+                .k(k(20).ra(-0.6f, 0, 0).lean(10).crouch(0.08f))
+                .k(k(26).ra(-2.8f, 0, 0).crouch(0.08f))
+                .k(k(30).ra(-0.6f, 0, 0).lean(10).crouch(0.08f))
+                .k(k(44))
+                .snd(10, () -> SoundEvents.ANVIL_USE, 0.5f, 1.4f)
+                .snd(20, () -> SoundEvents.ANVIL_USE, 0.5f, 1.5f)
+                .snd(30, () -> SoundEvents.ANVIL_USE, 0.5f, 1.6f)
+                .fx(10, ParticleTypes.CRIT, 6, 0.8f, 0.6f, 0.2f, 0.2f)
+                .fx(20, ParticleTypes.CRIT, 6, 0.8f, 0.6f, 0.2f, 0.2f)
+                .fx(30, ParticleTypes.FLAME, 8, 0.8f, 0.6f, 0.2f, 0.1f);
+        def("her_guardian", 34).left(it(Items.ANVIL))
+                .k(k(8).la(-2.8f, 0, -0.2f))
+                .k(k(16).la(-0.6f, 0, 0).crouch(0.15f).lean(12))
+                .k(k(24).ra(-1.5f, -0.5f, 0).la(-1.5f, 0.5f, 0))
+                .k(k(34))
+                .snd(16, () -> SoundEvents.ANVIL_LAND, 0.6f, 0.9f)
+                .snd(24, () -> SoundEvents.SHIELD_BLOCK, 0.7f, 1.0f)
+                .ring(24, ParticleTypes.CRIT, 18, 1.4f, 1.2f);
+
         // ---------- Etapa 6a: habilidades nuevas ----------
         def("pol_camara", 26).left(it(Items.OBSERVER))
                 .k(k(6).la(-2.4f, 0.3f, 0).ra(-2.2f, -0.2f, 0).h(-0.3f, 0))

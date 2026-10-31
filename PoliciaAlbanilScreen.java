@@ -16,6 +16,8 @@ import net.minecraft.world.entity.LivingEntity;
 // Pantalla del arbol de habilidades del Albanil: Pico/MURO-REFUGIO/AYUDANTE/
 // LINTERNA/TRACTOR y sus mejoras, con zoom con la rueda del mouse.
 public class PoliciaAlbanilScreen extends Screen {
+    // Animacion que muestra el muñeco al mirar cada habilidad (vista previa).
+    static final String[] PREVIEW = new String[]{"alb_pico", "alb_muro", "alb_muro", "alb_ayudante", "alb_ayudante", "alb_ayudante", "alb_linterna", "alb_tractor", "alb_muro", "alb_pico"};
     static final int PW = 460;
     static final int PH = 340;
     static final int LEFT_W = 104;
@@ -175,6 +177,7 @@ public class PoliciaAlbanilScreen extends Screen {
         this.tag(g, "Albañil", this.px + 6, this.py - 6);
         if (this.minecraft != null && this.minecraft.player != null) {
             InventoryScreen.renderEntityInInventoryFollowsMouse(g, this.px + 52, this.py + 340 - 30, 55, (float) (this.px + 52 - mx), (float) (this.py + 60 - my), this.minecraft.player);
+            PoliciaAnimCliente.guiFx(g, this.px + 52, this.py + 340 - 30, 55.0f);
         }
         int rx = this.px + 104 + 8;
         PoliciaTreeScreen.panel(g, rx, this.py, this.px + 460, this.py + 340);
@@ -227,6 +230,7 @@ public class PoliciaAlbanilScreen extends Screen {
             g.drawString(this.font, NAMES[i], nx + 12, y + 27, open ? -1 : -6250336);
         }
         int show = hov >= 0 ? hov : sel;
+        PoliciaAnimCliente.preview(show >= 0 && show < PREVIEW.length ? PREVIEW[show] : null);
         int bx0 = rx + 6;
         int by0 = this.py + 258;
         int bx1 = this.px + 460 - 6;

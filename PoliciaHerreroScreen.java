@@ -16,6 +16,8 @@ import net.minecraft.util.FormattedCharSequence;
 // derecha. Las habilidades no se compran: se desbloquean solas al llegar
 // al XP de cada una. Clic en una desbloqueada para elegirla (J la usa).
 public class PoliciaHerreroScreen extends Screen {
+    // Animacion que muestra el muñeco al mirar cada habilidad (vista previa).
+    static final String[] PREVIEW = new String[]{"her_grito", "her_yunque", "her_marca", "her_forja", "her_faro", "her_vinculo", "her_reparar", "her_guardian", "her_analizador"};
     static final int PW = 460;
     static final int PH = 340;
 
@@ -139,6 +141,7 @@ public class PoliciaHerreroScreen extends Screen {
         this.tag(g, "Herrero", this.px + 6, this.py - 6);
         if (this.minecraft != null && this.minecraft.player != null) {
             InventoryScreen.renderEntityInInventoryFollowsMouse(g, this.px + 52, this.py + PH - 60, 55, (float) (this.px + 52 - mx), (float) (this.py + 60 - my), this.minecraft.player);
+            PoliciaAnimCliente.guiFx(g, this.px + 52, this.py + PH - 60, 55.0f);
         }
         g.drawString(this.font, "K: cambiar", this.px + 8, this.py + PH - 40, -6642512, false);
         g.drawString(this.font, "J: usar", this.px + 8, this.py + PH - 30, -6642512, false);
@@ -216,6 +219,7 @@ public class PoliciaHerreroScreen extends Screen {
             g.drawString(this.font, st, nx + 12 - sw / 2, y + 47, col, false);
         }
         int show = hov >= 0 ? hov : Math.max(0, Math.min(7, h.sel));
+        PoliciaAnimCliente.preview(show >= 0 && show < PREVIEW.length ? PREVIEW[show] : null);
         int bx0 = rx + 6;
         int by0 = this.py + 258;
         int bx1 = this.px + PW - 6;

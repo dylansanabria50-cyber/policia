@@ -117,6 +117,8 @@ public class PoliciaClient {
         MinecraftForge.EVENT_BUS.addListener(PoliciaHerreroAnim::firstPerson);
         PoliciaMovimiento.init();
         PoliciaAnimCliente.init();
+        net.minecraftforge.fml.ModLoadingContext.get().registerExtensionPoint(net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory((mc, padre) -> new PoliciaOpcionesScreen(padre)));
         PoliciaMisionesCliente.init();
         PoliciaAliento.init();
         PoliciaEstacionCliente.init();
@@ -366,6 +368,14 @@ public class PoliciaClient {
         if (e.getScreen() instanceof InventoryScreen) {
             e.addListener((GuiEventListener) new TreeButton());
             e.addListener((GuiEventListener) new ArmorHideButton());
+        }
+        // Opciones del mod desde el menu de Opciones de Minecraft.
+        if (e.getScreen() instanceof net.minecraft.client.gui.screens.OptionsScreen) {
+            Screen padre = e.getScreen();
+            e.addListener((GuiEventListener) net.minecraft.client.gui.components.Button.builder(
+                    net.minecraft.network.chat.Component.literal("§6Oficios..."),
+                    b -> Minecraft.getInstance().setScreen(new PoliciaOpcionesScreen(padre)))
+                    .bounds(5, 5, 80, 20).build());
         }
         // Desde el arbol clasico de cada oficio se llega a las habilidades
         // nuevas (las de la etapa 6, que se usan con Z).
