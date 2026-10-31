@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:bell"
+    },
+    "title": {
+      "text": "Señor alcalde"
+    },
+    "description": {
+      "text": "Ganá una elección de alcalde"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "policia:oficios/raiz",
+  "criteria": {
+    "hecho": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

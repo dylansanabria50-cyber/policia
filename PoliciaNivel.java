@@ -54,7 +54,7 @@ public class PoliciaNivel {
     static int conIngenio(Player p, int xp) {
         int ing = PoliciaRPG.atributo(p, "ingenio") - PoliciaRPG.BASE_ATRIBUTO;
         float anillo = PoliciaRareza.tipoAnillo(p) == 3 ? 0.10f : 0.0f;
-        return Math.max(1, Math.round(xp * (1.0f + Math.max(0, ing) * 0.02f + anillo)));
+        return Math.max(1, Math.round(xp * (1.0f + Math.max(0, ing) * 0.02f + anillo + PoliciaAlcalde.bonoXp(p))));
     }
 
     static void dar(ServerPlayer p, int xp) {

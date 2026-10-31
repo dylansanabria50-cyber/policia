@@ -159,6 +159,8 @@ public class PoliciaMod {
         PoliciaGremio.init();
         PoliciaAsalto.init();
         PoliciaCampo.init();
+        PoliciaAlcalde.init();
+        PoliciaEstacion.init();
         PoliciaConfig.init();
         MinecraftForge.EVENT_BUS.register(this);
         PoliciaShield.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());

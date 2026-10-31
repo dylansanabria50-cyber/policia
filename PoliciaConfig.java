@@ -15,6 +15,7 @@ public class PoliciaConfig {
     public static final ForgeConfigSpec.BooleanValue HUD_NIVEL;
     public static final ForgeConfigSpec.BooleanValue HUD_DIARIAS;
     public static final ForgeConfigSpec.BooleanValue HUD_RELOJ;
+    public static final ForgeConfigSpec.BooleanValue ESTACIONES;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -37,6 +38,10 @@ public class PoliciaConfig {
                 .define("hudDiarias", true);
         HUD_RELOJ = b.comment("Mostrar el reloj y la franja del dia arriba a la izquierda.")
                 .define("hudReloj", true);
+        b.pop();
+        b.push("mundo");
+        ESTACIONES = b.comment("Estaciones visibles: color de pasto y hojas, petalos, copos y neblina de manana. Apagalo si choca con un shader.")
+                .define("estacionesVisuales", true);
         b.pop();
         SPEC = b.build();
     }
@@ -96,6 +101,14 @@ public class PoliciaConfig {
     static boolean hudReloj() {
         try {
             return HUD_RELOJ.get();
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    static boolean estaciones() {
+        try {
+            return ESTACIONES.get();
         } catch (Throwable t) {
             return true;
         }

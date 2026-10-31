@@ -119,6 +119,7 @@ public class PoliciaClient {
         PoliciaAnimCliente.init();
         PoliciaMisionesCliente.init();
         PoliciaAliento.init();
+        PoliciaEstacionCliente.init();
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::render);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::screenInit);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::livingPre);

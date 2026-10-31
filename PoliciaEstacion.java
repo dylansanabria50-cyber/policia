@@ -1,6 +1,10 @@
 package com.example.policia;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.level.BlockEvent;
 
 // Estaciones del año: cada una dura 8 días de Minecraft y cambia los
 // trabajos: en invierno hay más pedidos de casas y pagan mejor, en verano
@@ -9,6 +13,52 @@ import net.minecraft.server.level.ServerLevel;
 public class PoliciaEstacion {
     static final String[] NAME = new String[]{"primavera", "verano", "otoño", "invierno"};
     static final int DAYS = 8;
+
+    // Etapa 13: efectos de las estaciones en el mundo.
+    // - Clima: al amanecer se tira el clima del dia. Otono lluvioso, invierno
+    //   con lluvia (nieve en biomas frios), verano con alguna tormenta.
+    // - Cultivos: en invierno crecen a la mitad de velocidad.
+    static long ultimoDia = -1;
+
+    static void init() {
+        MinecraftForge.EVENT_BUS.addListener(PoliciaEstacion::tick);
+        MinecraftForge.EVENT_BUS.addListener(PoliciaEstacion::cultivo);
+    }
+
+    static void tick(TickEvent.LevelTickEvent e) {
+        if (e.phase != TickEvent.Phase.END || !(e.level instanceof ServerLevel sl) || sl != sl.getServer().overworld()) {
+            return;
+        }
+        long dia = sl.getDayTime() / 24000L;
+        long hora = sl.getDayTime() % 24000L;
+        if (dia == ultimoDia || hora < 0 || hora > 200) {
+            return;
+        }
+        ultimoDia = dia;
+        if (!sl.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_WEATHER_CYCLE)) {
+            return;
+        }
+        int s = PoliciaEstacion.of(sl);
+        var r = sl.random;
+        int lluvia = switch (s) {
+            case 2 -> 45;
+            case 3 -> 35;
+            case 0 -> 20;
+            default -> 10;
+        };
+        if (r.nextInt(100) < lluvia) {
+            boolean tormenta = s == 1 ? r.nextInt(2) == 0 : r.nextInt(6) == 0;
+            sl.setWeatherParameters(0, 6000 + r.nextInt(6000), true, tormenta);
+        } else if (s == 1) {
+            sl.setWeatherParameters(12000, 0, false, false);
+        }
+    }
+
+    static void cultivo(BlockEvent.CropGrowEvent.Pre e) {
+        if (e.getLevel() instanceof ServerLevel sl && PoliciaEstacion.of(sl) == 3 && sl.random.nextBoolean()) {
+            e.setResult(Event.Result.DENY);
+        }
+    }
 
     static int of(ServerLevel sl) {
         long day = sl.getServer().overworld().getDayTime() / 24000L;
@@ -44,8 +94,8 @@ public class PoliciaEstacion {
         return switch (PoliciaEstacion.of(sl)) {
             case 0 -> "Primavera: eventos aleatorios más seguidos.";
             case 1 -> "Verano: más robos. El Perista y las recompensas de policía pagan más.";
-            case 2 -> "Otoño: los encargos al herrero pagan 50% más.";
-            default -> "Invierno: los pedidos de construcción pagan 50% más.";
+            case 2 -> "Otoño: los encargos al herrero pagan 50% más. Llueve seguido.";
+            default -> "Invierno: los pedidos de construcción pagan 50% más y los cultivos crecen a la mitad.";
         };
     }
 }

@@ -209,11 +209,13 @@ public class PoliciaDiarias {
     static void cofre(ServerPlayer p, int racha) {
         ItemStack[] premios = {new ItemStack(Items.GOLDEN_APPLE, 2), new ItemStack(Items.DIAMOND, 2), new ItemStack(Items.EXPERIENCE_BOTTLE, 8), new ItemStack(Items.IRON_INGOT, 12), new ItemStack(Items.ENDER_PEARL, 4)};
         ItemStack premio = premios[p.getRandom().nextInt(premios.length)].copy();
-        dar(p, new ItemStack(Items.EMERALD, 10));
+        // Ley "fiesta" del alcalde: 5 esmeraldas mas.
+        int esm = "fiesta".equals(PoliciaAlcalde.ley(p.server)) ? 15 : 10;
+        dar(p, new ItemStack(Items.EMERALD, esm));
         dar(p, premio);
         int xp = 60 + 20 * Math.min(7, racha);
         PoliciaNivel.dar(p, xp);
-        p.displayClientMessage(Component.literal("§6§l¡Cofre del día! §e+10 esmeraldas, " + premio.getCount() + " " + premio.getHoverName().getString() + " y " + xp + " XP §7(racha: " + racha + (racha == 1 ? " día)" : " días)")), false);
+        p.displayClientMessage(Component.literal("§6§l¡Cofre del día! §e+" + esm + " esmeraldas, " + premio.getCount() + " " + premio.getHoverName().getString() + " y " + xp + " XP §7(racha: " + racha + (racha == 1 ? " día)" : " días)")), false);
         p.serverLevel().sendParticles(ParticleTypes.HAPPY_VILLAGER, p.getX(), p.getY() + 1.0, p.getZ(), 30, 0.6, 0.8, 0.6, 0.1);
         p.serverLevel().playSound(null, p.blockPosition(), SoundEvents.CHEST_OPEN, SoundSource.PLAYERS, 0.8f, 1.2f);
         PoliciaNivel.logro(p, "diarias_1");

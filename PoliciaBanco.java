@@ -66,8 +66,10 @@ public class PoliciaBanco {
         if (dias > 0) {
             int saldo = c.getInt("saldo");
             int ganado = 0;
+            // Ley "comercio" del alcalde: el banco paga el doble.
+            int por = "comercio".equals(PoliciaAlcalde.ley(s)) ? 2 : 1;
             for (int i = 0; i < dias; i++) {
-                int inc = Math.min(10, saldo / 50);
+                int inc = Math.min(10 * por, saldo / 50 * por);
                 saldo += inc;
                 ganado += inc;
             }
