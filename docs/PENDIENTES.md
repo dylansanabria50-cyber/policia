@@ -269,4 +269,10 @@ Diseño, nombres y sonidos propios; solo inspiración.
     - Inclinación al acelerar y al frenar, ladeo en curvas con la cabeza que se adelanta, aplastado al aterrizar y estirada al saltar.
     - Respiración quieto, brazos más amplios al correr, escalera, brazos en el aire y empujón al recibir un golpe.
     - Primera persona: brazo con resorte al girar, hundida al aterrizar, brazo atrás y líneas de velocidad al correr, cámara que se inclina en curvas.
-- Próxima: etapa 3 (animaciones de las 39 habilidades + tractor + sonidos .ogg).
+- **Etapa 3a — animaciones de habilidades (31/10/2026, commit 6b6864b en main).**
+  - Respaldo del jar anterior: rama `respaldos`, archivo `policia-antes-etapa3.jar`.
+  - `PoliciaAnim` (común): animaciones por poses clave (brazos, cabeza, piernas, inclinación, agachada, giro) más momentos con partículas, sonidos y temblor de cámara, y un objeto en la mano (escudo, radio, linterna, catalejo).
+  - `PoliciaAnimCliente`: las reproduce; mensaje 1 de `policia:red` (AnimPlay) avisa a todos los que ven al jugador.
+  - Solo se anima si la habilidad se usó de verdad (no en "en enfriamiento").
+  - Animadas: transformación (modo); Policía (escudo, refuerzo, tanque, heli, esposas, K9, sirena, dron, burbuja); Ladrón (silbido, humo, salto, instinto, polvo/ganzúa, escape); Albañil (pico, muro/refugio, ayudante, linterna, tractor); Herrero (grito, marca, forja interior, faro, vínculo, analizador; yunque/reparación/guardián ya tenían la suya).
+- Próximas: etapa 3b (tractor con el modelo de la vista previa) y 3c (sonidos .ogg propios generados del sintetizador de la vista previa).
