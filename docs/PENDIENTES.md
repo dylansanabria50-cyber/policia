@@ -134,7 +134,7 @@ Vista previa: "Pueblo de Oficios" v5.
   - Lluvia con salpicaduras y charcos, tormenta con rayos y trueno, niebla en capas, y nieve que se acumula en techos.
   - Efectos de juego por clima y estación.
 
-## Vistas previas RPG (tanda 5: oficios en acción) — en revisión
+## Vistas previas RPG (tanda 5: oficios en acción) — APROBADAS
 Vista previa: "Pueblo de Oficios" v6.
 - **Establo.**
   - Caballo con comida, ánimo, limpieza y vínculo, y 5 pelajes. Dar zanahoria: come y suelta corazones. Cepillar: saca el barro.
