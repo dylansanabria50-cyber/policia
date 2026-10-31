@@ -37,8 +37,8 @@ Todavía NO implementar: primero se siguen sumando ideas.
 - Escudo de mil placas: decenas de placas de hierro orbitan alrededor y vuelan solas a bloquear flechas y golpes; al final forman un capullo y estallan.
 - Forja del tiempo: repara un objeto rebobinando el tiempo; aparece un reloj que gira al revés, la imagen se tiñe y los pedazos vuelven por el mismo camino hasta unirse.
 - Campana de bronce: campana mágica; cada martillazo manda una onda dorada que marea a los mobs y repara el equipo de los aliados.
-- Armero (sin animar aún): perchero que guarda y repara solo la armadura que dejes ahí.
-- Fundición de emergencia (sin animar aún): derrite herramientas rotas y las devuelve como lingotes.
+- Armero (animado, en revisión): clava un perchero de madera, cuelga casco, pechera, piernas y botas rotas; un martillito encantado golpea cada pieza (3 golpes), las grietas se cierran y el hierro vuelve a brillar; barra de reparación.
+- Fundición de emergencia (animada, en revisión): apoya un crisol al rojo, tira pico, espada y hacha rotos que se derriten burbujeando, vuelca el metal en una lingotera y, entre vapor, salen 3 lingotes.
 - Horno portátil: horno a su lado que funde minerales al instante mientras dure.
 
 ## Modo RPG (aprobado: 1, 4 y 6)
@@ -156,3 +156,27 @@ Vista previa: "Pueblo de Oficios" v6.
 - **Elección de alcalde.** Tres candidatos (Policía, Herrero, Ladrón) con afiches y leyes propuestas.
   - Hacer campaña sube la intención de voto. El día de elecciones los vecinos votan en la urna y se cuentan los votos con barras.
   - Fuegos artificiales al final, y las leyes del ganador quedan vigentes 7 días.
+
+## Vistas previas RPG (tanda 6: lo que faltaba) — en revisión
+Vista previa: "Pueblo de Oficios" v7.
+- **NPCs con «!» y «?».**
+  - Marcador que gira y brilla sobre la cabeza: ! amarillo = misión nueva, ! celeste = diaria, ? gris = en curso, ? amarillo = lista para entregar.
+  - El jugador camina hasta el vecino al tocarlo. El diálogo se escribe letra por letra, con aceptar / entregar.
+  - Al entregar: monedas, XP y logro; después de un rato vuelve a aparecer un ! nuevo.
+- **Misiones diarias por oficio.**
+  - Una tarjeta por oficio con tarea, progreso y recompensa (120 XP, 80 pesos, +5 de reputación).
+  - Cuenta regresiva hasta medianoche, sello HECHA y racha de días (si hacés las 4, cofre diario).
+  - A medianoche las tarjetas se dan vuelta con tareas nuevas.
+- **Zonas con nivel recomendado.**
+  - Mapa con 5 zonas: Pradera 1–5, Bosque 5–10, Pantano 10–15, Las Minas 20–25, Ruinas del Eco 30–40.
+  - Zonas sin explorar con «???». Al entrar, título grande con el nivel.
+  - Si la zona te supera por 5 niveles o más, aviso rojo (+50 % de daño, sin carruaje) y viñeta roja.
+- **Ciudad central con los gremios.** Plaza con fuente y vecinos caminando, y 4 sedes:
+  - Cuartel (sirena y bandera), Taller de Obra (grúa), Herrería del Yunque (chimenea y fragua) y Taberna «El Gato Negro» (guarida del ladrón con trampilla).
+  - Cada sede tiene maestro, saludo, rango del gremio con barra (Cadete→Comisario, Peón→Arquitecto, Aprendiz→Legendario, Ratero→Fantasma) y tienda con objetos bloqueados por rango.
+  - Los encargos del gremio suben el rango.
+- **Tienda y banco.**
+  - Tienda de Doña Rosa: comprar con carrito y vender; descuentos por la ley del alcalde.
+  - Banco: bóveda con la pila de oro según el saldo. Depositar y retirar con monedas que vuelan, interés del 2 % por día y cuenta del gremio.
+  - Préstamo de 500 que se devuelve en 600 a los 5 días, con recargo si vence.
+  - Asalto del ladrón: alarma, el ladrón se lleva oro, el seguro te devuelve el 80 % de tu cuenta y queda un SE BUSCA en el tablero.
