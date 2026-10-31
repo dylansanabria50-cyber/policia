@@ -52,7 +52,7 @@ public class PoliciaMazmorra {
     static final int NIVEL = 20;
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosMazmorra());
     }
 
     static CompoundTag estado(MinecraftServer s) {
@@ -366,7 +366,7 @@ public class PoliciaMazmorra {
         sl.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, c.getX() + 0.5, c.getY() + 1, c.getZ() + 0.5, 80, 0.6, 0.8, 0.6, 0.4);
     }
 
-    public static class Eventos {
+    public static class EventosMazmorra {
         @SubscribeEvent
         public void tick(TickEvent.PlayerTickEvent e) {
             if (e.phase != TickEvent.Phase.END || !(e.player instanceof ServerPlayer p) || p.tickCount % 20 != 15) {

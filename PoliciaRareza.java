@@ -68,7 +68,7 @@ public class PoliciaRareza {
     static final Map<UUID, Long> FORJA = new HashMap<UUID, Long>();
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosRareza());
     }
 
     public static class Anillo extends Item {
@@ -245,7 +245,7 @@ public class PoliciaRareza {
         }
     }
 
-    public static class Eventos {
+    public static class EventosRareza {
         @SubscribeEvent
         public void fabricar(PlayerEvent.ItemCraftedEvent e) {
             if (e.getEntity() instanceof ServerPlayer p && equipo(e.getCrafting()) && !e.getCrafting().hasTag()) {

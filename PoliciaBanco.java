@@ -36,7 +36,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 //   si alguien puja al final. Las pujas salen de la cuenta del banco.
 public class PoliciaBanco {
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosBanco());
     }
 
     static CompoundTag cuentas(MinecraftServer s) {
@@ -214,7 +214,7 @@ public class PoliciaBanco {
         sucio(s);
     }
 
-    public static class Eventos {
+    public static class EventosBanco {
         @SubscribeEvent
         public void entrar(PlayerEvent.PlayerLoggedInEvent e) {
             if (e.getEntity() instanceof ServerPlayer p) {

@@ -38,7 +38,7 @@ public class PoliciaAsalto {
     static final DustParticleOptions HUELLA = new DustParticleOptions(new Vector3f(0.35f, 0.22f, 0.1f), 0.8f);
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosAsalto());
     }
 
     static WanderingTrader rosa(ServerPlayer p) {
@@ -183,7 +183,7 @@ public class PoliciaAsalto {
         return 1;
     }
 
-    public static class Eventos {
+    public static class EventosAsalto {
         @SubscribeEvent
         public void comandos(RegisterCommandsEvent e) {
             e.getDispatcher().register(Commands.literal("asalto").executes(c -> empezar(c.getSource().getPlayerOrException())));

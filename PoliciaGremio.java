@@ -30,7 +30,7 @@ public class PoliciaGremio {
     static final Set<String> COFRE_ABIERTO = new HashSet<String>();
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosGremio());
     }
 
     static CompoundTag gremios(MinecraftServer s) {
@@ -65,7 +65,7 @@ public class PoliciaGremio {
         PoliciaMundo.get(s).setDirty();
     }
 
-    public static class Eventos {
+    public static class EventosGremio {
         @SubscribeEvent
         public void comandos(RegisterCommandsEvent e) {
             e.getDispatcher().register(Commands.literal("g").then(Commands.argument("mensaje", StringArgumentType.greedyString()).executes(c -> {

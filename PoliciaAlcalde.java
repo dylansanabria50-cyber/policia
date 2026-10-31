@@ -30,7 +30,7 @@ public class PoliciaAlcalde {
     static final String[] LEY_TXT = {"Comercio libre: el banco paga el doble de interés", "Mano dura: los policías ganan 25 % más de XP", "Fiesta del pueblo: el cofre del día trae 5 esmeraldas más", "Obra pública: albañiles y herreros ganan 25 % más de XP"};
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosAlcalde());
     }
 
     static CompoundTag datos(MinecraftServer s) {
@@ -121,7 +121,7 @@ public class PoliciaAlcalde {
         }
     }
 
-    public static class Eventos {
+    public static class EventosAlcalde {
         @SubscribeEvent
         public void tick(TickEvent.ServerTickEvent e) {
             if (e.phase != TickEvent.Phase.END || e.getServer().getTickCount() % 100 != 40) {

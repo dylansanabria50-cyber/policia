@@ -46,7 +46,7 @@ public class PoliciaCasa {
     static final Map<UUID, String> DONDE = new HashMap<UUID, String>();
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosCasa());
     }
 
     static CompoundTag casas(MinecraftServer s) {
@@ -170,7 +170,7 @@ public class PoliciaCasa {
         }
     }
 
-    public static class Eventos {
+    public static class EventosCasa {
         @SubscribeEvent
         public void romper(BlockEvent.BreakEvent e) {
             if (e.getLevel() instanceof Level l && bloqueado(l, e.getPlayer(), e.getPos())) {

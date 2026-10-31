@@ -71,8 +71,8 @@ public class PoliciaHab {
     }
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
-        MinecraftForge.EVENT_BUS.register(new PoliciaHabExtra.Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosHab());
+        MinecraftForge.EVENT_BUS.register(new PoliciaHabExtra.EventosHabExtra());
     }
 
     static Def buscar(String id) {
@@ -256,7 +256,7 @@ public class PoliciaHab {
         NUEVAS.add(paso);
     }
 
-    public static class Eventos {
+    public static class EventosHab {
         @SubscribeEvent
         public void tick(TickEvent.ServerTickEvent e) {
             if (e.phase != TickEvent.Phase.END) {

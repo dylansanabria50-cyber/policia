@@ -18,7 +18,7 @@ public class PoliciaDiaNoche {
     static int ultima = -1;
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosDiaNoche());
     }
 
     public static int franja(long dayTime) {
@@ -44,7 +44,7 @@ public class PoliciaDiaNoche {
         };
     }
 
-    public static class Eventos {
+    public static class EventosDiaNoche {
         @SubscribeEvent
         public void tick(TickEvent.ServerTickEvent e) {
             if (e.phase != TickEvent.Phase.END || e.getServer().getTickCount() % 20 != 0) {

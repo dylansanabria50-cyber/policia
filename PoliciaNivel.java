@@ -30,7 +30,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 // (advancements propios en data/policia/advancements/oficios/).
 public class PoliciaNivel {
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosNivel());
     }
 
     // ---------------- Contadores (para la ficha y los logros) ----------------
@@ -157,7 +157,7 @@ public class PoliciaNivel {
     }
 
     // ---------------- Eventos ----------------
-    public static class Eventos {
+    public static class EventosNivel {
         @SubscribeEvent
         public void entrar(PlayerEvent.PlayerLoggedInEvent e) {
             if (e.getEntity() instanceof ServerPlayer p) {

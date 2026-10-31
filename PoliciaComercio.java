@@ -35,7 +35,7 @@ public class PoliciaComercio {
     static final Map<UUID, Long> PEDIDO_T = new HashMap<UUID, Long>();
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosComercio());
     }
 
     static class Sesion {
@@ -229,7 +229,7 @@ public class PoliciaComercio {
         b.openMenu(new SimpleMenuProvider((id, inv, pl) -> new Menu(id, inv, s, false), Component.literal("Comercio con " + a.getName().getString())));
     }
 
-    public static class Eventos {
+    public static class EventosComercio {
         @SubscribeEvent
         public void comandos(RegisterCommandsEvent e) {
             e.getDispatcher().register(Commands.literal("comercio")

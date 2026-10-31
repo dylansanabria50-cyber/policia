@@ -78,7 +78,7 @@ public class PoliciaCampo {
 
     static void init() {
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosCampo());
     }
 
     // ---------------- Flor de luna ----------------
@@ -325,7 +325,7 @@ public class PoliciaCampo {
         PoliciaRPG.sync(p);
     }
 
-    public static class Eventos {
+    public static class EventosCampo {
         @SubscribeEvent
         public void pesca(ItemFishedEvent e) {
             if (e.getEntity() instanceof ServerPlayer p && p.getRandom().nextFloat() < 0.35f) {

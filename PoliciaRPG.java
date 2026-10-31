@@ -40,7 +40,7 @@ public class PoliciaRPG {
     public static volatile CompoundTag CLIENTE = new CompoundTag();
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosRPG());
     }
 
     // ---------------- Datos ----------------
@@ -164,7 +164,7 @@ public class PoliciaRPG {
     }
 
     // ---------------- Eventos ----------------
-    public static class Eventos {
+    public static class EventosRPG {
         @SubscribeEvent
         public void entrar(PlayerEvent.PlayerLoggedInEvent e) {
             if (e.getEntity() instanceof ServerPlayer p) {

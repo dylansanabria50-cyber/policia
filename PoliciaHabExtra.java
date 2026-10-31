@@ -653,7 +653,7 @@ public class PoliciaHabExtra {
     }
 
     // ---------------- Eventos ----------------
-    public static class Eventos {
+    public static class EventosHabExtra {
         // Rueda de adaptacion: cada golpe del mismo tipo de dano pega menos.
         @SubscribeEvent(priority = EventPriority.LOW)
         public void dano(LivingHurtEvent e) {

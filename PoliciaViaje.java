@@ -31,7 +31,7 @@ public class PoliciaViaje {
     static final java.util.Set<UUID> VIAJANDO = new java.util.HashSet<UUID>();
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosViaje());
     }
 
     static CompoundTag paradas(ServerPlayer p) {
@@ -200,7 +200,7 @@ public class PoliciaViaje {
         });
     }
 
-    public static class Eventos {
+    public static class EventosViaje {
         @SubscribeEvent
         public void tick(TickEvent.PlayerTickEvent e) {
             if (e.phase == TickEvent.Phase.END && e.player instanceof ServerPlayer p && p.tickCount % 40 == 21) {

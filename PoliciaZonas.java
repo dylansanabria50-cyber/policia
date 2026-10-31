@@ -37,7 +37,7 @@ public class PoliciaZonas {
     static final Map<UUID, String> ULTIMA = new HashMap<UUID, String>();
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosZonas());
     }
 
     public static class Zona {
@@ -96,7 +96,7 @@ public class PoliciaZonas {
         p.connection.send(new ClientboundSetSubtitleTextPacket(Component.literal(color + "Nivel " + z.nivel + (peligro ? " · ¡Peligro! Recibís +50 % de daño" : ""))));
     }
 
-    public static class Eventos {
+    public static class EventosZonas {
         @SubscribeEvent
         public void tick(TickEvent.PlayerTickEvent e) {
             if (e.phase != TickEvent.Phase.END || !(e.player instanceof ServerPlayer p) || p.tickCount % 20 != 7) {

@@ -96,7 +96,7 @@ public class PoliciaDiarias {
             new Def("g5", "piedra", 64, "Picá 64 bloques de piedra")};
 
     static void init() {
-        MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new EventosDiarias());
     }
 
     static Def[] grupo(String oficio) {
@@ -233,7 +233,7 @@ public class PoliciaDiarias {
         return rl == null ? "" : rl.toString();
     }
 
-    public static class Eventos {
+    public static class EventosDiarias {
         @SubscribeEvent
         public void tick(TickEvent.PlayerTickEvent e) {
             if (e.phase == TickEvent.Phase.END && e.player instanceof ServerPlayer p && p.tickCount % 100 == 13) {
