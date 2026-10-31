@@ -26,6 +26,21 @@ public class PoliciaSonido {
     public static final RegistryObject<SoundEvent> PERSECUCION = SOUNDS.register("musica.persecucion", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("policia", "musica.persecucion")));
     public static final RegistryObject<SoundEvent> GOLPE = SOUNDS.register("musica.golpe", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("policia", "musica.golpe")));
 
+    // Etapa 3c: sonidos de las animaciones, grabados del sintetizador de la
+    // vista previa (assets/policia/sounds/anim/*.ogg).
+    static final String[] ANIM_NOMBRES = new String[]{"bark", "beep", "brick", "chain", "chime", "clang", "click", "crank", "crumble", "hiss", "hydraulic", "ignite", "magic", "puff", "pulse", "radio", "roar", "scan", "shield", "thud", "warp", "whistle", "whistle2", "whoosh", "zap"};
+    static final java.util.Map<String, RegistryObject<SoundEvent>> ANIM = new java.util.HashMap<String, RegistryObject<SoundEvent>>();
+
+    static {
+        for (String n : ANIM_NOMBRES) {
+            ANIM.put(n, SOUNDS.register("anim." + n, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("policia", "anim." + n))));
+        }
+    }
+
+    public static Supplier<SoundEvent> anim(String n) {
+        return () -> ANIM.get(n).get();
+    }
+
     static void init(IEventBus modBus) {
         SOUNDS.register(modBus);
         PoliciaMod.NET.registerMessage(13, Music.class, Music::enc, Music::dec, Music::handle);
