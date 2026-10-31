@@ -253,4 +253,6 @@ Vistas previas: "Animaciones de Oficios" v25, con las pestañas Médico y Mercad
 - **Médico · Babosa curandera** (inspirada en Katsuyu, Naruto): invoca una babosa gigante que se divide en babositas que se pegan a cada aliado y lo curan.
 - **Médico · Píldora monstruo** (inspirada en la Rumble Ball de Chopper, One Piece): toma una píldora y durante 20 s crece, carga heridos en los hombros y cura el doble.
 - **Mercader · Puerta del tesoro** (inspirada en las bóvedas doradas de Fate): portales dorados detrás de él escupen mercancía, escudos y cajones que lo protegen.
+- **Mercader · Cartas de mercancía** (inspirada en las cartas de Hunter x Hunter): guarda cualquier objeto en una carta brillante y lo saca al instante tirando la carta al suelo.
+- **Mercader · Tienda del otro mundo** (inspirada en las tiendas mágicas de los isekai): se abre una ventana flotante de tienda y lo que compra cae del cielo en un paquete con paracaídas.
 Diseño, nombres y sonidos propios; solo inspiración.
