@@ -475,5 +475,107 @@ public class PoliciaAnim {
                 .k(k(22))
                 .snd(4, PoliciaSonido.anim("crumble"), 1.0f, 0.7f)
                 .shake(4, 0.6f);
+
+        // ---------- Etapa 6b: Ladron ----------
+        def("lad_senuelo", 22)
+                .k(k(5).ra(-2.6f, 0, 0.2f).crouch(0.05f))
+                .k(k(9).ra(0.3f, 0, 0).lean(10).crouch(0.12f))
+                .k(k(22))
+                .snd(9, PoliciaSonido.anim("puff"), 1.0f, 1.3f);
+        def("lad_trampa", 26)
+                .k(k(6).crouch(0.3f).lean(25).ra(-0.9f, 0.3f, 0).la(-0.9f, -0.3f, 0))
+                .k(k(18).crouch(0.3f).lean(25).ra(-0.9f, -0.3f, 0).la(-0.9f, 0.3f, 0))
+                .k(k(26))
+                .snd(10, PoliciaSonido.anim("click"), 0.8f, 1.4f);
+        def("lad_bolsa", 22).left(it(Items.BUNDLE))
+                .k(k(6).la(-1.4f, 0.4f, 0).ra(-1.2f, -0.6f, 0).h(0.3f, 0))
+                .k(k(16).la(-1.4f, 0.4f, 0).ra(-0.6f, -0.2f, 0).h(0.3f, 0))
+                .k(k(22))
+                .snd(6, PoliciaSonido.anim("magic"), 0.8f, 1.2f);
+        def("lad_tirolesa", 20)
+                .k(k(4).ra(-2.4f, 0, 0).h(-0.2f, 0))
+                .k(k(8).ra(-3.0f, 0, 0.1f).la(-3.0f, 0, -0.1f).legs(0.4f, -0.3f))
+                .k(k(20).ra(-3.0f, 0, 0.1f).la(-3.0f, 0, -0.1f).legs(0.4f, -0.3f))
+                .snd(4, PoliciaSonido.anim("whoosh"), 1.0f, 0.8f);
+        def("lad_paso", 16)
+                .k(k(4).spin(180).crouch(0.15f).ra(-0.5f, 0, 0.6f).la(-0.5f, 0, -0.6f))
+                .k(k(10).spin(360).ra(-1.6f, 0, 0))
+                .k(k(16).spin(360))
+                .snd(2, PoliciaSonido.anim("warp"), 0.8f, 1.5f);
+
+        // ---------- Etapa 6b: Herrero ----------
+        def("her_lluvia", 30)
+                .k(k(4).ra(-0.6f, 0, 0).lean(10))
+                .k(k(8).ra(-0.4f, 0, 0).lean(14))
+                .k(k(14).ra(-3.0f, 0, 0.2f).h(-0.4f, 0).lean(-4))
+                .k(k(30))
+                .snd(4, PoliciaSonido.anim("clang"), 0.8f, 1.2f)
+                .snd(8, PoliciaSonido.anim("clang"), 0.8f, 1.3f);
+        def("her_horno", 22)
+                .k(k(6).ra(-0.8f, 0, 0).la(-0.8f, 0, 0).crouch(0.2f).lean(14))
+                .k(k(22))
+                .snd(6, PoliciaSonido.anim("ignite"), 1.0f, 1.0f);
+        def("her_armero", 26)
+                .k(k(5).ra(-2.6f, 0, 0))
+                .k(k(9).ra(-0.9f, 0, 0).lean(6))
+                .k(k(14).ra(-2.6f, 0, 0))
+                .k(k(18).ra(-0.9f, 0, 0).lean(6))
+                .k(k(26))
+                .snd(9, PoliciaSonido.anim("clang"), 0.6f, 1.6f)
+                .snd(18, PoliciaSonido.anim("clang"), 0.6f, 1.7f);
+        def("her_golem", 40)
+                .k(k(6).ra(-2.8f, 0, 0))
+                .k(k(10).ra(-0.6f, 0, 0).lean(10))
+                .k(k(16).ra(-2.8f, 0, 0))
+                .k(k(20).ra(-0.6f, 0, 0).lean(10))
+                .k(k(30).ra(-2.6f, 0, 0.9f).la(-2.6f, 0, -0.9f).h(-0.4f, 0))
+                .k(k(40))
+                .snd(10, PoliciaSonido.anim("clang"), 0.8f, 1.0f)
+                .snd(20, PoliciaSonido.anim("clang"), 0.8f, 0.9f)
+                .snd(30, () -> SoundEvents.IRON_GOLEM_REPAIR, 1.0f, 0.8f);
+        def("her_fundicion", 26)
+                .k(k(6).ra(-1.0f, 0, 0).la(-1.0f, 0, 0).crouch(0.15f).lean(12))
+                .k(k(14).ra(-1.5f, 0, 0.4f).la(-1.5f, 0, -0.4f).crouch(0.15f).lean(12))
+                .k(k(26))
+                .snd(8, PoliciaSonido.anim("hiss"), 0.8f, 0.8f);
+        def("her_campana", 34)
+                .k(k(4).ra(-2.8f, 0, 0))
+                .k(k(8).ra(-1.0f, 0, 0).lean(6))
+                .k(k(16).ra(-2.8f, 0, 0))
+                .k(k(22).ra(-1.0f, 0, 0).lean(6))
+                .k(k(34))
+                .snd(8, PoliciaSonido.anim("clang"), 0.5f, 0.7f);
+        def("her_tiempo", 30)
+                .k(k(6).ra(-2.6f, 0, 0).h(-0.3f, 0))
+                .k(k(20).ra(-2.6f, 0, 0).la(-1.4f, 0, 0).h(-0.3f, 0))
+                .k(k(30))
+                .snd(6, PoliciaSonido.anim("clang"), 0.7f, 1.0f);
+        def("her_rueda", 36)
+                .k(k(5).ra(-2.7f, 0, 0))
+                .k(k(9).ra(-0.7f, 0, 0).lean(8))
+                .k(k(14).ra(-2.7f, 0, 0))
+                .k(k(18).ra(-0.7f, 0, 0).lean(8))
+                .k(k(26).ra(-2.6f, 0, 0.6f).la(-2.6f, 0, -0.6f).h(-0.6f, 0))
+                .k(k(36))
+                .snd(9, PoliciaSonido.anim("clang"), 0.8f, 1.1f)
+                .snd(18, PoliciaSonido.anim("clang"), 0.8f, 1.2f)
+                .snd(26, PoliciaSonido.anim("chime"), 1.0f, 0.8f);
+        def("her_placas", 30)
+                .k(k(4).legs(-0.6f, 0).lean(-4))
+                .k(k(8).crouch(0.15f).ra(-0.4f, 0, 0.8f).la(-0.4f, 0, -0.8f).legs(0, 0))
+                .k(k(22).ra(-0.4f, 0, 1.0f).la(-0.4f, 0, -1.0f))
+                .k(k(30))
+                .snd(8, PoliciaSonido.anim("chain"), 1.0f, 0.8f)
+                .shake(8, 0.5f);
+        def("her_espadas", 84)
+                .k(k(10).ra(-1.4f, -0.6f, 0).la(-1.4f, 0.6f, 0).h(0.15f, 0))
+                .k(k(20).ra(-3.0f, 0, 0.2f).h(-0.3f, 0))
+                .k(k(66).ra(-3.0f, 0, 0.2f).h(-0.3f, 0))
+                .k(k(74).ra(-1.2f, 0, 0).lean(10))
+                .k(k(84))
+                .snd(4, PoliciaSonido.anim("warp"), 1.0f, 0.6f)
+                .snd(20, PoliciaSonido.anim("magic"), 1.0f, 0.9f)
+                .ring(10, ParticleTypes.ENCHANT, 40, 1.4f, 0.1f)
+                .shake(80, 1.0f);
     }
 }

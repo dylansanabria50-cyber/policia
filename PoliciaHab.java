@@ -65,10 +65,14 @@ public class PoliciaHab {
         def("taladro", "albanil", "Taladro de túnel", "Abre un túnel de 3 × 3 de 10 bloques hacia donde mirás y deja antorchas. Solo rompe terreno natural.", 12, 1, 40, "alb_taladro");
         def("puno", "albanil", "Puño de tierra", "Una mano de piedra sale bajo el enemigo que mirás, lo levanta y lo aplasta contra el piso.", 15, 1, 30, "alb_puno");
         def("torre", "albanil", "Torre instantánea", "Una torre de piedra te sube 8 bloques en un momento. Se deshace sola al minuto.", 18, 1, 45, "alb_torre");
+        // Las de los otros oficios se registran en sus clases.
+        PoliciaHabExtra.cargar();
+        PoliciaHabOficios.cargar();
     }
 
     static void init() {
         MinecraftForge.EVENT_BUS.register(new Eventos());
+        MinecraftForge.EVENT_BUS.register(new PoliciaHabExtra.Eventos());
     }
 
     static Def buscar(String id) {
