@@ -56,6 +56,9 @@ public class PoliciaZonas {
 
     static Zona zona(ServerLevel sl, BlockPos pos) {
         try {
+            if (sl.dimension() == Level.OVERWORLD && PoliciaMazmorra.enCueva(sl.getServer(), pos)) {
+                return new Zona("Cueva del Eco", PoliciaMazmorra.NIVEL);
+            }
             PoliciaStruct.Sites s = PoliciaStruct.Sites.get(sl);
             if (sl.dimension() == Level.OVERWORLD) {
                 for (int k = 0; k < NOMBRE.length && k < s.l.size(); k++) {
