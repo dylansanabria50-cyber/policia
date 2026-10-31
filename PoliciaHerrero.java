@@ -183,16 +183,20 @@ public class PoliciaHerrero {
     }
 
     // Árbol de habilidades: costo en XP de oficio (se consume al
-    // desbloquear) y habilidad previa necesaria. El Grito es la raíz.
-    static final int[] COST = new int[]{0, 10, 10, 15, 15, 20, 20, 25, 25};
-    static final int[] PRE = new int[]{-1, 0, 0, 0, 3, 2, 3, 1, 0};
+    // desbloquear) y habilidad previa necesaria. La raíz es el Analizador
+    // del Forjador (gratis desde el principio); después viene el Grito.
+    static final int[] COST = new int[]{10, 10, 10, 15, 15, 20, 20, 25, 0};
+    static final int[] PRE = new int[]{8, 0, 0, 0, 3, 2, 3, 1, -1};
 
     static int mask(ServerPlayer p) {
         CompoundTag d = p.getPersistentData();
         if (!d.contains("her_un")) {
             // migración: lo que ya tenía por XP queda desbloqueado
             int xp = PoliciaMod.xp(p);
-            int m = 1;
+            int m = 1 << 8;
+            if (xp > 0) {
+                m |= 1;
+            }
             for (int i = 1; i < THRESH.length; ++i) {
                 if (xp < THRESH[i]) break;
                 m |= 1 << i;
@@ -200,11 +204,11 @@ public class PoliciaHerrero {
             if (xp >= ANALIZADOR_XP) m |= 1 << 8;
             d.putInt("her_un", m);
         }
-        return d.getInt("her_un") | 1;
+        return d.getInt("her_un") | 1 << 8;
     }
 
     static boolean has(ServerPlayer p, int i) {
-        return i == 0 || (PoliciaHerrero.mask(p) >> i & 1) == 1;
+        return i == 8 || (PoliciaHerrero.mask(p) >> i & 1) == 1;
     }
 
     static void unlock(ServerPlayer p, int i) {
@@ -367,6 +371,10 @@ public class PoliciaHerrero {
         int s = PoliciaHerrero.sel(p);
         if (!PoliciaHerrero.has(p, s)) {
             s = 0;
+        }
+        if (!PoliciaHerrero.has(p, s)) {
+            PoliciaMod.msg(p, "Todavía no tenés habilidades para usar con J: desbloqueá el Grito del Forjador en el árbol (" + COST[0] + " XP). El Analizador (O) ya lo tenés.");
+            return;
         }
         if (PoliciaHerrero.cd(p, s) > 0) {
             PoliciaMod.msg(p, SKILLS[s] + " en enfriamiento: " + (PoliciaHerrero.cd(p, s) + 19) / 20 + " s");

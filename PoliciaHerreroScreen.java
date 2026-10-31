@@ -88,18 +88,19 @@ public class PoliciaHerreroScreen extends Screen {
 
     // Desbloqueada según el árbol (lo manda el servidor).
     static boolean open(int i, int xp) {
-        return i == 0 || (PoliciaHerrero.CL.un >> i & 1) == 1;
+        return i == 8 || (PoliciaHerrero.CL.un >> i & 1) == 1;
     }
 
     static boolean canBuy(int i, int xp) {
         return !open(i, xp) && open(PoliciaHerrero.PRE[i], xp) && xp >= need(i);
     }
 
-    // Árbol como el de policía: el Grito arriba y tres ramas.
-    //   Grito ── Analizador
+    // Árbol: el Analizador es la raíz (arriba a la izquierda), de ahí sale
+    // el Grito y del Grito las tres ramas.
+    //   Analizador ── Grito
     //   Yunque Portátil   Forja Interior   Marca del Herrero
     //   Yunque Guardián   Reparación · Faro   Vínculo de Acero
-    static final int[] CX = new int[]{150, 30, 270, 150, 190, 270, 110, 30, 270};
+    static final int[] CX = new int[]{150, 30, 270, 150, 190, 270, 110, 30, 30};
     static final int[] ROW = new int[]{0, 1, 1, 1, 2, 2, 2, 2, 0};
     int lastClick = -1;
     long lastClickT;
@@ -147,8 +148,11 @@ public class PoliciaHerreroScreen extends Screen {
         this.tag(g, "Habilidades", rx + 6, this.py - 6);
         g.drawString(this.font, "XP: " + xp, rx + 8, this.py + 10, -1523648, true);
         g.drawString(this.font, "Clic: elegir · Clic derecho (o doble clic): desbloquear", rx + 8, this.py + 21, -6642512, false);
-        for (int i = 1; i < 9; ++i) {
+        for (int i = 0; i < 9; ++i) {
             int pre = PoliciaHerrero.PRE[i];
+            if (pre < 0) {
+                continue;
+            }
             int col = open(i, xp) ? -2068264 : -9815450;
             if (ROW[i] == ROW[pre]) {
                 int cy = this.nodeY(i) + 11;

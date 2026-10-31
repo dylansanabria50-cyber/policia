@@ -286,7 +286,7 @@ public class PoliciaAnalizador {
     static void act(ServerPlayer p, int kind, String item) {
         if (!PoliciaAnalizador.active(p)) {
             if (kind != 4) {
-                PoliciaMod.msg(p, "El Analizador del Forjador se desbloquea en el árbol de habilidades del herrero (" + PoliciaHerrero.COST[8] + " XP)");
+                PoliciaMod.msg(p, "El Analizador del Forjador es la primera habilidad del oficio Herrero");
             }
             PoliciaAnalizador.send(p);
             return;

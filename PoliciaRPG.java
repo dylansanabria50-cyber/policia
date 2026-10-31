@@ -148,6 +148,16 @@ public class PoliciaRPG {
     public static void sync(ServerPlayer p) {
         CompoundTag c = datos(p).copy();
         c.putString("oficio", PoliciaMod.job(p));
+        // La casa vive en los datos del mundo: se manda aparte para el mapa.
+        try {
+            CompoundTag casa = PoliciaCasa.casaDe(p.server, p.getUUID());
+            if (casa != null) {
+                c.putBoolean("casa", true);
+                c.putInt("casa_x", casa.getInt("x"));
+                c.putInt("casa_z", casa.getInt("z"));
+            }
+        } catch (Throwable ignored) {
+        }
         PoliciaRed.toPlayer(p, new PoliciaRed.RpgSync(c));
     }
 
