@@ -110,6 +110,18 @@ Está escrito para el estado actual del repo: Forge 47.3.0, sin GeckoLib ni mixi
 | **Mercado negro** | NPC "Encapuchado" que aparece de noche en un claro del bosque, en un lugar distinto cada noche (lo anuncian rumores en el diario). La pantalla de regateo usa la paciencia y el precio mínimo calculados en el servidor. El **riesgo de policía** sube con el tiempo: si llega a 100, avisa a los policías conectados (marca en el mapa) y el NPC desaparece. |
 | **Elección de alcalde** | Cada 7 días de juego. Los candidatos son jugadores que se anotan (o NPCs si no hay nadie). Se vota en la urna de la municipalidad (bloque) y la campaña pone afiches que dan intención de voto. El conteo es un evento con overlay y fuegos artificiales reales (`FireworkRocketEntity`). Las **leyes** del ganador se aplican como reglas globales en `PoliciaMundo` (multas, precios, patrullas) durante 7 días. |
 
+## 7b. RPG — tanda 6: lo que faltaba
+
+| Vista previa | En el juego |
+|---|---|
+| **NPCs con «!» y «?»** | Encima del NPC se dibuja el marcador en 3D (`EntityRenderer`: billboard con textura + brillo), que gira y rebota. El estado sale de la capability del jugador que mira (cada jugador ve su propio marcador): se sincroniza la lista de NPCs con misión para ese jugador. Clic derecho → `PoliciaDialogo`. |
+| **Misiones diarias por oficio** | Pool en JSON por oficio. Se sortean al cambiar el día de juego (o a las 00:00 reales, configurable). Progreso por eventos (bloques puestos, ladrones atrapados, espadas forjadas…). La racha y el cofre diario van en la capability. Se ven en el diario y en el HUD. |
+| **Zonas con nivel** | Zonas como rectángulos o radios alrededor de cada estructura/bioma, guardadas en `PoliciaMundo`. Al cruzar el borde: título grande (`Gui.setTitle`) con el nivel. Si te supera por 5 o más: aviso rojo, viñeta, +50 % de daño (`LivingHurtEvent`) y carruaje bloqueado. Los mobs de cada zona escalan su vida y daño con el nivel. |
+| **Ciudad central con gremios** | Estructura grande nueva en `PoliciaStruct` (una por mundo, cerca del spawn), con las 4 sedes y la fuente. Los maestros son NPCs (patrón `PoliciaJefe`) con pantalla de gremio: rango (en la capability), encargos y tienda con objetos bloqueados por rango. |
+| **Tienda** | NPC tendero con `MerchantMenu` propio o una pantalla de carrito. Los precios salen de `PoliciaMercado` y se aplican los descuentos de las leyes del alcalde. Vender usa los mismos precios con margen. |
+| **Banco** | Bloque mostrador con pantalla de cuenta. Los saldos (personal y de gremio) van en `PoliciaMundo`, así se pueden usar desde cualquier banco. El interés se cobra por día de juego; el préstamo tiene vencimiento, recargo y embargo. La bóveda es un BER cuya pila de oro crece con el saldo total. El **asalto** se integra con `PoliciaGolpe`: alarma, el seguro devuelve el 80 % y se publica un SE BUSCA en el tablero. |
+| **Armero / Fundición de emergencia** (Herrero) | Armero: bloque perchero que guarda armadura (como un soporte de armadura) y la repara de a poco, con la animación del martillito encantado. Fundición: habilidad que convierte herramientas rotas del inventario en lingotes según su material, con la animación del crisol y la lingotera. |
+
 ---
 
 ## 8. Orden de implementación propuesto (por etapas, cada una compilable y probable)
@@ -122,12 +134,12 @@ Está escrito para el estado actual del repo: Forge 47.3.0, sin GeckoLib ni mixi
 2. **Movimientos + primera persona** (solo visual, para todos): no toca datos y se nota enseguida.
 3. **Animaciones de los 39 oficios + tractor nuevo**.
 4. **Nivel, atributos, ficha, logros (advancements)**: todo lo demás da XP.
-5. **Tablero, diálogo con decisiones, diario de misiones**.
+5. **Tablero, diálogo con decisiones, diario de misiones, NPCs con «!»/«?», diarias por oficio, zonas con nivel**.
 6. **Árbol de habilidades unificado + las 20 habilidades nuevas** (las grandes de a una).
 7. **Forja (minijuego) + rarezas + inventario/anillo**.
 8. **Mapa de viaje, casas, día y noche**.
 9. **Mazmorra + jefe con fases**.
-10. **Comercio, subasta/mercado, gremios**.
+10. **Comercio, subasta/mercado, gremios, ciudad central, tienda y banco**.
 11. **Golpe al banco en grupo, persecución, juicio con jurado, mercado negro**.
 12. **Granja, establo y carrera, pesca**.
 13. **Clima y estaciones, elección de alcalde**.

@@ -37,8 +37,8 @@ Todavía NO implementar: primero se siguen sumando ideas.
 - Escudo de mil placas: decenas de placas de hierro orbitan alrededor y vuelan solas a bloquear flechas y golpes; al final forman un capullo y estallan.
 - Forja del tiempo: repara un objeto rebobinando el tiempo; aparece un reloj que gira al revés, la imagen se tiñe y los pedazos vuelven por el mismo camino hasta unirse.
 - Campana de bronce: campana mágica; cada martillazo manda una onda dorada que marea a los mobs y repara el equipo de los aliados.
-- Armero (animado, en revisión): clava un perchero de madera, cuelga casco, pechera, piernas y botas rotas; un martillito encantado golpea cada pieza (3 golpes), las grietas se cierran y el hierro vuelve a brillar; barra de reparación.
-- Fundición de emergencia (animada, en revisión): apoya un crisol al rojo, tira pico, espada y hacha rotos que se derriten burbujeando, vuelca el metal en una lingotera y, entre vapor, salen 3 lingotes.
+- Armero (animado, APROBADO): clava un perchero de madera, cuelga casco, pechera, piernas y botas rotas; un martillito encantado golpea cada pieza (3 golpes), las grietas se cierran y el hierro vuelve a brillar; barra de reparación.
+- Fundición de emergencia (animada, APROBADA): apoya un crisol al rojo, tira pico, espada y hacha rotos que se derriten burbujeando, vuelca el metal en una lingotera y, entre vapor, salen 3 lingotes.
 - Horno portátil: horno a su lado que funde minerales al instante mientras dure.
 
 ## Modo RPG (aprobado: 1, 4 y 6)
@@ -157,7 +157,7 @@ Vista previa: "Pueblo de Oficios" v6.
   - Hacer campaña sube la intención de voto. El día de elecciones los vecinos votan en la urna y se cuentan los votos con barras.
   - Fuegos artificiales al final, y las leyes del ganador quedan vigentes 7 días.
 
-## Vistas previas RPG (tanda 6: lo que faltaba) — en revisión
+## Vistas previas RPG (tanda 6: lo que faltaba) — APROBADAS
 Vista previa: "Pueblo de Oficios" v7.
 - **NPCs con «!» y «?».**
   - Marcador que gira y brilla sobre la cabeza: ! amarillo = misión nueva, ! celeste = diaria, ? gris = en curso, ? amarillo = lista para entregar.
