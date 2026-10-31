@@ -25,6 +25,7 @@ public class PoliciaRed {
         CH.registerMessage(0, RpgSync.class, RpgSync::enc, RpgSync::dec, RpgSync::handle);
         CH.registerMessage(1, AnimPlay.class, AnimPlay::enc, AnimPlay::dec, AnimPlay::handle);
         CH.registerMessage(2, SubirAtributo.class, SubirAtributo::enc, SubirAtributo::dec, SubirAtributo::handle);
+        CH.registerMessage(3, HabAccion.class, HabAccion::enc, HabAccion::dec, HabAccion::handle);
     }
 
     static void toPlayer(ServerPlayer p, Object msg) {
@@ -109,6 +110,36 @@ public class PoliciaRed {
             c.get().enqueueWork(() -> {
                 if (p != null && m.idx >= 0 && m.idx < PoliciaRPG.ATRIBUTOS.length) {
                     PoliciaRPG.subirAtributo(p, PoliciaRPG.ATRIBUTOS[m.idx]);
+                }
+            });
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Etapa 6: arbol de habilidades nuevas (0 desbloquear, 1 equipar, 2 usar, 3 siguiente).
+    public static class HabAccion {
+        int a;
+        String id;
+
+        HabAccion(int a, String id) {
+            this.a = a;
+            this.id = id;
+        }
+
+        static void enc(HabAccion m, FriendlyByteBuf b) {
+            b.writeVarInt(m.a);
+            b.writeUtf(m.id, 64);
+        }
+
+        static HabAccion dec(FriendlyByteBuf b) {
+            return new HabAccion(b.readVarInt(), b.readUtf(64));
+        }
+
+        static void handle(HabAccion m, Supplier<NetworkEvent.Context> c) {
+            ServerPlayer p = c.get().getSender();
+            c.get().enqueueWork(() -> {
+                if (p != null) {
+                    PoliciaHab.accion(p, m.a, m.id);
                 }
             });
             c.get().setPacketHandled(true);

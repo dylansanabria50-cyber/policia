@@ -213,7 +213,7 @@ public class PoliciaNivel {
                 return;
             }
             int des = PoliciaRPG.atributo(p, "destreza");
-            if (p.getRandom().nextFloat() < des * 0.01f) {
+            if (PoliciaHabObra.DOMINIO.contains(p.getUUID()) || p.getRandom().nextFloat() < des * 0.01f) {
                 e.setAmount(e.getAmount() * 1.5f);
                 LivingEntity v = e.getEntity();
                 p.serverLevel().sendParticles(ParticleTypes.CRIT, v.getX(), v.getY() + v.getBbHeight() * 0.6, v.getZ(), 14, 0.3, 0.3, 0.3, 0.3);

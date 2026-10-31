@@ -82,6 +82,7 @@ public class PoliciaClient {
     static final KeyMapping K_REFS = new KeyMapping("Policia: orden a los refuerzos", 82, "Policia");
     static final KeyMapping K_ANALYZE = new KeyMapping("Herrero: abrir el Analizador del Forjador", 79, "Policia");
     static final KeyMapping K_FICHA = new KeyMapping("RPG: ficha de personaje", 73, "Policia");
+    static final KeyMapping K_HAB = new KeyMapping("RPG: usar habilidad nueva (Mayus: cambiar)", 90, "Policia");
     static final ResourceLocation TEX_POL = new ResourceLocation("policia", "textures/entity/policia.png");
     static final ResourceLocation TEX_ALB = new ResourceLocation("policia", "textures/entity/albanil.png");
     static final ResourceLocation TEX_LAD = new ResourceLocation("policia", "textures/entity/ladron.png");
@@ -341,6 +342,7 @@ public class PoliciaClient {
         e.register(K_REFS);
         e.register(K_ANALYZE);
         e.register(K_FICHA);
+        e.register(K_HAB);
     }
 
     static void overlays(RegisterGuiOverlaysEvent e) {
@@ -349,6 +351,7 @@ public class PoliciaClient {
         e.registerAboveAll("policia_dado", PoliciaDadoScreen::hud);
         e.registerAboveAll("policia_nivel", PoliciaFicha::hud);
         e.registerAboveAll("policia_diarias", PoliciaMisionesCliente::hud);
+        e.registerAboveAll("policia_hab", PoliciaHabScreen::hud);
     }
 
     static void screenInit(ScreenEvent.Init.Post e) {
@@ -687,6 +690,10 @@ public class PoliciaClient {
         while (K_FICHA.consumeClick()) {
             if (!free) continue;
             mc.setScreen(new PoliciaFicha());
+        }
+        while (K_HAB.consumeClick()) {
+            if (!free) continue;
+            PoliciaRed.CH.sendToServer(new PoliciaRed.HabAccion(net.minecraft.client.gui.screens.Screen.hasShiftDown() ? 3 : 2, ""));
         }
         boolean bl2 = zk = K_ZONE.isDown() && free && PoliciaClient.alb() && PoliciaAlbanil.CL.hl >= 1;
         if (zk) {

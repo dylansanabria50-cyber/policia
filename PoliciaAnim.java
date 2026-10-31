@@ -425,5 +425,55 @@ public class PoliciaAnim {
                 .snd(6, () -> SoundEvents.SPYGLASS_USE, 1.0f, 1.0f)
                 .fx(10, ParticleTypes.ENCHANT, 12, 1.0f, 1.5f, 0.3f, 0.3f)
                 .snd(6, PoliciaSonido.anim("scan"), 0.9f, 1.0f);
+
+        // ---------- Etapa 6a: habilidades nuevas ----------
+        def("pol_camara", 26).left(it(Items.OBSERVER))
+                .k(k(6).la(-2.4f, 0.3f, 0).ra(-2.2f, -0.2f, 0).h(-0.3f, 0))
+                .k(k(16).la(-2.4f, 0.3f, 0).ra(-2.0f, -0.4f, 0.1f).h(-0.3f, 0))
+                .k(k(26))
+                .snd(8, PoliciaSonido.anim("click"), 1.0f, 0.9f)
+                .snd(16, PoliciaSonido.anim("beep"), 0.8f, 1.2f);
+        def("pol_dominio", 40)
+                .k(k(8).ra(-1.4f, -0.5f, 0).la(-1.4f, 0.5f, 0).h(0.2f, 0).crouch(0.08f))
+                .k(k(18).ra(-1.4f, -0.5f, 0).la(-1.4f, 0.5f, 0).h(0.2f, 0).crouch(0.08f))
+                .k(k(26).ra(-2.8f, 0, 1.0f).la(-2.8f, 0, -1.0f).h(-0.4f, 0).lean(-6))
+                .k(k(40))
+                .snd(8, PoliciaSonido.anim("pulse"), 1.0f, 0.8f)
+                .snd(26, PoliciaSonido.anim("warp"), 1.0f, 0.7f)
+                .ring(26, ParticleTypes.END_ROD, 40, 2.5f, 0.3f)
+                .shake(26, 0.8f);
+        def("alb_grua", 24)
+                .k(k(6).ra(-2.8f, 0, 0.2f).h(-0.4f, 0))
+                .k(k(14).ra(-1.4f, 0, 0).lean(4))
+                .k(k(24))
+                .snd(6, PoliciaSonido.anim("hydraulic"), 1.0f, 0.9f)
+                .snd(14, () -> SoundEvents.CHAIN_PLACE, 1.0f, 0.8f);
+        def("alb_ascensor", 26)
+                .k(k(4).ra(-0.9f, 0, 0).la(-0.9f, 0, 0).crouch(0.06f))
+                .k(k(10).ra(-2.2f, 0, 0.2f).la(-0.4f, 0, 0))
+                .k(k(26))
+                .snd(4, PoliciaSonido.anim("crank"), 1.0f, 1.0f)
+                .snd(10, PoliciaSonido.anim("hydraulic"), 1.0f, 1.1f);
+        def("alb_taladro", 30)
+                .k(k(5).ra(-1.4f, 0, 0).la(-1.4f, 0, 0).lean(12).crouch(0.1f))
+                .k(k(24).ra(-1.4f, 0, 0).la(-1.4f, 0, 0).lean(12).crouch(0.1f))
+                .k(k(30))
+                .snd(5, PoliciaSonido.anim("crank"), 1.0f, 0.8f)
+                .snd(12, PoliciaSonido.anim("crumble"), 1.0f, 0.8f)
+                .shake(8, 0.5f);
+        def("alb_puno", 30)
+                .k(k(6).ra(-2.9f, 0, 0.1f).h(-0.3f, 0).lean(-4))
+                .k(k(10).ra(0.2f, 0, 0).lean(20).crouch(0.25f).h(0.4f, 0))
+                .k(k(20).ra(-0.2f, 0, 0).lean(10).crouch(0.12f))
+                .k(k(30))
+                .snd(10, PoliciaSonido.anim("thud"), 1.0f, 0.7f)
+                .fx(10, ParticleTypes.POOF, 16, 0.8f, 0.1f, 0.5f, 0.05f)
+                .shake(10, 0.9f);
+        def("alb_torre", 22)
+                .k(k(4).ra(-2.9f, 0, 0.4f).la(-0.3f, 0, -0.3f).h(-0.4f, 0))
+                .k(k(18).ra(-2.9f, 0, 0.4f).la(-0.6f, 0, -0.6f).h(-0.2f, 0))
+                .k(k(22))
+                .snd(4, PoliciaSonido.anim("crumble"), 1.0f, 0.7f)
+                .shake(4, 0.6f);
     }
 }
