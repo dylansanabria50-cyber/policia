@@ -107,6 +107,8 @@ public class PoliciaClient {
     public static void init() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaClient::keys);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaClient::overlays);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(PoliciaForjaScreen::decoradores);
+        MinecraftForge.EVENT_BUS.addListener(PoliciaForjaScreen::tooltip);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::tick);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::camera);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::hideRider);

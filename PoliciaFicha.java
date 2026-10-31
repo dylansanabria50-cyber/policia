@@ -43,6 +43,8 @@ public class PoliciaFicha extends Screen {
             this.mas[i] = this.addRenderableWidget(Button.builder(Component.literal("+"), b -> PoliciaRed.CH.sendToServer(new PoliciaRed.SubirAtributo(idx)))
                     .bounds(this.x0 + W - 30, this.y0 + 74 + i * 24, 18, 16).build());
         }
+        this.addRenderableWidget(Button.builder(Component.literal("Quitar"), b -> PoliciaRed.CH.sendToServer(new PoliciaRed.QuitarAnillo()))
+                .bounds(this.x0 + W - 52, this.y0 + 59, 40, 12).build());
         int bw = 66;
         int by = this.y0 + H - 26;
         this.addRenderableWidget(Button.builder(Component.literal("Habilidades"), b -> Minecraft.getInstance().setScreen(new PoliciaHabScreen()))
@@ -125,6 +127,19 @@ public class PoliciaFicha extends Screen {
         g.drawCenteredString(this.font, xs, x + W / 2, y + 52, 0xC8B89A);
         int pts = d.getInt("puntos");
         g.drawString(this.font, pts > 0 ? "§ePuntos libres: " + pts : "§7Puntos libres: 0", x + 12, y + 62, 0xFFFFFF);
+        // casillero del anillo
+        g.fill(x + W - 76, y + 57, x + W - 58, y + 75, 0xFF6B4B22);
+        g.fill(x + W - 75, y + 58, x + W - 59, y + 74, 0xFF0E0B08);
+        if (d.contains("anillo")) {
+            net.minecraft.world.item.ItemStack an = net.minecraft.world.item.ItemStack.of(d.getCompound("anillo"));
+            g.renderItem(an, x + W - 75, y + 58);
+            if (mx >= x + W - 76 && mx <= x + W - 58 && my >= y + 57 && my <= y + 75) {
+                g.renderTooltip(this.font, an, mx, my);
+            }
+        } else {
+            g.drawString(this.font, "§8○", x + W - 70, y + 62, 0xFFFFFF);
+        }
+        g.drawString(this.font, "§7Anillo", x + W - 116, y + 62, 0xFFFFFF);
         // atributos
         for (int i = 0; i < 5; i++) {
             int ry = y + 74 + i * 24;

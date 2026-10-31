@@ -33,5 +33,9 @@
  "enchantment.policia.filo_de_fragua": "Filo de fragua",
  "enchantment.policia.temple": "Temple",
  "item.policia.contrato_aprendiz": "Contrato de aprendiz",
- "entity.policia.aprendiz": "Aprendiz"
+ "entity.policia.aprendiz": "Aprendiz",
+ "item.policia.anillo_vida": "Anillo de vida",
+ "item.policia.anillo_fuerza": "Anillo de fuerza",
+ "item.policia.anillo_velocidad": "Anillo de velocidad",
+ "item.policia.anillo_suerte": "Anillo de la suerte"
 }

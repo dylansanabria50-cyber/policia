@@ -1,0 +1,21 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "misc",
+ "pattern": [
+  " G ",
+  "GXG",
+  " G "
+ ],
+ "key": {
+  "G": {
+   "item": "minecraft:gold_ingot"
+  },
+  "X": {
+   "item": "minecraft:emerald"
+  }
+ },
+ "result": {
+  "item": "policia:anillo_suerte",
+  "count": 1
+ }
+}

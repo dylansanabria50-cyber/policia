@@ -1,0 +1,21 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "misc",
+ "pattern": [
+  " G ",
+  "GXG",
+  " G "
+ ],
+ "key": {
+  "G": {
+   "item": "minecraft:gold_ingot"
+  },
+  "X": {
+   "item": "minecraft:golden_apple"
+  }
+ },
+ "result": {
+  "item": "policia:anillo_vida",
+  "count": 1
+ }
+}

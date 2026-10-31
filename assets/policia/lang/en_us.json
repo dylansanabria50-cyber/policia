@@ -33,5 +33,9 @@
  "enchantment.policia.filo_de_fragua": "Forge Edge",
  "enchantment.policia.temple": "Temper",
  "item.policia.contrato_aprendiz": "Apprentice Contract",
- "entity.policia.aprendiz": "Apprentice"
+ "entity.policia.aprendiz": "Apprentice",
+ "item.policia.anillo_vida": "Ring of Life",
+ "item.policia.anillo_fuerza": "Ring of Strength",
+ "item.policia.anillo_velocidad": "Ring of Speed",
+ "item.policia.anillo_suerte": "Ring of Luck"
 }

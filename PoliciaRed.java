@@ -26,6 +26,9 @@ public class PoliciaRed {
         CH.registerMessage(1, AnimPlay.class, AnimPlay::enc, AnimPlay::dec, AnimPlay::handle);
         CH.registerMessage(2, SubirAtributo.class, SubirAtributo::enc, SubirAtributo::dec, SubirAtributo::handle);
         CH.registerMessage(3, HabAccion.class, HabAccion::enc, HabAccion::dec, HabAccion::handle);
+        CH.registerMessage(4, ForjaAbrir.class, ForjaAbrir::enc, ForjaAbrir::dec, ForjaAbrir::handle);
+        CH.registerMessage(5, ForjaResultado.class, ForjaResultado::enc, ForjaResultado::dec, ForjaResultado::handle);
+        CH.registerMessage(6, QuitarAnillo.class, QuitarAnillo::enc, QuitarAnillo::dec, QuitarAnillo::handle);
     }
 
     static void toPlayer(ServerPlayer p, Object msg) {
@@ -140,6 +143,75 @@ public class PoliciaRed {
             c.get().enqueueWork(() -> {
                 if (p != null) {
                     PoliciaHab.accion(p, m.a, m.id);
+                }
+            });
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Etapa 7: el servidor abre el minijuego de forja en el cliente.
+    public static class ForjaAbrir {
+        int rareza;
+
+        ForjaAbrir(int rareza) {
+            this.rareza = rareza;
+        }
+
+        static void enc(ForjaAbrir m, FriendlyByteBuf b) {
+            b.writeVarInt(m.rareza);
+        }
+
+        static ForjaAbrir dec(FriendlyByteBuf b) {
+            return new ForjaAbrir(b.readVarInt());
+        }
+
+        static void handle(ForjaAbrir m, Supplier<NetworkEvent.Context> c) {
+            c.get().enqueueWork(() -> net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> PoliciaForjaScreen.abrir(Math.max(0, Math.min(4, m.rareza)))));
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Etapa 7: el cliente manda la puntuacion del minijuego (el servidor la valida).
+    public static class ForjaResultado {
+        int puntos;
+
+        ForjaResultado(int puntos) {
+            this.puntos = puntos;
+        }
+
+        static void enc(ForjaResultado m, FriendlyByteBuf b) {
+            b.writeVarInt(m.puntos);
+        }
+
+        static ForjaResultado dec(FriendlyByteBuf b) {
+            return new ForjaResultado(b.readVarInt());
+        }
+
+        static void handle(ForjaResultado m, Supplier<NetworkEvent.Context> c) {
+            ServerPlayer p = c.get().getSender();
+            c.get().enqueueWork(() -> {
+                if (p != null) {
+                    PoliciaRareza.resultado(p, m.puntos);
+                }
+            });
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Etapa 7: sacarse el anillo (boton de la ficha).
+    public static class QuitarAnillo {
+        static void enc(QuitarAnillo m, FriendlyByteBuf b) {
+        }
+
+        static QuitarAnillo dec(FriendlyByteBuf b) {
+            return new QuitarAnillo();
+        }
+
+        static void handle(QuitarAnillo m, Supplier<NetworkEvent.Context> c) {
+            ServerPlayer p = c.get().getSender();
+            c.get().enqueueWork(() -> {
+                if (p != null) {
+                    PoliciaRareza.quitarAnillo(p);
                 }
             });
             c.get().setPacketHandled(true);

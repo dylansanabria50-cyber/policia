@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:golden_sword"
+    },
+    "title": {
+      "text": "Leyenda forjada"
+    },
+    "description": {
+      "text": "Conseguí un objeto legendario"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "policia:oficios/oficio",
+  "criteria": {
+    "hecho": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

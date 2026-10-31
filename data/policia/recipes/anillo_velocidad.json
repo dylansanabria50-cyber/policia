@@ -1,0 +1,21 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "misc",
+ "pattern": [
+  " G ",
+  "GXG",
+  " G "
+ ],
+ "key": {
+  "G": {
+   "item": "minecraft:gold_ingot"
+  },
+  "X": {
+   "item": "minecraft:sugar"
+  }
+ },
+ "result": {
+  "item": "policia:anillo_velocidad",
+  "count": 1
+ }
+}

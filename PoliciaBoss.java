@@ -120,6 +120,10 @@ public class PoliciaBoss {
         out.accept((ItemLike) PoliciaAprendiz.CONTRATO.get());
         out.accept((ItemLike) PoliciaShield.SHIELD.get());
         out.accept((ItemLike) VEST.get());
+        out.accept((ItemLike) PoliciaRareza.ANILLO_VIDA.get());
+        out.accept((ItemLike) PoliciaRareza.ANILLO_FUERZA.get());
+        out.accept((ItemLike) PoliciaRareza.ANILLO_VELOCIDAD.get());
+        out.accept((ItemLike) PoliciaRareza.ANILLO_SUERTE.get());
         for (String[] x : sk = new String[][]{{"refuerzo", "Refuerzo"}, {"k9", "Perro K9"}, {"esposas", "Esposas"}, {"sirena", "Sirena y torreta"}, {"dron", "Dron de vigilancia"}, {"burbuja", "Escudo de burbuja"}, {"pico", "Pico de albañil"}, {"muro", "Muro"}, {"refugio", "Refugio"}, {"silbido", "Silbido"}}) {
             out.accept(PoliciaBoss.single(x[0], x[1]));
         }
