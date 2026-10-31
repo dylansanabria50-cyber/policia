@@ -110,3 +110,26 @@ Vista previa: "Pueblo de Oficios" v4.
 - **Nivel y logros.**
   - La XP vuela hasta la barra. Al subir de nivel aparece una pantalla con rayos, confeti y fanfarria, con las recompensas.
   - Avisos de logro y 8 logros con progreso, conectados a las otras vistas: jefe, casa, golpe, forja, habilidades y misiones.
+
+## Vistas previas RPG (tanda 4: vida en la comarca) — en revisión
+Vista previa: "Pueblo de Oficios" v5.
+- **Comercio entre jugadores.**
+  - Ventana con dos ofertas y pesos, y un medidor de valor (Parejo / Te conviene / Das de más).
+  - Los dos tocan «Listo», cuenta 3-2-1 y los objetos vuelan de un lado al otro.
+  - **Antiestafa**: si alguien cambia algo, se cancelan los «Listo» con aviso rojo (en la vista, Martina lo intenta una vez).
+- **Gremio.**
+  - Editor de estandarte: color, diseño (franja, cruz, diagonal, cuartel, borde), símbolo y su color, y nombre.
+  - La tela ondea con sombreado. "Fundar" iza el estandarte con trompetas y confeti.
+  - Lista de miembros con rangos y conectados, y beneficios.
+- **Juicio en el tribunal.**
+  - Jueza, acusado esposado, abogado, fiscal y jurado de 6 que reaccionan.
+  - Se presentan pruebas (huellas, testigo, cámara, botín) con fuerza; el abogado defensor responde.
+  - Medidor culpable/inocente. En el veredicto cada jurado vota, la jueza golpea el mazo 3 veces y dicta la condena (celda + multa).
+- **Pesca.**
+  - Mantener para cargar el lanzamiento, esperar, tirar a tiempo cuando el corcho se hunde.
+  - Minijuego de recoger: mantener la zona sobre el pez. Hay peces por rareza, uno solo de noche y basura.
+  - Colección con récords en cm. Usa la hora compartida.
+- **Clima y estaciones.**
+  - Primavera (pétalos y flores), verano, otoño (hojas que caen) e invierno (río congelado, árboles pelados).
+  - Lluvia con salpicaduras y charcos, tormenta con rayos y trueno, niebla en capas, y nieve que se acumula en techos.
+  - Efectos de juego por clima y estación.
