@@ -88,3 +88,25 @@ Ajustes visuales y de animación incluidos en "Pueblo de Oficios" v3:
   - Panorama del pueblo con sol y luna en arco, estrellas, nubes, molino, faroles y luciérnagas.
   - De día patrullas; de noche, un ladrón y un policía con farol.
   - Reloj de 24 h y ciclo rápido. La hora es compartida: el mapa, la casa y el golpe cambian con ella.
+
+## Vistas previas RPG (tanda 3: interfaz del aventurero) — en revisión
+Vista previa: "Pueblo de Oficios" v4.
+- **Inventario y equipo.**
+  - Mochila de 24 casilleros, con arrastrar y soltar (también en el celular).
+  - Rareza por color: común, rara, épica y legendaria (esta última brilla).
+  - Las pilas se juntan; el equipo va en cabeza, pecho, arma y anillo, y solo acepta lo que corresponde.
+  - El muñeco muestra lo que tenés puesto.
+  - Estadísticas con +/−, peso, botón Ordenar con animación, y objetos que se usan (pan, poción).
+- **Árbol de habilidades por oficio** (Herrero, Policía, Ladrón y Albañil).
+  - Nodos con rangos, ramas que se encienden al aprender y una habilidad suprema arriba.
+  - Usa las habilidades ya aprobadas (Rueda de adaptación, Dominio de la ley, Golpe maestro, etc.).
+  - Botón para devolver los puntos.
+- **Diario de misiones.** Un libro con pestañas: Activas, Cumplidas e Historia (por capítulos).
+  - La página da vuelta al cambiar de misión.
+  - Croquis dibujado a tinta con la ruta animada; objetivos que se tachan y sello CUMPLIDA.
+- **Minijuego de forja.**
+  - Calentar manteniendo el botón hasta la zona justa y martillar 5 veces con buen ritmo (Perfecto/Bien/Torcido).
+  - Templar en el agua con vapor. El resultado es una espada de 1 a 5 estrellas con rareza según la calidad.
+- **Nivel y logros.**
+  - La XP vuela hasta la barra. Al subir de nivel aparece una pantalla con rayos, confeti y fanfarria, con las recompensas.
+  - Avisos de logro y 8 logros con progreso, conectados a las otras vistas: jefe, casa, golpe, forja, habilidades y misiones.
