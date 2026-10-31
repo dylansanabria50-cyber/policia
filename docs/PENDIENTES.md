@@ -133,3 +133,26 @@ Vista previa: "Pueblo de Oficios" v5.
   - Primavera (pétalos y flores), verano, otoño (hojas que caen) e invierno (río congelado, árboles pelados).
   - Lluvia con salpicaduras y charcos, tormenta con rayos y trueno, niebla en capas, y nieve que se acumula en techos.
   - Efectos de juego por clima y estación.
+
+## Vistas previas RPG (tanda 5: oficios en acción) — en revisión
+Vista previa: "Pueblo de Oficios" v6.
+- **Establo.**
+  - Caballo con comida, ánimo, limpieza y vínculo, y 5 pelajes. Dar zanahoria: come y suelta corazones. Cepillar: saca el barro.
+  - Carrera contra Martina con vallas: saltar a tiempo; si chocás, perdés velocidad.
+  - El vínculo y el ánimo mejoran la velocidad.
+- **Granja.** 12 parcelas con trigo, zanahoria, calabaza y flor de luna (esta solo crece de noche y brilla).
+  - Al tocar una parcela se planta, se riega o se cosecha según cómo esté. Sin agua no crece.
+  - Los cuervos bajan a las parcelas maduras: hay que espantarlos o se comen la cosecha.
+  - Granero con lo cosechado y los pesos.
+- **Persecución policía vs ladrón.**
+  - Calles vistas desde arriba; se juega con flechas/WASD, mayúscula para correr con aliento, y botones en pantalla para celular.
+  - El ladrón huye por las calles abiertas, deja huellas y tira bomba de humo con un señuelo.
+  - Tiempo de 45 s. De noche solo se ve el cono de la linterna.
+- **Mercado negro.**
+  - Claro del bosque de noche con fogata, puesto y el Encapuchado con farol.
+  - Objetos ilegales (ganzúa maestra, plano de la bóveda, placa falsa…).
+  - **Regateo**: deslizador de oferta, paciencia del vendedor, contraofertas e insultos si ofrecés muy poco. Si se le acaba la paciencia, cierra el puesto.
+  - El riesgo de policía sube mientras regateás; si llega a 100 hay redada y el vendedor desaparece en humo.
+- **Elección de alcalde.** Tres candidatos (Policía, Herrero, Ladrón) con afiches y leyes propuestas.
+  - Hacer campaña sube la intención de voto. El día de elecciones los vecinos votan en la urna y se cuentan los votos con barras.
+  - Fuegos artificiales al final, y las leyes del ganador quedan vigentes 7 días.
