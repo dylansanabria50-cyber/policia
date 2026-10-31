@@ -237,7 +237,10 @@ Vistas previas: "Animaciones de Oficios" v25, con las pestañas Médico y Mercad
 - **Árbol de habilidades**:
   - Médico: Vendaje rápido → Mortero / Antídoto → Nube curativa, Lazo vital, Burbuja vital → suprema: Reanimar.
   - Mercader: Buen ojo → Puesto instantáneo / Regateo → Mochila sin fondo, Caravana, Contrato sellado → suprema: Lluvia de monedas.
-  - Hospital de campaña y Propina dorada quedan como habilidades de rango alto del gremio.
+  - (Reemplazado) Árbol ampliado — "Pueblo de Oficios" v11. Cada oficio tiene en su árbol TODAS sus habilidades:
+    - Policía 12, Albañil 15 + Ciudad en un día, Ladrón 15 + Golpe maestro, Herrero 19, Médico 8, Mercader 8.
+    - Filas de 4: las básicas abajo (rango 3 en la primera fila, 2 en las demás) y las nuevas arriba (rango 1).
+    - Habilidad suprema en la cima. 10 puntos por oficio.
 - **Sedes en la ciudad central**:
   - **Hospital del Roble** (Doctora Luz; rangos Enfermero → Eminencia; tienda con pociones, antídoto, semillas y paletas).
   - **Casa de Comercio** (Don Baltasar; rangos Buhonero → Magnate; tienda con balanza, fardo de puesto, carro y contratos).
