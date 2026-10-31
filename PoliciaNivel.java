@@ -66,6 +66,7 @@ public class PoliciaNivel {
             logro(p, "transformacion");
             return;
         }
+        PoliciaDiarias.habilidad(p, id);
         int total = sumar(p, "habilidades", 1);
         int deEsta = sumar(p, "h_" + id, 1);
         dar(p, 4);
@@ -120,6 +121,25 @@ public class PoliciaNivel {
         if (PoliciaRPG.atributo(p, a) >= PoliciaRPG.MAX_ATRIBUTO) {
             logro(p, "maestria");
         }
+    }
+
+    // Etapa 5: copia para el cliente de la mision del jefe (para el diario
+    // y los marcadores ! / ? sobre los jefes). Solo se manda si cambio.
+    static void estadoMision(ServerPlayer p) {
+        CompoundTag d = PoliciaRPG.datos(p);
+        PoliciaJefe.Def def = PoliciaJefe.active(p);
+        int estado = def == null ? 0 : PoliciaJefe.done(p) ? 2 : 1;
+        String desc = def == null ? "" : def.desc;
+        int prog = def == null ? 0 : PoliciaJefe.prog(p);
+        int need = def == null ? 0 : def.need;
+        if (d.getInt("jm_estado") == estado && d.getString("jm_desc").equals(desc) && d.getInt("jm_prog") == prog && d.getInt("jm_need") == need) {
+            return;
+        }
+        d.putInt("jm_estado", estado);
+        d.putString("jm_desc", desc);
+        d.putInt("jm_prog", prog);
+        d.putInt("jm_need", need);
+        PoliciaRPG.sync(p);
     }
 
     // ---------------- Logros ----------------
@@ -210,6 +230,7 @@ public class PoliciaNivel {
             if (!PoliciaMod.job(p).isEmpty()) {
                 logro(p, "oficio");
             }
+            PoliciaNivel.estadoMision(p);
         }
     }
 }

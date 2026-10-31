@@ -49,6 +49,8 @@ public class PoliciaFicha extends Screen {
                 mc.setScreen(new AdvancementsScreen(mc.player.connection.getAdvancements()));
             }
         }).bounds(this.x0 + 12, this.y0 + H - 26, 80, 18).build());
+        this.addRenderableWidget(Button.builder(Component.literal("Misiones"), b -> Minecraft.getInstance().setScreen(new PoliciaMisionesCliente.Diario()))
+                .bounds(this.x0 + W / 2 - 40, this.y0 + H - 26, 80, 18).build());
         this.addRenderableWidget(Button.builder(Component.literal("Cerrar"), b -> this.onClose())
                 .bounds(this.x0 + W - 92, this.y0 + H - 26, 80, 18).build());
     }

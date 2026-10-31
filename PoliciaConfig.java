@@ -13,6 +13,7 @@ public class PoliciaConfig {
     public static final ForgeConfigSpec.BooleanValue PRIMERA_PERSONA;
     public static final ForgeConfigSpec.BooleanValue LINEAS_VELOCIDAD;
     public static final ForgeConfigSpec.BooleanValue HUD_NIVEL;
+    public static final ForgeConfigSpec.BooleanValue HUD_DIARIAS;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -31,6 +32,8 @@ public class PoliciaConfig {
         b.push("rpg");
         HUD_NIVEL = b.comment("Mostrar el nivel y la barra de XP del modo RPG abajo a la izquierda.")
                 .define("hudNivel", true);
+        HUD_DIARIAS = b.comment("Mostrar las misiones diarias a la derecha de la pantalla.")
+                .define("hudDiarias", true);
         b.pop();
         SPEC = b.build();
     }
@@ -74,6 +77,14 @@ public class PoliciaConfig {
     static boolean hudNivel() {
         try {
             return HUD_NIVEL.get();
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    static boolean hudDiarias() {
+        try {
+            return HUD_DIARIAS.get();
         } catch (Throwable t) {
             return true;
         }
