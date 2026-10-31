@@ -378,6 +378,17 @@ public class PoliciaHerrero {
     // Ejecuta la habilidad s (sin mirar desbloqueo ni enfriamiento).
     // Devuelve true si se pudo usar.
     static boolean doSkill(ServerPlayer p, int s) {
+        boolean ok = PoliciaHerrero.doSkill0(p, s);
+        if (ok) {
+            String[] an = new String[]{"her_grito", null, "her_marca", "her_forja", "her_faro", "her_vinculo", null, null, "her_analizador"};
+            if (s >= 0 && s < an.length && an[s] != null) {
+                PoliciaAnim.play(p, an[s]);
+            }
+        }
+        return ok;
+    }
+
+    static boolean doSkill0(ServerPlayer p, int s) {
         CompoundTag d = p.getPersistentData();
         switch (s) {
             case 0: {

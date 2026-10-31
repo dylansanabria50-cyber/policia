@@ -415,6 +415,12 @@ public class PoliciaLadron {
     }
 
     static void use(ServerPlayer p, int a) {
+        PoliciaLadron.use0(p, a);
+        String[] an = new String[]{"lad_silbido", "lad_humo", "lad_salto", "lad_instinto", "lad_polvo", "lad_polvo", "lad_escape"};
+        PoliciaAnim.play(p, an[Math.max(0, Math.min(an.length - 1, a))]);
+    }
+
+    static void use0(ServerPlayer p, int a) {
         ServerLevel sl = p.serverLevel();
         if (a == 0) {
             PoliciaLadron.whistleUse(p);

@@ -140,11 +140,17 @@ public class PoliciaMovimiento {
 
     // ---------------- Tercera persona: todo el cuerpo ----------------
     static void pre(RenderPlayerEvent.Pre e) {
-        if (!PoliciaConfig.mov()) {
-            return;
-        }
         Player p = e.getEntity();
         if (p.isSleeping()) {
+            return;
+        }
+        if (!PoliciaConfig.mov()) {
+            // Sin movimientos mejorados igual se ven las animaciones de habilidades.
+            if (PoliciaAnimCliente.activo(p)) {
+                e.getPoseStack().pushPose();
+                PUSHED.add(p.getId());
+                PoliciaAnimCliente.root(e.getPoseStack(), p, e.getPartialTick());
+            }
             return;
         }
         St s = st(p);
@@ -165,6 +171,7 @@ public class PoliciaMovimiento {
         if (Math.abs(s.sq) > 0.001f) {
             ps.scale(1.0f + s.sq * 0.5f, 1.0f - s.sq, 1.0f + s.sq * 0.5f);
         }
+        PoliciaAnimCliente.root(ps, p, e.getPartialTick());
     }
 
     static void post(RenderPlayerEvent.Post e) {

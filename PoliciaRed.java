@@ -23,6 +23,7 @@ public class PoliciaRed {
 
     static void init() {
         CH.registerMessage(0, RpgSync.class, RpgSync::enc, RpgSync::dec, RpgSync::handle);
+        CH.registerMessage(1, AnimPlay.class, AnimPlay::enc, AnimPlay::dec, AnimPlay::handle);
     }
 
     static void toPlayer(ServerPlayer p, Object msg) {
@@ -57,6 +58,31 @@ public class PoliciaRed {
             // Solo guarda una copia: no toca clases de cliente, asi el
             // servidor dedicado puede cargar esta clase sin problemas.
             c.get().enqueueWork(() -> PoliciaRPG.CLIENTE = m.data);
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Etapa 3: "el jugador X empezo la animacion N" (ver PoliciaAnim).
+    public static class AnimPlay {
+        int ent;
+        int idx;
+
+        AnimPlay(int ent, int idx) {
+            this.ent = ent;
+            this.idx = idx;
+        }
+
+        static void enc(AnimPlay m, FriendlyByteBuf b) {
+            b.writeVarInt(m.ent);
+            b.writeVarInt(m.idx);
+        }
+
+        static AnimPlay dec(FriendlyByteBuf b) {
+            return new AnimPlay(b.readVarInt(), b.readVarInt());
+        }
+
+        static void handle(AnimPlay m, Supplier<NetworkEvent.Context> c) {
+            c.get().enqueueWork(() -> net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> PoliciaAnimCliente.start(m.ent, m.idx)));
             c.get().setPacketHandled(true);
         }
     }

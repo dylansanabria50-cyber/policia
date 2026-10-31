@@ -259,6 +259,9 @@ public class PoliciaMod {
             d.putInt("pol_tf", 40);
             d.putInt("pol_tfd", on(p) ? 1 : -1);
             transformFx(p);
+            if (on(p)) {
+                PoliciaAnim.play(p, "modo");
+            }
             msg(p, on(p) ? "Modo " + job(p) + " activado" : "Modo " + job(p) + " desactivado");
             sync(p);
             return;
@@ -402,47 +405,68 @@ public class PoliciaMod {
         }
         if (id == 1) {
             int s = has(p, sel(p)) ? sel(p) : 0;
-            if (s == 0) {
-                if (shield(p) > 0) {
-                    msg(p, "El escudo ya está activo");
-                    return;
+            CompoundTag antesAnim = p.getPersistentData().copy();
+            try {
+                if (s == 0) {
+                    if (shield(p) > 0) {
+                        msg(p, "El escudo ya está activo");
+                        return;
+                    }
+                    if (cooldown(p) > 0) {
+                        msg(p, "Escudo en enfriamiento: " + (cooldown(p) + 19) / 20 + " s");
+                        return;
+                    }
+                    d.putInt("pol_shield", 240);
+                    startShield(p);
+                    p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 0.6f, 1.6f);
+                    msg(p, "Escudo balístico desplegado");
+                    sync(p);
+                } else if (s == 2 && has(p, 4)) {
+                    PoliciaTank.useMobile(p);
+                } else if (s == 2) {
+                    if (p.getVehicle() instanceof PoliciaTank.TankEntity) {
+                        msg(p, "El tanque ya está invocado");
+                        return;
+                    }
+                    if (shield(p) > 0) {
+                        msg(p, "Espera a que termine el escudo");
+                        return;
+                    }
+                    if (d.getInt("pol_tcd") > 0) {
+                        msg(p, "Tanque en enfriamiento: " + (d.getInt("pol_tcd") + 19) / 20 + " s");
+                        return;
+                    }
+                    PoliciaTank.summon(p);
+                    sync(p);
+                } else if (s == 3) {
+                    PoliciaHeli.use(p);
+                } else if (s >= 5) {
+                    PoliciaExtra.use(p, s);
+                } else if (s == 1) {
+                    PoliciaRefuerzo.use(p);
+                } else {
+                    msg(p, SKILLS[s] + " (próximamente)");
                 }
-                if (cooldown(p) > 0) {
-                    msg(p, "Escudo en enfriamiento: " + (cooldown(p) + 19) / 20 + " s");
-                    return;
-                }
-                d.putInt("pol_shield", 240);
-                startShield(p);
-                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 0.6f, 1.6f);
-                msg(p, "Escudo balístico desplegado");
-                sync(p);
-            } else if (s == 2 && has(p, 4)) {
-                PoliciaTank.useMobile(p);
-            } else if (s == 2) {
-                if (p.getVehicle() instanceof PoliciaTank.TankEntity) {
-                    msg(p, "El tanque ya está invocado");
-                    return;
-                }
-                if (shield(p) > 0) {
-                    msg(p, "Espera a que termine el escudo");
-                    return;
-                }
-                if (d.getInt("pol_tcd") > 0) {
-                    msg(p, "Tanque en enfriamiento: " + (d.getInt("pol_tcd") + 19) / 20 + " s");
-                    return;
-                }
-                PoliciaTank.summon(p);
-                sync(p);
-            } else if (s == 3) {
-                PoliciaHeli.use(p);
-            } else if (s >= 5) {
-                PoliciaExtra.use(p, s);
-            } else if (s == 1) {
-                PoliciaRefuerzo.use(p);
-            } else {
-                msg(p, SKILLS[s] + " (próximamente)");
+            } finally {
+                PoliciaAnim.siCambio(p, antesAnim, PoliciaMod.animPol(s));
             }
         }
+    }
+
+    // Animacion de cada habilidad del policia (etapa 3).
+    static String animPol(int s) {
+        return switch (s) {
+            case 0 -> "pol_escudo";
+            case 1 -> "pol_refuerzo";
+            case 2 -> "pol_tanque";
+            case 3 -> "pol_heli";
+            case 5 -> "pol_esposas";
+            case 6 -> "pol_k9";
+            case 7 -> "pol_sirena";
+            case 8 -> "pol_dron";
+            case 9 -> "pol_burbuja";
+            default -> null;
+        };
     }
 
     static void pushMobs(ServerPlayer p) {

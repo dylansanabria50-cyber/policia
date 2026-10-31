@@ -133,6 +133,8 @@ public class PoliciaHerreroAnim {
             if (t < 0.0f) {
                 // Sin animacion del herrero: movimientos mejorados (etapa 2).
                 PoliciaMovimiento.pose(this, e, ageInTicks);
+                // Animaciones de habilidades (etapa 3).
+                PoliciaAnimCliente.pose(this, e, ageInTicks);
                 return;
             }
             PoliciaHerreroAnim.pose(this, t, PoliciaHerreroAnim.kind(e));

@@ -348,64 +348,70 @@ public class PoliciaAlbanil {
         if (s == 1 && PoliciaAlbanil.lv(p) < 1) {
             s = 0;
         }
-        if (s == 2) {
-            PoliciaAyudante.use(p);
-            return;
-        }
-        if (s == 3) {
-            PoliciaAlbanil.toggleLamp(p);
-            return;
-        }
-        if (s == 4) {
-            PoliciaTractor.use(p);
-            return;
-        }
-        if (s == 0) {
-            if (d.getInt("alb_pick") > 0) {
-                PoliciaMod.msg(p, "El pico ya está activo");
+        CompoundTag antesAnim = p.getPersistentData().copy();
+        String anim = new String[]{"alb_pico", "alb_muro", "alb_ayudante", "alb_linterna", "alb_tractor"}[Math.max(0, Math.min(4, s))];
+        try {
+            if (s == 2) {
+                PoliciaAyudante.use(p);
                 return;
             }
-            if (d.getInt("alb_c0") > 0) {
-                PoliciaMod.msg(p, "Pico en enfriamiento: " + (d.getInt("alb_c0") + 19) / 20 + " s");
+            if (s == 3) {
+                PoliciaAlbanil.toggleLamp(p);
                 return;
             }
-            d.putInt("alb_pick", PoliciaAlbanil.pickT(p));
-            PoliciaAlbanil.startPick(p);
-            p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ARMOR_EQUIP_IRON, SoundSource.PLAYERS, 0.6f, 1.4f);
-            PoliciaMod.msg(p, "Pico de albañil: fuerza y prisa minera");
-        } else {
-            boolean house;
-            boolean bl = house = PoliciaAlbanil.lv(p) >= 2;
-            if (d.getInt("alb_st") > 0) {
-                if (house || d.getInt("alb_house") == 1) {
-                    PoliciaMod.msg(p, "El refugio sigue en pie");
-                    return;
-                }
-                if (d.getInt("alb_walls") >= 3) {
-                    PoliciaMod.msg(p, "Ya levantaste los 3 muros");
-                    return;
-                }
-            } else {
-                if (d.getInt("alb_c1") > 0) {
-                    PoliciaMod.msg(p, "Construcción en enfriamiento: " + (d.getInt("alb_c1") + 19) / 20 + " s");
-                    return;
-                }
-                d.putInt("alb_walls", 0);
-                d.putInt("alb_st", house ? (PoliciaAlbanil.lv(p) >= 3 ? 3600 : 700) : 300);
-                d.putInt("alb_house", house ? 1 : 0);
+            if (s == 4) {
+                PoliciaTractor.use(p);
+                return;
             }
-            if (house && PoliciaAlbanil.lv(p) >= 3) {
-                PoliciaAlbanil.buildHouse2(p);
-            } else if (house) {
-                PoliciaAlbanil.buildHouse(p);
+            if (s == 0) {
+                if (d.getInt("alb_pick") > 0) {
+                    PoliciaMod.msg(p, "El pico ya está activo");
+                    return;
+                }
+                if (d.getInt("alb_c0") > 0) {
+                    PoliciaMod.msg(p, "Pico en enfriamiento: " + (d.getInt("alb_c0") + 19) / 20 + " s");
+                    return;
+                }
+                d.putInt("alb_pick", PoliciaAlbanil.pickT(p));
+                PoliciaAlbanil.startPick(p);
+                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ARMOR_EQUIP_IRON, SoundSource.PLAYERS, 0.6f, 1.4f);
+                PoliciaMod.msg(p, "Pico de albañil: fuerza y prisa minera");
             } else {
-                PoliciaAlbanil.buildWall(p);
-                d.putInt("alb_walls", d.getInt("alb_walls") + 1);
+                boolean house;
+                boolean bl = house = PoliciaAlbanil.lv(p) >= 2;
+                if (d.getInt("alb_st") > 0) {
+                    if (house || d.getInt("alb_house") == 1) {
+                        PoliciaMod.msg(p, "El refugio sigue en pie");
+                        return;
+                    }
+                    if (d.getInt("alb_walls") >= 3) {
+                        PoliciaMod.msg(p, "Ya levantaste los 3 muros");
+                        return;
+                    }
+                } else {
+                    if (d.getInt("alb_c1") > 0) {
+                        PoliciaMod.msg(p, "Construcción en enfriamiento: " + (d.getInt("alb_c1") + 19) / 20 + " s");
+                        return;
+                    }
+                    d.putInt("alb_walls", 0);
+                    d.putInt("alb_st", house ? (PoliciaAlbanil.lv(p) >= 3 ? 3600 : 700) : 300);
+                    d.putInt("alb_house", house ? 1 : 0);
+                }
+                if (house && PoliciaAlbanil.lv(p) >= 3) {
+                    PoliciaAlbanil.buildHouse2(p);
+                } else if (house) {
+                    PoliciaAlbanil.buildHouse(p);
+                } else {
+                    PoliciaAlbanil.buildWall(p);
+                    d.putInt("alb_walls", d.getInt("alb_walls") + 1);
+                }
+                p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.7f, 1.2f);
+                PoliciaMod.msg(p, house ? (PoliciaAlbanil.lv(p) >= 3 ? "REFUGIO II levantado" : "REFUGIO levantado") : "MURO " + d.getInt("alb_walls") + "/3");
             }
-            p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.7f, 1.2f);
-            PoliciaMod.msg(p, house ? (PoliciaAlbanil.lv(p) >= 3 ? "REFUGIO II levantado" : "REFUGIO levantado") : "MURO " + d.getInt("alb_walls") + "/3");
+            PoliciaMod.sync(p);
+        } finally {
+            PoliciaAnim.siCambio(p, antesAnim, anim);
         }
-        PoliciaMod.sync(p);
     }
 
     static void setZone(ServerPlayer p, int len, int wid) {
