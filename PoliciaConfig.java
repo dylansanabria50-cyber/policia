@@ -14,6 +14,7 @@ public class PoliciaConfig {
     public static final ForgeConfigSpec.BooleanValue LINEAS_VELOCIDAD;
     public static final ForgeConfigSpec.BooleanValue HUD_NIVEL;
     public static final ForgeConfigSpec.BooleanValue HUD_DIARIAS;
+    public static final ForgeConfigSpec.BooleanValue HUD_RELOJ;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -34,6 +35,8 @@ public class PoliciaConfig {
                 .define("hudNivel", true);
         HUD_DIARIAS = b.comment("Mostrar las misiones diarias a la derecha de la pantalla.")
                 .define("hudDiarias", true);
+        HUD_RELOJ = b.comment("Mostrar el reloj y la franja del dia arriba a la izquierda.")
+                .define("hudReloj", true);
         b.pop();
         SPEC = b.build();
     }
@@ -85,6 +88,14 @@ public class PoliciaConfig {
     static boolean hudDiarias() {
         try {
             return HUD_DIARIAS.get();
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    static boolean hudReloj() {
+        try {
+            return HUD_RELOJ.get();
         } catch (Throwable t) {
             return true;
         }

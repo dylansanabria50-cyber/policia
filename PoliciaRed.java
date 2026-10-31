@@ -29,6 +29,7 @@ public class PoliciaRed {
         CH.registerMessage(4, ForjaAbrir.class, ForjaAbrir::enc, ForjaAbrir::dec, ForjaAbrir::handle);
         CH.registerMessage(5, ForjaResultado.class, ForjaResultado::enc, ForjaResultado::dec, ForjaResultado::handle);
         CH.registerMessage(6, QuitarAnillo.class, QuitarAnillo::enc, QuitarAnillo::dec, QuitarAnillo::handle);
+        CH.registerMessage(7, ViajeIr.class, ViajeIr::enc, ViajeIr::dec, ViajeIr::handle);
     }
 
     static void toPlayer(ServerPlayer p, Object msg) {
@@ -212,6 +213,33 @@ public class PoliciaRed {
             c.get().enqueueWork(() -> {
                 if (p != null) {
                     PoliciaRareza.quitarAnillo(p);
+                }
+            });
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Etapa 8: viajar en carruaje a una parada ("casa" = tu casa).
+    public static class ViajeIr {
+        String clave;
+
+        ViajeIr(String clave) {
+            this.clave = clave;
+        }
+
+        static void enc(ViajeIr m, FriendlyByteBuf b) {
+            b.writeUtf(m.clave, 64);
+        }
+
+        static ViajeIr dec(FriendlyByteBuf b) {
+            return new ViajeIr(b.readUtf(64));
+        }
+
+        static void handle(ViajeIr m, Supplier<NetworkEvent.Context> c) {
+            ServerPlayer p = c.get().getSender();
+            c.get().enqueueWork(() -> {
+                if (p != null) {
+                    PoliciaViaje.viajar(p, m.clave);
                 }
             });
             c.get().setPacketHandled(true);

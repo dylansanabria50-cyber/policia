@@ -53,7 +53,8 @@ public class PoliciaNivel {
     // Ingenio: +2 % de XP por punto sobre la base.
     static int conIngenio(Player p, int xp) {
         int ing = PoliciaRPG.atributo(p, "ingenio") - PoliciaRPG.BASE_ATRIBUTO;
-        return Math.max(1, Math.round(xp * (1.0f + Math.max(0, ing) * 0.02f)));
+        float anillo = PoliciaRareza.tipoAnillo(p) == 3 ? 0.10f : 0.0f;
+        return Math.max(1, Math.round(xp * (1.0f + Math.max(0, ing) * 0.02f + anillo)));
     }
 
     static void dar(ServerPlayer p, int xp) {

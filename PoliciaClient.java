@@ -83,6 +83,7 @@ public class PoliciaClient {
     static final KeyMapping K_ANALYZE = new KeyMapping("Herrero: abrir el Analizador del Forjador", 79, "Policia");
     static final KeyMapping K_FICHA = new KeyMapping("RPG: ficha de personaje", 73, "Policia");
     static final KeyMapping K_HAB = new KeyMapping("RPG: usar habilidad nueva (Mayus: cambiar)", 90, "Policia");
+    static final KeyMapping K_MAPA = new KeyMapping("RPG: mapa de viaje en carruaje", 77, "Policia");
     static final ResourceLocation TEX_POL = new ResourceLocation("policia", "textures/entity/policia.png");
     static final ResourceLocation TEX_ALB = new ResourceLocation("policia", "textures/entity/albanil.png");
     static final ResourceLocation TEX_LAD = new ResourceLocation("policia", "textures/entity/ladron.png");
@@ -345,6 +346,7 @@ public class PoliciaClient {
         e.register(K_ANALYZE);
         e.register(K_FICHA);
         e.register(K_HAB);
+        e.register(K_MAPA);
     }
 
     static void overlays(RegisterGuiOverlaysEvent e) {
@@ -354,6 +356,7 @@ public class PoliciaClient {
         e.registerAboveAll("policia_nivel", PoliciaFicha::hud);
         e.registerAboveAll("policia_diarias", PoliciaMisionesCliente::hud);
         e.registerAboveAll("policia_hab", PoliciaHabScreen::hud);
+        e.registerAboveAll("policia_reloj", PoliciaViajeScreen::hud);
     }
 
     static void screenInit(ScreenEvent.Init.Post e) {
@@ -692,6 +695,10 @@ public class PoliciaClient {
         while (K_FICHA.consumeClick()) {
             if (!free) continue;
             mc.setScreen(new PoliciaFicha());
+        }
+        while (K_MAPA.consumeClick()) {
+            if (!free) continue;
+            mc.setScreen(new PoliciaViajeScreen());
         }
         while (K_HAB.consumeClick()) {
             if (!free) continue;
