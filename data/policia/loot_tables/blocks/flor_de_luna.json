@@ -1,0 +1,71 @@
+{
+ "type": "minecraft:block",
+ "pools": [
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:alternatives",
+     "children": [
+      {
+       "type": "minecraft:item",
+       "name": "policia:flor_de_luna_cosechada",
+       "conditions": [
+        {
+         "condition": "minecraft:block_state_property",
+         "block": "policia:flor_de_luna",
+         "properties": {
+          "age": "3"
+         }
+        }
+       ],
+       "functions": [
+        {
+         "function": "minecraft:set_count",
+         "count": {
+          "type": "minecraft:uniform",
+          "min": 1,
+          "max": 2
+         }
+        }
+       ]
+      },
+      {
+       "type": "minecraft:item",
+       "name": "policia:semillas_de_luna"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "policia:semillas_de_luna",
+     "functions": [
+      {
+       "function": "minecraft:apply_bonus",
+       "enchantment": "minecraft:fortune",
+       "formula": "minecraft:binomial_with_bonus_count",
+       "parameters": {
+        "extra": 2,
+        "probability": 0.5714286
+       }
+      }
+     ]
+    }
+   ],
+   "conditions": [
+    {
+     "condition": "minecraft:block_state_property",
+     "block": "policia:flor_de_luna",
+     "properties": {
+      "age": "3"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -38,5 +38,10 @@
  "item.policia.anillo_fuerza": "Ring of Strength",
  "item.policia.anillo_velocidad": "Ring of Speed",
  "item.policia.anillo_suerte": "Ring of Luck",
- "item.policia.escritura_terreno": "Land Deed"
+ "item.policia.escritura_terreno": "Land Deed",
+ "block.policia.flor_de_luna": "Moonflower",
+ "item.policia.semillas_de_luna": "Moonflower Seeds",
+ "item.policia.flor_de_luna_cosechada": "Moonflower",
+ "item.policia.regadera": "Watering Can",
+ "item.policia.cepillo": "Horse Brush"
 }

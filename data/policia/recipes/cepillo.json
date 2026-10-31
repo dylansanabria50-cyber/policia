@@ -1,0 +1,19 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "tools",
+ "pattern": [
+  "WWW",
+  "SSS"
+ ],
+ "key": {
+  "W": {
+   "item": "minecraft:wheat"
+  },
+  "S": {
+   "tag": "minecraft:wooden_slabs"
+  }
+ },
+ "result": {
+  "item": "policia:cepillo"
+ }
+}

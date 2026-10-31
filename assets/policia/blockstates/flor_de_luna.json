@@ -1,0 +1,16 @@
+{
+ "variants": {
+  "age=0": {
+   "model": "policia:block/flor_de_luna_stage0"
+  },
+  "age=1": {
+   "model": "policia:block/flor_de_luna_stage1"
+  },
+  "age=2": {
+   "model": "policia:block/flor_de_luna_stage2"
+  },
+  "age=3": {
+   "model": "policia:block/flor_de_luna_stage3"
+  }
+ }
+}

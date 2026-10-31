@@ -38,5 +38,10 @@
  "item.policia.anillo_fuerza": "Anillo de fuerza",
  "item.policia.anillo_velocidad": "Anillo de velocidad",
  "item.policia.anillo_suerte": "Anillo de la suerte",
- "item.policia.escritura_terreno": "Escritura de terreno"
+ "item.policia.escritura_terreno": "Escritura de terreno",
+ "block.policia.flor_de_luna": "Flor de luna",
+ "item.policia.semillas_de_luna": "Semillas de luna",
+ "item.policia.flor_de_luna_cosechada": "Flor de luna",
+ "item.policia.regadera": "Regadera",
+ "item.policia.cepillo": "Cepillo para caballos"
 }
