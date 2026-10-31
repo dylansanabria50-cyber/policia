@@ -58,10 +58,17 @@ public class PoliciaViaje {
         }
         String clave = "v_" + s.getChunkPos().x + "_" + s.getChunkPos().z;
         CompoundTag mias = paradas(p);
+        PoliciaMundo m = PoliciaMundo.get(sl.getServer());
+        // Etapa 10: cada aldea tiene el almacen de Dona Rosa.
+        CompoundTag glob = m.getSeccion("paradas").getCompound(clave);
+        if (!glob.isEmpty() && !glob.getBoolean("rosa")) {
+            glob.putBoolean("rosa", true);
+            m.setDirty();
+            PoliciaBanco.donaRosa(sl, glob.getInt("x") + 2, glob.getInt("y"), glob.getInt("z") + 2);
+        }
         if (mias.contains(clave)) {
             return;
         }
-        PoliciaMundo m = PoliciaMundo.get(sl.getServer());
         CompoundTag todas = m.getSeccion("paradas");
         CompoundTag par;
         if (todas.contains(clave)) {
