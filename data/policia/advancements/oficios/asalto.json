@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:gold_ingot"
+    },
+    "title": {
+      "text": "El gran golpe"
+    },
+    "description": {
+      "text": "Asaltá el banco de una aldea y escapá con el botín"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "policia:oficios/fantasma",
+  "criteria": {
+    "hecho": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

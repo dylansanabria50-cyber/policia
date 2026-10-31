@@ -118,6 +118,7 @@ public class PoliciaClient {
         PoliciaMovimiento.init();
         PoliciaAnimCliente.init();
         PoliciaMisionesCliente.init();
+        PoliciaAliento.init();
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::render);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::screenInit);
         MinecraftForge.EVENT_BUS.addListener(PoliciaClient::livingPre);
@@ -357,6 +358,7 @@ public class PoliciaClient {
         e.registerAboveAll("policia_diarias", PoliciaMisionesCliente::hud);
         e.registerAboveAll("policia_hab", PoliciaHabScreen::hud);
         e.registerAboveAll("policia_reloj", PoliciaViajeScreen::hud);
+        e.registerAboveAll("policia_aliento", PoliciaAliento::hud);
     }
 
     static void screenInit(ScreenEvent.Init.Post e) {
