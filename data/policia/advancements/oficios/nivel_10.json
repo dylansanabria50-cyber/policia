@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:gold_ingot"
+    },
+    "title": {
+      "text": "Con oficio"
+    },
+    "description": {
+      "text": "Llegá al nivel 10"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "policia:oficios/nivel_5",
+  "criteria": {
+    "hecho": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

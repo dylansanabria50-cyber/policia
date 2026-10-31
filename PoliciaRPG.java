@@ -99,6 +99,7 @@ public class PoliciaRPG {
             p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0f, 1.2f);
             p.displayClientMessage(Component.literal("§6¡Subiste al nivel " + nivel + "! §7(+" + (subidos * 3) + " puntos de atributo)"), false);
             aplicar(p);
+            PoliciaNivel.subio(p, nivel, subidos);
         }
         sync(p);
         return subidos;
@@ -114,6 +115,7 @@ public class PoliciaRPG {
         d.putInt("puntos", d.getInt("puntos") - 1);
         aplicar(p);
         sync(p);
+        PoliciaNivel.atributoSubido(p, a);
         return true;
     }
 
@@ -144,7 +146,9 @@ public class PoliciaRPG {
     }
 
     public static void sync(ServerPlayer p) {
-        PoliciaRed.toPlayer(p, new PoliciaRed.RpgSync(datos(p).copy()));
+        CompoundTag c = datos(p).copy();
+        c.putString("oficio", PoliciaMod.job(p));
+        PoliciaRed.toPlayer(p, new PoliciaRed.RpgSync(c));
     }
 
     static String resumen(Player p) {

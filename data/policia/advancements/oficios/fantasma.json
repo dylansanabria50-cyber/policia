@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:phantom_membrane"
+    },
+    "title": {
+      "text": "Fantasma"
+    },
+    "description": {
+      "text": "Escapá 10 veces como ladrón"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "policia:oficios/habilidades_10",
+  "criteria": {
+    "hecho": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

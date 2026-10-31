@@ -189,6 +189,8 @@ public class PoliciaAnim {
             return;
         }
         PoliciaRed.CH.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> p), new PoliciaRed.AnimPlay(p.getId(), i));
+        // Etapa 4: cada habilidad usada da XP y cuenta para los logros.
+        PoliciaNivel.habilidad(p, id);
     }
 
     // Juega la animacion solo si la habilidad cambio algo en los datos del

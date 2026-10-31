@@ -12,6 +12,7 @@ public class PoliciaConfig {
     public static final ForgeConfigSpec.DoubleValue INTENSIDAD;
     public static final ForgeConfigSpec.BooleanValue PRIMERA_PERSONA;
     public static final ForgeConfigSpec.BooleanValue LINEAS_VELOCIDAD;
+    public static final ForgeConfigSpec.BooleanValue HUD_NIVEL;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -26,6 +27,10 @@ public class PoliciaConfig {
                 .define("activada", true);
         LINEAS_VELOCIDAD = b.comment("Lineas de velocidad en los bordes al correr (estilo anime).")
                 .define("lineasDeVelocidad", true);
+        b.pop();
+        b.push("rpg");
+        HUD_NIVEL = b.comment("Mostrar el nivel y la barra de XP del modo RPG abajo a la izquierda.")
+                .define("hudNivel", true);
         b.pop();
         SPEC = b.build();
     }
@@ -61,6 +66,14 @@ public class PoliciaConfig {
     static boolean lineas() {
         try {
             return LINEAS_VELOCIDAD.get();
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    static boolean hudNivel() {
+        try {
+            return HUD_NIVEL.get();
         } catch (Throwable t) {
             return true;
         }

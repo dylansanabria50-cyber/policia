@@ -145,6 +145,7 @@ public class PoliciaMod {
         // Etapa 1 del modo RPG: canal nuevo, datos del jugador y opciones.
         PoliciaRed.init();
         PoliciaRPG.init();
+        PoliciaNivel.init();
         PoliciaConfig.init();
         MinecraftForge.EVENT_BUS.register(this);
         PoliciaShield.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());

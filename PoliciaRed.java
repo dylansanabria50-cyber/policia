@@ -24,6 +24,7 @@ public class PoliciaRed {
     static void init() {
         CH.registerMessage(0, RpgSync.class, RpgSync::enc, RpgSync::dec, RpgSync::handle);
         CH.registerMessage(1, AnimPlay.class, AnimPlay::enc, AnimPlay::dec, AnimPlay::handle);
+        CH.registerMessage(2, SubirAtributo.class, SubirAtributo::enc, SubirAtributo::dec, SubirAtributo::handle);
     }
 
     static void toPlayer(ServerPlayer p, Object msg) {
@@ -83,6 +84,33 @@ public class PoliciaRed {
 
         static void handle(AnimPlay m, Supplier<NetworkEvent.Context> c) {
             c.get().enqueueWork(() -> net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> PoliciaAnimCliente.start(m.ent, m.idx)));
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Etapa 4: el cliente pide gastar un punto en un atributo (ficha, tecla I).
+    public static class SubirAtributo {
+        int idx;
+
+        SubirAtributo(int idx) {
+            this.idx = idx;
+        }
+
+        static void enc(SubirAtributo m, FriendlyByteBuf b) {
+            b.writeVarInt(m.idx);
+        }
+
+        static SubirAtributo dec(FriendlyByteBuf b) {
+            return new SubirAtributo(b.readVarInt());
+        }
+
+        static void handle(SubirAtributo m, Supplier<NetworkEvent.Context> c) {
+            ServerPlayer p = c.get().getSender();
+            c.get().enqueueWork(() -> {
+                if (p != null && m.idx >= 0 && m.idx < PoliciaRPG.ATRIBUTOS.length) {
+                    PoliciaRPG.subirAtributo(p, PoliciaRPG.ATRIBUTOS[m.idx]);
+                }
+            });
             c.get().setPacketHandled(true);
         }
     }
