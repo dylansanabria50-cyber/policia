@@ -277,14 +277,14 @@ public class PoliciaMovimiento {
         }
         // Escalera: trepa con brazos y piernas alternados.
         if (e.onClimbable() && !g && !e.isPassenger()) {
-            float ph = age * 0.45f;
+            float esc = age * 0.45f;
             float mv = Mth.clamp(Math.abs(s.vy) / 2.0f, 0.0f, 1.0f);
-            m.rightArm.xRot = -2.5f + Mth.sin(ph) * 0.45f * mv;
-            m.leftArm.xRot = -2.5f - Mth.sin(ph) * 0.45f * mv;
+            m.rightArm.xRot = -2.5f + Mth.sin(esc) * 0.45f * mv;
+            m.leftArm.xRot = -2.5f - Mth.sin(esc) * 0.45f * mv;
             m.rightArm.zRot = 0.0f;
             m.leftArm.zRot = 0.0f;
-            m.rightLeg.xRot = -0.35f - Mth.sin(ph) * 0.35f * mv;
-            m.leftLeg.xRot = -0.35f + Mth.sin(ph) * 0.35f * mv;
+            m.rightLeg.xRot = -0.35f - Mth.sin(esc) * 0.35f * mv;
+            m.leftLeg.xRot = -0.35f + Mth.sin(esc) * 0.35f * mv;
             m.head.xRot = Math.min(m.head.xRot, -0.2f);
         } else if (!g && !e.isSwimming() && !e.isFallFlying() && !e.isPassenger() && !golpeando) {
             // En el aire: brazos arriba al subir, abiertos al caer fuerte.
