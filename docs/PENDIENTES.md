@@ -221,5 +221,27 @@ Vistas previas: "Animaciones de Oficios" v25, con las pestañas Médico y Mercad
 - **Lluvia de monedas**: tira una moneda al cofre de la suerte, el cofre tiembla y brilla, y revienta en una fuente de monedas (×10).
 - Primera misión: atender 3 clientes eligiendo precio (si cobrás de más, el cliente se va) y juntar al menos 60 pesos. Kit: bolsa, cofre de mercancía, mapa de rutas.
 
-### Pendiente para estos dos oficios
-- Árbol de habilidades propio (con habilidad suprema), libro del oficio, sede en la ciudad de los gremios (hospital y casa de comercio) y diarias propias.
+### Habilidades extra (en revisión) — "Animaciones de Oficios" v26
+- Médico:
+  - **Hospital de campaña**: carpa con bandera de la cruz y camilla; aura verde que late y cura acostado.
+  - **Burbuja vital**: burbuja verde sobre un aliado; los golpes rebotan en chispas, se agrieta y estalla.
+  - **Mortero de hierbas**: hojas al mortero, muele, el jugo cae al frasco y queda una poción brillante.
+  - **Lazo vital**: lazo de luz entre el médico y un aliado; la vida pasa en pulsos y el médico se cansa un poco.
+- Mercader:
+  - **Balanza tasadora**: objeto en un platillo y monedas en el otro hasta equilibrar; aparece «Vale 240 pesos».
+  - **Contrato sellado**: pergamino; firman los dos con pluma, cae el lacre y una cinta dorada ata el trato.
+  - **Mochila sin fondo**: salen 14 bultos volando que se apilan en un depósito; con un chasquido vuelven.
+  - **Propina dorada**: el guardia no deja pasar; moneda girando, ojos de estrella, «Yo no vi nada…» y se corre.
+
+### Sistemas de los dos oficios (en revisión) — "Pueblo de Oficios" v10
+- **Árbol de habilidades**:
+  - Médico: Vendaje rápido → Mortero / Antídoto → Nube curativa, Lazo vital, Burbuja vital → suprema: Reanimar.
+  - Mercader: Buen ojo → Puesto instantáneo / Regateo → Mochila sin fondo, Caravana, Contrato sellado → suprema: Lluvia de monedas.
+  - Hospital de campaña y Propina dorada quedan como habilidades de rango alto del gremio.
+- **Sedes en la ciudad central**:
+  - **Hospital del Roble** (Doctora Luz; rangos Enfermero → Eminencia; tienda con pociones, antídoto, semillas y paletas).
+  - **Casa de Comercio** (Don Baltasar; rangos Buhonero → Magnate; tienda con balanza, fardo de puesto, carro y contratos).
+- **Libro del oficio**: en cada sede, de 3 páginas (qué hace, habilidades, consejo). También en los 4 gremios viejos.
+- **Diarias propias**:
+  - Médico: curar a 5, 3 pociones, reanimar, atender en el hospital.
+  - Mercader: vender 10, 2 contratos, viaje en caravana, ganar 300 regateando.
