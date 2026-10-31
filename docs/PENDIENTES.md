@@ -248,3 +248,9 @@ Vistas previas: "Animaciones de Oficios" v25, con las pestañas Médico y Mercad
 - **Diarias propias**:
   - Médico: curar a 5, 3 pociones, reanimar, atender en el hospital.
   - Mercader: vender 10, 2 contratos, viaje en caravana, ganar 300 regateando.
+
+## Habilidades de anime para los oficios nuevos — aprobadas (sin animar aún)
+- **Médico · Babosa curandera** (inspirada en Katsuyu, Naruto): invoca una babosa gigante que se divide en babositas que se pegan a cada aliado y lo curan.
+- **Médico · Píldora monstruo** (inspirada en la Rumble Ball de Chopper, One Piece): toma una píldora y durante 20 s crece, carga heridos en los hombros y cura el doble.
+- **Mercader · Puerta del tesoro** (inspirada en las bóvedas doradas de Fate): portales dorados detrás de él escupen mercancía, escudos y cajones que lo protegen.
+Diseño, nombres y sonidos propios; solo inspiración.
