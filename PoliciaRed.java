@@ -30,6 +30,9 @@ public class PoliciaRed {
         CH.registerMessage(5, ForjaResultado.class, ForjaResultado::enc, ForjaResultado::dec, ForjaResultado::handle);
         CH.registerMessage(6, QuitarAnillo.class, QuitarAnillo::enc, QuitarAnillo::dec, QuitarAnillo::handle);
         CH.registerMessage(7, ViajeIr.class, ViajeIr::enc, ViajeIr::dec, ViajeIr::handle);
+        CH.registerMessage(8, Esquivar.class, Esquivar::enc, Esquivar::dec, Esquivar::handle);
+        CH.registerMessage(9, DanoNum.class, DanoNum::enc, DanoNum::dec, DanoNum::handle);
+        CH.registerMessage(10, EnergiaSync.class, EnergiaSync::enc, EnergiaSync::dec, EnergiaSync::handle);
     }
 
     static void toPlayer(ServerPlayer p, Object msg) {
@@ -241,6 +244,92 @@ public class PoliciaRed {
                 if (p != null) {
                     PoliciaViaje.viajar(p, m.clave);
                 }
+            });
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Combate: rodar hacia (dx, dz).
+    public static class Esquivar {
+        float dx;
+        float dz;
+
+        Esquivar(float dx, float dz) {
+            this.dx = dx;
+            this.dz = dz;
+        }
+
+        static void enc(Esquivar m, FriendlyByteBuf b) {
+            b.writeFloat(m.dx);
+            b.writeFloat(m.dz);
+        }
+
+        static Esquivar dec(FriendlyByteBuf b) {
+            return new Esquivar(b.readFloat(), b.readFloat());
+        }
+
+        static void handle(Esquivar m, Supplier<NetworkEvent.Context> c) {
+            ServerPlayer p = c.get().getSender();
+            c.get().enqueueWork(() -> {
+                if (p != null) {
+                    PoliciaCombate.esquivar(p, m.dx, m.dz);
+                }
+            });
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Combate: numero de dano flotante.
+    public static class DanoNum {
+        int ent;
+        float cant;
+        int tipo;
+
+        DanoNum(int ent, float cant, int tipo) {
+            this.ent = ent;
+            this.cant = cant;
+            this.tipo = tipo;
+        }
+
+        static void enc(DanoNum m, FriendlyByteBuf b) {
+            b.writeVarInt(m.ent);
+            b.writeFloat(m.cant);
+            b.writeByte(m.tipo);
+        }
+
+        static DanoNum dec(FriendlyByteBuf b) {
+            return new DanoNum(b.readVarInt(), b.readFloat(), b.readByte());
+        }
+
+        static void handle(DanoNum m, Supplier<NetworkEvent.Context> c) {
+            c.get().enqueueWork(() -> net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> PoliciaCombateCliente.numero(m.ent, m.cant, m.tipo)));
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Combate: energia del jugador.
+    public static class EnergiaSync {
+        float v;
+        float max;
+
+        EnergiaSync(float v, float max) {
+            this.v = v;
+            this.max = max;
+        }
+
+        static void enc(EnergiaSync m, FriendlyByteBuf b) {
+            b.writeFloat(m.v);
+            b.writeFloat(m.max);
+        }
+
+        static EnergiaSync dec(FriendlyByteBuf b) {
+            return new EnergiaSync(b.readFloat(), b.readFloat());
+        }
+
+        static void handle(EnergiaSync m, Supplier<NetworkEvent.Context> c) {
+            c.get().enqueueWork(() -> {
+                PoliciaCombateCliente.ENERGIA = m.v;
+                PoliciaCombateCliente.ENERGIA_MAX = m.max;
             });
             c.get().setPacketHandled(true);
         }

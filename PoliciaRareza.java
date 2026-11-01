@@ -233,6 +233,7 @@ public class PoliciaRareza {
         int antes = rareza(obj);
         if (r > antes) {
             ponerRareza(obj, r);
+            PoliciaBotin.tirarAfijos(obj, p.getRandom());
         }
         obj.setDamageValue(Math.max(0, obj.getDamageValue() - obj.getMaxDamage() / 4));
         p.serverLevel().sendParticles(ParticleTypes.LAVA, p.getX(), p.getY() + 1, p.getZ(), 10, 0.3, 0.3, 0.3, 0);
@@ -252,6 +253,7 @@ public class PoliciaRareza {
                 int r = tirar(p);
                 if (r > 0) {
                     ponerRareza(e.getCrafting(), r);
+                    PoliciaBotin.tirarAfijos(e.getCrafting(), p.getRandom());
                     p.displayClientMessage(Component.literal("§7Te salió ").append(etiqueta(r)).append(Component.literal("§7: " + e.getCrafting().getHoverName().getString())), true);
                     if (r == 4) {
                         PoliciaNivel.logro(p, "legendario");

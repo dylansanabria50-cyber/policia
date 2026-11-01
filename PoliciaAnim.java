@@ -426,6 +426,13 @@ public class PoliciaAnim {
                 .fx(10, ParticleTypes.ENCHANT, 12, 1.0f, 1.5f, 0.3f, 0.3f)
                 .snd(6, PoliciaSonido.anim("scan"), 0.9f, 1.0f);
 
+        // ---------- Combate ----------
+        def("rodar", 13)
+                .k(k(2).crouch(0.25f).lean(35).ra(-1.2f, 0, 0.3f).la(-1.2f, 0, -0.3f).legs(-0.8f, -0.8f))
+                .k(k(8).crouch(0.55f).lean(300).ra(-1.4f, 0, 0.3f).la(-1.4f, 0, -0.3f).legs(-1.2f, -1.2f))
+                .k(k(12).crouch(0.1f).lean(360))
+                .k(k(13).lean(360));
+
         // ---------- Solo para la vista previa del arbol ----------
         // (habilidades que en el juego usan otra animacion o son pasivas)
         def("lad_carterismo", 30)

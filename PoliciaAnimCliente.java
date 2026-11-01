@@ -274,7 +274,12 @@ public class PoliciaAnimCliente {
             ps.translate(0.0f, -crouch, 0.0f);
         }
         if (lean != 0.0f) {
+            // inclinaciones chicas giran desde los pies; las vueltas
+            // completas (rodar) giran desde el centro del cuerpo
+            float piv = Mth.clamp((Math.abs(lean) - 30.0f) / 60.0f, 0.0f, 1.0f) * 0.7f;
+            ps.translate(0.0f, piv, 0.0f);
             ps.mulPose(new Quaternionf().rotationAxis((float) Math.toRadians(lean), Mth.cos(yaw), 0.0f, Mth.sin(yaw)));
+            ps.translate(0.0f, -piv, 0.0f);
         }
         if (spin != 0.0f) {
             ps.mulPose(Axis.YP.rotationDegrees(-spin));

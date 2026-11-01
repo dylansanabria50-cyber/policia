@@ -117,6 +117,7 @@ public class PoliciaClient {
         MinecraftForge.EVENT_BUS.addListener(PoliciaHerreroAnim::firstPerson);
         PoliciaMovimiento.init();
         PoliciaAnimCliente.init();
+        PoliciaCombateCliente.init();
         net.minecraftforge.fml.ModLoadingContext.get().registerExtensionPoint(net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory.class,
                 () -> new net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory((mc, padre) -> new PoliciaOpcionesScreen(padre)));
         PoliciaMisionesCliente.init();
@@ -376,6 +377,7 @@ public class PoliciaClient {
         e.register(K_FICHA);
         e.register(K_HAB);
         e.register(K_MAPA);
+        e.register(PoliciaCombateCliente.K_ESQUIVAR);
     }
 
     static void overlays(RegisterGuiOverlaysEvent e) {
@@ -387,6 +389,7 @@ public class PoliciaClient {
         e.registerAboveAll("policia_hab", PoliciaHabScreen::hud);
         e.registerAboveAll("policia_reloj", PoliciaViajeScreen::hud);
         e.registerAboveAll("policia_aliento", PoliciaAliento::hud);
+        e.registerAboveAll("policia_energia", PoliciaCombateCliente::hud);
     }
 
     static void screenInit(ScreenEvent.Init.Post e) {

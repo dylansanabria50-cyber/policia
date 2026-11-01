@@ -54,7 +54,7 @@ public class PoliciaNivel {
     static int conIngenio(Player p, int xp) {
         int ing = PoliciaRPG.atributo(p, "ingenio") - PoliciaRPG.BASE_ATRIBUTO;
         float anillo = PoliciaRareza.tipoAnillo(p) == 3 ? 0.10f : 0.0f;
-        return Math.max(1, Math.round(xp * (1.0f + Math.max(0, ing) * 0.02f + anillo + (p instanceof net.minecraft.server.level.ServerPlayer sp ? PoliciaAlcalde.bonoXp(sp) : 0.0f))));
+        return Math.max(1, Math.round(xp * (1.0f + Math.max(0, ing) * 0.02f + anillo + PoliciaBotin.bonoXp(p) + (p instanceof net.minecraft.server.level.ServerPlayer sp ? PoliciaAlcalde.bonoXp(sp) : 0.0f))));
     }
 
     static void dar(ServerPlayer p, int xp) {
@@ -217,6 +217,7 @@ public class PoliciaNivel {
             if (PoliciaHabObra.DOMINIO.contains(p.getUUID()) || p.getRandom().nextFloat() < des * 0.01f) {
                 e.setAmount(e.getAmount() * 1.5f);
                 LivingEntity v = e.getEntity();
+                PoliciaCombate.marcarCritico(v);
                 p.serverLevel().sendParticles(ParticleTypes.CRIT, v.getX(), v.getY() + v.getBbHeight() * 0.6, v.getZ(), 14, 0.3, 0.3, 0.3, 0.3);
                 p.serverLevel().playSound(null, v.blockPosition(), SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.PLAYERS, 1.0f, 1.0f);
             }

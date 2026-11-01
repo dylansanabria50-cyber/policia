@@ -201,8 +201,13 @@ public class PoliciaHab {
             PoliciaMod.msg(p, d.nombre + " en enfriamiento: " + (hasta - ahora + 19) / 20 + " s");
             return;
         }
+        if (PoliciaCombate.energia(p) < PoliciaCombate.costoHab(d.cd)) {
+            PoliciaCombate.gastar(p, PoliciaCombate.costoHab(d.cd));
+            return;
+        }
         boolean ok = ejecutar(p, d);
         if (ok) {
+            PoliciaCombate.gastar(p, PoliciaCombate.costoHab(d.cd));
             CompoundTag cd = h.getCompound("cd");
             cd.putLong(id, ahora + d.cd);
             h.put("cd", cd);
