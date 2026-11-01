@@ -107,6 +107,12 @@ public class PoliciaBoss {
     public static final RegistryObject<CreativeModeTab> TAB = TABS.register("oficios", () -> CreativeModeTab.builder().title(Component.literal("Oficios")).icon(() -> new ItemStack((ItemLike) PoliciaPlaca.PLACA.get())).displayItems((params, out) -> {
         String[][] sk;
         out.accept((ItemLike) PoliciaPlaca.PLACA.get());
+        for (net.minecraft.world.item.Item it : PoliciaBotin.accesorios()) {
+            out.accept((ItemLike) it);
+        }
+        for (int g = 0; g < PoliciaBotin.GEMAS.length; g++) {
+            out.accept((ItemLike) PoliciaBotin.gema(g));
+        }
         out.accept((ItemLike) PoliciaPlaca.BALDE.get());
         out.accept((ItemLike) PoliciaPlaca.GUANTE.get());
         out.accept((ItemLike) PoliciaPlaca.MARTILLO.get());
