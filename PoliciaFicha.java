@@ -22,6 +22,8 @@ public class PoliciaFicha extends Screen {
             "1 % de golpe crítico (x1,5) por punto",
             "+2 % de XP ganada por punto"};
     final Button[] mas = new Button[5];
+    static final String[] CASILLEROS = {"anillo", "anillo2", "amuleto", "capa", "cinturon"};
+    static final String[] ICONO = {"○", "○", "◊", "▲", "═"};
     int x0;
     int y0;
 
@@ -43,8 +45,6 @@ public class PoliciaFicha extends Screen {
             this.mas[i] = this.addRenderableWidget(Button.builder(Component.literal("+"), b -> PoliciaRed.CH.sendToServer(new PoliciaRed.SubirAtributo(idx)))
                     .bounds(this.x0 + W - 30, this.y0 + 74 + i * 24, 18, 16).build());
         }
-        this.addRenderableWidget(Button.builder(Component.literal("Quitar"), b -> PoliciaRed.CH.sendToServer(new PoliciaRed.QuitarAnillo()))
-                .bounds(this.x0 + W - 52, this.y0 + 59, 40, 12).build());
         int bw = 66;
         int by = this.y0 + H - 26;
         this.addRenderableWidget(Button.builder(Component.literal("Habilidades"), b -> Minecraft.getInstance().setScreen(new PoliciaHabScreen()))
@@ -59,6 +59,21 @@ public class PoliciaFicha extends Screen {
         }).bounds(this.x0 + 10 + 2 * (bw + 4), by, bw, 18).build());
         this.addRenderableWidget(Button.builder(Component.literal("Cerrar"), b -> this.onClose())
                 .bounds(this.x0 + 10 + 3 * (bw + 4), by, bw, 18).build());
+    }
+
+    @Override
+    public boolean mouseClicked(double mx, double my, int b) {
+        for (int i = 0; i < CASILLEROS.length; i++) {
+            int cx = this.x0 + W - 112 + i * 20;
+            int cy = this.y0 + 56;
+            if (mx >= cx && mx < cx + 18 && my >= cy && my < cy + 18) {
+                if (d().contains(CASILLEROS[i])) {
+                    PoliciaRed.CH.sendToServer(new PoliciaRed.QuitarCasillero(CASILLEROS[i]));
+                }
+                return true;
+            }
+        }
+        return super.mouseClicked(mx, my, b);
     }
 
     @Override
@@ -127,19 +142,28 @@ public class PoliciaFicha extends Screen {
         g.drawCenteredString(this.font, xs, x + W / 2, y + 52, 0xC8B89A);
         int pts = d.getInt("puntos");
         g.drawString(this.font, pts > 0 ? "§ePuntos libres: " + pts : "§7Puntos libres: 0", x + 12, y + 62, 0xFFFFFF);
-        // casillero del anillo
-        g.fill(x + W - 76, y + 57, x + W - 58, y + 75, 0xFF6B4B22);
-        g.fill(x + W - 75, y + 58, x + W - 59, y + 74, 0xFF0E0B08);
-        if (d.contains("anillo")) {
-            net.minecraft.world.item.ItemStack an = net.minecraft.world.item.ItemStack.of(d.getCompound("anillo"));
-            g.renderItem(an, x + W - 75, y + 58);
-            if (mx >= x + W - 76 && mx <= x + W - 58 && my >= y + 57 && my <= y + 75) {
-                g.renderTooltip(this.font, an, mx, my);
+        // casilleros: dos anillos, amuleto, capa y cinturon (clic = sacar)
+        net.minecraft.world.item.ItemStack tip = null;
+        String tipNombre = null;
+        for (int i = 0; i < CASILLEROS.length; i++) {
+            int cx = x + W - 112 + i * 20;
+            int cy = y + 56;
+            boolean sobre = mx >= cx && mx < cx + 18 && my >= cy && my < cy + 18;
+            g.fill(cx, cy, cx + 18, cy + 18, sobre ? 0xFFC89A48 : 0xFF6B4B22);
+            g.fill(cx + 1, cy + 1, cx + 17, cy + 17, 0xFF0E0B08);
+            if (d.contains(CASILLEROS[i])) {
+                net.minecraft.world.item.ItemStack it = net.minecraft.world.item.ItemStack.of(d.getCompound(CASILLEROS[i]));
+                g.renderItem(it, cx + 1, cy + 1);
+                if (sobre) {
+                    tip = it;
+                }
+            } else {
+                g.drawCenteredString(this.font, "§8" + ICONO[i], cx + 9, cy + 5, 0xFFFFFF);
+                if (sobre) {
+                    tipNombre = PoliciaBotin.nombreCasillero(CASILLEROS[i]) + " §8(vacío)";
+                }
             }
-        } else {
-            g.drawString(this.font, "§8○", x + W - 70, y + 62, 0xFFFFFF);
         }
-        g.drawString(this.font, "§7Anillo", x + W - 116, y + 62, 0xFFFFFF);
         // atributos
         for (int i = 0; i < 5; i++) {
             int ry = y + 74 + i * 24;
@@ -168,6 +192,13 @@ public class PoliciaFicha extends Screen {
         g.drawCenteredString(this.font, st, x + W / 2, y + H - 52, 0xFFFFFF);
         g.drawCenteredString(this.font, "§8Habilidades usadas: " + c.getInt("habilidades") + " · Enemigos: " + c.getInt("muertes") + " · Menas: " + c.getInt("menas"), x + W / 2, y + H - 40, 0xFFFFFF);
         super.render(g, mx, my, pt);
+        if (tip != null) {
+            java.util.List<Component> l = new java.util.ArrayList<Component>(net.minecraft.client.gui.screens.Screen.getTooltipFromItem(Minecraft.getInstance(), tip));
+            l.add(Component.literal("§eClic para sacártelo"));
+            g.renderComponentTooltip(this.font, l, mx, my);
+        } else if (tipNombre != null) {
+            g.renderTooltip(this.font, Component.literal(tipNombre), mx, my);
+        }
     }
 
     // ---------------- HUD: nivel y barra de XP abajo a la izquierda ----------------

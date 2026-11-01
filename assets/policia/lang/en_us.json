@@ -43,5 +43,19 @@
  "item.policia.semillas_de_luna": "Moonflower Seeds",
  "item.policia.flor_de_luna_cosechada": "Moonflower",
  "item.policia.regadera": "Watering Can",
- "item.policia.cepillo": "Horse Brush"
+ "item.policia.cepillo": "Horse Brush",
+ "item.policia.amuleto_vida": "Amulet of Life",
+ "item.policia.amuleto_sabio": "Sage Amulet",
+ "item.policia.amuleto_guerra": "War Amulet",
+ "item.policia.capa_viajero": "Traveler Cape",
+ "item.policia.capa_guardian": "Guardian Cape",
+ "item.policia.capa_sombras": "Shadow Cape",
+ "item.policia.cinturon_cuero": "Reinforced Leather Belt",
+ "item.policia.cinturon_alquimista": "Alchemist Belt",
+ "item.policia.gema_rubi": "Ruby",
+ "item.policia.gema_zafiro": "Sapphire",
+ "item.policia.gema_ambar": "Amber",
+ "item.policia.gema_amatista": "Amethyst Gem",
+ "item.policia.gema_onix": "Onyx",
+ "item.policia.gema_topacio": "Topaz"
 }

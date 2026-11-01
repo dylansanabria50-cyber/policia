@@ -33,6 +33,7 @@ public class PoliciaRed {
         CH.registerMessage(8, Esquivar.class, Esquivar::enc, Esquivar::dec, Esquivar::handle);
         CH.registerMessage(9, DanoNum.class, DanoNum::enc, DanoNum::dec, DanoNum::handle);
         CH.registerMessage(10, EnergiaSync.class, EnergiaSync::enc, EnergiaSync::dec, EnergiaSync::handle);
+        CH.registerMessage(11, QuitarCasillero.class, QuitarCasillero::enc, QuitarCasillero::dec, QuitarCasillero::handle);
     }
 
     static void toPlayer(ServerPlayer p, Object msg) {
@@ -330,6 +331,33 @@ public class PoliciaRed {
             c.get().enqueueWork(() -> {
                 PoliciaCombateCliente.ENERGIA = m.v;
                 PoliciaCombateCliente.ENERGIA_MAX = m.max;
+            });
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Ficha: sacar lo que hay en un casillero (anillo, anillo2, amuleto...).
+    public static class QuitarCasillero {
+        String slot;
+
+        QuitarCasillero(String slot) {
+            this.slot = slot;
+        }
+
+        static void enc(QuitarCasillero m, FriendlyByteBuf b) {
+            b.writeUtf(m.slot, 16);
+        }
+
+        static QuitarCasillero dec(FriendlyByteBuf b) {
+            return new QuitarCasillero(b.readUtf(16));
+        }
+
+        static void handle(QuitarCasillero m, Supplier<NetworkEvent.Context> c) {
+            ServerPlayer p = c.get().getSender();
+            c.get().enqueueWork(() -> {
+                if (p != null && java.util.Arrays.asList("anillo", "anillo2", "amuleto", "capa", "cinturon").contains(m.slot)) {
+                    PoliciaRareza.quitar(p, m.slot);
+                }
             });
             c.get().setPacketHandled(true);
         }

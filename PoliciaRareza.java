@@ -84,8 +84,11 @@ public class PoliciaRareza {
             ItemStack st = p.getItemInHand(hand);
             if (!level.isClientSide && p instanceof ServerPlayer sp) {
                 CompoundTag d = PoliciaRPG.datos(sp);
-                ItemStack viejo = d.contains("anillo") ? ItemStack.of(d.getCompound("anillo")) : ItemStack.EMPTY;
-                d.put("anillo", st.copyWithCount(1).save(new CompoundTag()));
+                // dos dedos: primero el anillo 1, despues el 2; si estan los
+                // dos, se cambia el 1
+                String slot = !d.contains("anillo") ? "anillo" : !d.contains("anillo2") ? "anillo2" : "anillo";
+                ItemStack viejo = d.contains(slot) ? ItemStack.of(d.getCompound(slot)) : ItemStack.EMPTY;
+                d.put(slot, st.copyWithCount(1).save(new CompoundTag()));
                 p.setItemInHand(hand, viejo);
                 aplicarAnillo(sp);
                 PoliciaRPG.sync(sp);
@@ -108,38 +111,57 @@ public class PoliciaRareza {
     }
 
     static int tipoAnillo(Player p) {
+        return tipoAnillo(p, "anillo");
+    }
+
+    static int tipoAnillo(Player p, String slot) {
         CompoundTag d = PoliciaRPG.datos(p);
-        if (!d.contains("anillo")) {
+        if (!d.contains(slot)) {
             return -1;
         }
-        ItemStack st = ItemStack.of(d.getCompound("anillo"));
+        ItemStack st = ItemStack.of(d.getCompound(slot));
         return st.getItem() instanceof Anillo a ? a.tipo : -1;
     }
 
+    // Cuantos anillos de ese tipo tiene puestos (0, 1 o 2).
+    static int anillos(Player p, int tipo) {
+        return (tipoAnillo(p, "anillo") == tipo ? 1 : 0) + (tipoAnillo(p, "anillo2") == tipo ? 1 : 0);
+    }
+
+    static final UUID MOD_ANILLO2 = UUID.fromString("3e8f1b2a-6c4d-4a1e-9b7f-0c2d4e6f8a21");
+
     static void poner(Player p, Attribute at, double v, AttributeModifier.Operation op) {
+        poner(p, at, v, op, MOD_ANILLO);
+    }
+
+    static void poner(Player p, Attribute at, double v, AttributeModifier.Operation op, UUID id) {
         AttributeInstance inst = p.getAttribute(at);
         if (inst != null) {
-            inst.removeModifier(MOD_ANILLO);
+            inst.removeModifier(id);
             if (v != 0) {
-                inst.addPermanentModifier(new AttributeModifier(MOD_ANILLO, "anillo", v, op));
+                inst.addPermanentModifier(new AttributeModifier(id, "anillo", v, op));
             }
         }
     }
 
     static void aplicarAnillo(ServerPlayer p) {
-        int t = tipoAnillo(p);
         for (Attribute at : new Attribute[]{Attributes.MAX_HEALTH, Attributes.ATTACK_DAMAGE, Attributes.MOVEMENT_SPEED, Attributes.LUCK}) {
             AttributeInstance inst = p.getAttribute(at);
             if (inst != null) {
                 inst.removeModifier(MOD_ANILLO);
+                inst.removeModifier(MOD_ANILLO2);
             }
         }
-        switch (t) {
-            case 0 -> poner(p, Attributes.MAX_HEALTH, 4.0, AttributeModifier.Operation.ADDITION);
-            case 1 -> poner(p, Attributes.ATTACK_DAMAGE, 1.5, AttributeModifier.Operation.ADDITION);
-            case 2 -> poner(p, Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.MULTIPLY_BASE);
-            case 3 -> poner(p, Attributes.LUCK, 2.0, AttributeModifier.Operation.ADDITION);
-            default -> {
+        String[] slots = {"anillo", "anillo2"};
+        UUID[] ids = {MOD_ANILLO, MOD_ANILLO2};
+        for (int i = 0; i < 2; i++) {
+            switch (tipoAnillo(p, slots[i])) {
+                case 0 -> poner(p, Attributes.MAX_HEALTH, 4.0, AttributeModifier.Operation.ADDITION, ids[i]);
+                case 1 -> poner(p, Attributes.ATTACK_DAMAGE, 1.5, AttributeModifier.Operation.ADDITION, ids[i]);
+                case 2 -> poner(p, Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.MULTIPLY_BASE, ids[i]);
+                case 3 -> poner(p, Attributes.LUCK, 2.0, AttributeModifier.Operation.ADDITION, ids[i]);
+                default -> {
+                }
             }
         }
         if (p.getHealth() > p.getMaxHealth()) {
@@ -148,16 +170,23 @@ public class PoliciaRareza {
     }
 
     static void quitarAnillo(ServerPlayer p) {
+        quitar(p, "anillo");
+    }
+
+    // Saca lo que haya en ese casillero (anillo, anillo2, amuleto, capa,
+    // cinturon) y lo devuelve al inventario.
+    static void quitar(ServerPlayer p, String slot) {
         CompoundTag d = PoliciaRPG.datos(p);
-        if (!d.contains("anillo")) {
+        if (!d.contains(slot)) {
             return;
         }
-        ItemStack st = ItemStack.of(d.getCompound("anillo"));
-        d.remove("anillo");
+        ItemStack st = ItemStack.of(d.getCompound(slot));
+        d.remove(slot);
         if (!p.getInventory().add(st)) {
             p.drop(st, false);
         }
         aplicarAnillo(p);
+        PoliciaBotin.aplicarExtra(p);
         PoliciaRPG.sync(p);
     }
 

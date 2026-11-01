@@ -71,7 +71,7 @@ public class PoliciaCombate {
 
     // ---------------- Energia ----------------
     static float energiaMax(ServerPlayer p) {
-        return 100.0f + Math.max(0, PoliciaRPG.atributo(p, "ingenio") - PoliciaRPG.BASE_ATRIBUTO) * 2.0f;
+        return 100.0f + Math.max(0, PoliciaRPG.atributo(p, "ingenio") - PoliciaRPG.BASE_ATRIBUTO) * 2.0f + PoliciaBotin.bonoEnergia(p);
     }
 
     static float energia(ServerPlayer p) {

@@ -360,6 +360,8 @@ public class PoliciaMazmorra {
             ItemStack e = eq[r.nextInt(eq.length)];
             PoliciaRareza.ponerRareza(e, r.nextInt(4) == 0 ? 4 : 3);
             PoliciaBotin.tirarAfijos(e, sl.getRandom());
+            ch.setItem(20, PoliciaBotin.piezaConjunto(sl.getRandom(), 20));
+            ch.setItem(24, new ItemStack(PoliciaBotin.gema(sl.getRandom().nextInt(PoliciaBotin.GEMAS.length)), 2));
             ch.setItem(4, e);
             ItemStack[] an = {new ItemStack(PoliciaRareza.ANILLO_VIDA.get()), new ItemStack(PoliciaRareza.ANILLO_FUERZA.get()), new ItemStack(PoliciaRareza.ANILLO_VELOCIDAD.get()), new ItemStack(PoliciaRareza.ANILLO_SUERTE.get())};
             ch.setItem(22, an[r.nextInt(an.length)]);

@@ -43,5 +43,19 @@
  "item.policia.semillas_de_luna": "Semillas de luna",
  "item.policia.flor_de_luna_cosechada": "Flor de luna",
  "item.policia.regadera": "Regadera",
- "item.policia.cepillo": "Cepillo para caballos"
+ "item.policia.cepillo": "Cepillo para caballos",
+ "item.policia.amuleto_vida": "Amuleto de vida",
+ "item.policia.amuleto_sabio": "Amuleto del sabio",
+ "item.policia.amuleto_guerra": "Amuleto de guerra",
+ "item.policia.capa_viajero": "Capa de viajero",
+ "item.policia.capa_guardian": "Capa del guardián",
+ "item.policia.capa_sombras": "Capa de sombras",
+ "item.policia.cinturon_cuero": "Cinturón de cuero reforzado",
+ "item.policia.cinturon_alquimista": "Cinturón del alquimista",
+ "item.policia.gema_rubi": "Rubí",
+ "item.policia.gema_zafiro": "Zafiro",
+ "item.policia.gema_ambar": "Ámbar",
+ "item.policia.gema_amatista": "Amatista",
+ "item.policia.gema_onix": "Ónix",
+ "item.policia.gema_topacio": "Topacio"
 }
