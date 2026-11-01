@@ -122,6 +122,12 @@ public class PoliciaHerreroAnim {
     }
 
     public static class AnimModel extends PlayerModel<AbstractClientPlayer> {
+        // Codos y rodillas (PoliciaHuesos).
+        public float codoD;
+        public float codoI;
+        public float rodD;
+        public float rodI;
+
         public AnimModel(ModelPart root, boolean slim) {
             super(root, slim);
         }
@@ -136,12 +142,51 @@ public class PoliciaHerreroAnim {
                 PoliciaMovimiento.pose(this, e, limbSwing, limbAmount, ageInTicks);
                 // Animaciones de habilidades (etapa 3).
                 PoliciaAnimCliente.pose(this, e, ageInTicks);
+            } else {
+                PoliciaHerreroAnim.pose(this, t, PoliciaHerreroAnim.kind(e));
+                this.rightSleeve.copyFrom(this.rightArm);
+                this.leftSleeve.copyFrom(this.leftArm);
+                this.hat.copyFrom(this.head);
+            }
+            PoliciaHuesos.calcular(this, e, limbSwing, limbAmount, ageInTicks);
+        }
+
+        boolean doblado() {
+            return PoliciaHuesos.activo() && (this.codoD != 0.0f || this.codoI != 0.0f || this.rodD != 0.0f || this.rodI != 0.0f);
+        }
+
+        @Override
+        public void renderToBuffer(PoseStack ps, com.mojang.blaze3d.vertex.VertexConsumer vc, int luz, int overlay, float r, float g, float b, float a) {
+            if (!this.doblado()) {
+                super.renderToBuffer(ps, vc, luz, overlay, r, g, b, a);
                 return;
             }
-            PoliciaHerreroAnim.pose(this, t, PoliciaHerreroAnim.kind(e));
-            this.rightSleeve.copyFrom(this.rightArm);
-            this.leftSleeve.copyFrom(this.leftArm);
-            this.hat.copyFrom(this.head);
+            ModelPart[] partes = {this.rightArm, this.leftArm, this.rightLeg, this.leftLeg, this.rightSleeve, this.leftSleeve, this.rightPants, this.leftPants};
+            float[] doblez = {this.codoD, this.codoI, this.rodD, this.rodI, this.codoD, this.codoI, this.rodD, this.rodI};
+            boolean[] vis = new boolean[partes.length];
+            for (int i = 0; i < partes.length; i++) {
+                vis[i] = partes[i].visible;
+                partes[i].visible = false;
+            }
+            super.renderToBuffer(ps, vc, luz, overlay, r, g, b, a);
+            for (int i = 0; i < partes.length; i++) {
+                partes[i].visible = vis[i];
+            }
+            for (int i = 0; i < partes.length; i++) {
+                PoliciaHuesos.miembro(partes[i], ps, vc, luz, overlay, r, g, b, a, doblez[i]);
+            }
+        }
+
+        // El objeto en la mano sigue al antebrazo.
+        @Override
+        public void translateToHand(net.minecraft.world.entity.HumanoidArm arm, PoseStack ps) {
+            super.translateToHand(arm, ps);
+            float d = arm == net.minecraft.world.entity.HumanoidArm.RIGHT ? this.codoD : this.codoI;
+            if (PoliciaHuesos.activo() && d != 0.0f) {
+                ps.translate(0.0f, 0.25f, 0.0f);
+                ps.mulPose(com.mojang.math.Axis.XP.rotation(d));
+                ps.translate(0.0f, -0.25f, 0.0f);
+            }
         }
     }
 

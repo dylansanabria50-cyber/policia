@@ -16,12 +16,15 @@ public class PoliciaConfig {
     public static final ForgeConfigSpec.BooleanValue HUD_DIARIAS;
     public static final ForgeConfigSpec.BooleanValue HUD_RELOJ;
     public static final ForgeConfigSpec.BooleanValue ESTACIONES;
+    public static final ForgeConfigSpec.BooleanValue ARTICULACIONES;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
         b.push("movimientos");
         MOVIMIENTOS = b.comment("Movimientos mejorados de todos los jugadores (inclinacion al acelerar y en curvas, aterrizaje, escalera, golpes). Solo visual.")
                 .define("activados", true);
+        ARTICULACIONES = b.comment("Codos y rodillas que se doblan (al caminar, correr, pelear, cubrirse...). Tambien en la armadura.")
+                .define("articulaciones", true);
         INTENSIDAD = b.comment("Que tan marcados son los movimientos (0.0 a 2.0).")
                 .defineInRange("intensidad", 1.0, 0.0, 2.0);
         b.pop();
@@ -109,6 +112,14 @@ public class PoliciaConfig {
     static boolean estaciones() {
         try {
             return ESTACIONES.get();
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    static boolean articulaciones() {
+        try {
+            return ARTICULACIONES.get();
         } catch (Throwable t) {
             return true;
         }

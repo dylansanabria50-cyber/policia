@@ -204,6 +204,7 @@ public class PoliciaClient {
                 for (int i = 0; i < list.size(); ++i) {
                     Object layer = list.get(i);
                     if (layer instanceof HumanoidArmorLayer && !(layer instanceof HideArmorLayer)) {
+                        PoliciaClient.armaduraDoblable(layer, "slim".equals(skin), e.getContext());
                         list.set(i, new HideArmorLayer((RenderLayerParent) r, (RenderLayer) layer));
                     }
                 }
@@ -223,6 +224,30 @@ public class PoliciaClient {
                 list.add(new PoliciaAnimCliente.PropLayer((RenderLayerParent) r));
             } catch (Throwable ignored) {
             }
+        }
+    }
+
+    // La armadura del jugador usa un modelo cuyos brazos y piernas se doblan
+    // igual que la piel (codos y rodillas). Si algo falla queda la normal.
+    static void armaduraDoblable(Object layer, boolean slim, net.minecraft.client.renderer.entity.EntityRendererProvider.Context ctx) {
+        try {
+            for (java.lang.reflect.Field f : HumanoidArmorLayer.class.getDeclaredFields()) {
+                if (!net.minecraft.client.model.HumanoidModel.class.isAssignableFrom(f.getType())) {
+                    continue;
+                }
+                f.setAccessible(true);
+                net.minecraft.client.model.HumanoidModel<?> viejo = (net.minecraft.client.model.HumanoidModel<?>) f.get(layer);
+                if (viejo instanceof PoliciaHuesos.ArmaduraModel) {
+                    continue;
+                }
+                float minX = PoliciaHuesos.cubos(viejo.head).isEmpty() ? -4.5f : PoliciaHuesos.cubos(viejo.head).get(0).minX;
+                boolean interior = minX > -4.75f;
+                net.minecraft.client.model.geom.ModelLayerLocation capa = interior
+                        ? (slim ? net.minecraft.client.model.geom.ModelLayers.PLAYER_SLIM_INNER_ARMOR : net.minecraft.client.model.geom.ModelLayers.PLAYER_INNER_ARMOR)
+                        : (slim ? net.minecraft.client.model.geom.ModelLayers.PLAYER_SLIM_OUTER_ARMOR : net.minecraft.client.model.geom.ModelLayers.PLAYER_OUTER_ARMOR);
+                f.set(layer, new PoliciaHuesos.ArmaduraModel(ctx.bakeLayer(capa)));
+            }
+        } catch (Throwable ignored) {
         }
     }
 
