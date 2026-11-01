@@ -160,6 +160,8 @@ public class PoliciaAsalto {
                     PoliciaHabOficios.dar(o, new ItemStack(Items.GOLD_INGOT, 2 + sl.random.nextInt(4)));
                     PoliciaNivel.dar(o, 120);
                     PoliciaNivel.logro(o, "asalto");
+                    PoliciaFacciones.sumar(o, "sombras", 8);
+                    PoliciaFacciones.sumar(o, "guardia", -8);
                     titulo(o, "§a¡Escapaste!", "§f+" + botin + " esmeraldas · el seguro le devolvió el 80 % al banco");
                     PoliciaDiario.add(sl, "SE BUSCA: " + o.getName().getString() + ", por el asalto al banco de " + lugar);
                 } else if (t % 100 == 0) {

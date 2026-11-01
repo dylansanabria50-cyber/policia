@@ -292,6 +292,7 @@ public class PoliciaCombate {
             }
             if (e.getSource().getEntity() instanceof ServerPlayer p) {
                 PoliciaNivel.dar(p, 35);
+                PoliciaFacciones.sumar(p, "guardia", 1);
                 p.displayClientMessage(Component.literal("§6Derrotaste a un élite: §e+35 XP"), true);
             }
         }

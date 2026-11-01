@@ -45,20 +45,29 @@ public class PoliciaFicha extends Screen {
             this.mas[i] = this.addRenderableWidget(Button.builder(Component.literal("+"), b -> PoliciaRed.CH.sendToServer(new PoliciaRed.SubirAtributo(idx)))
                     .bounds(this.x0 + W - 30, this.y0 + 74 + i * 24, 18, 16).build());
         }
-        int bw = 66;
+        int bw = 54;
         int by = this.y0 + H - 26;
-        this.addRenderableWidget(Button.builder(Component.literal("Habilidades"), b -> Minecraft.getInstance().setScreen(new PoliciaHabScreen()))
-                .bounds(this.x0 + 10, by, bw, 18).build());
-        this.addRenderableWidget(Button.builder(Component.literal("Misiones"), b -> Minecraft.getInstance().setScreen(new PoliciaMisionesCliente.Diario()))
-                .bounds(this.x0 + 10 + (bw + 4), by, bw, 18).build());
-        this.addRenderableWidget(Button.builder(Component.literal("Logros"), b -> {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.player != null) {
-                mc.setScreen(new AdvancementsScreen(mc.player.connection.getAdvancements()));
+        String[] nombres = {"Habilidades", "Misiones", "Facciones", "Logros", "Cerrar"};
+        for (int n = 0; n < nombres.length; n++) {
+            final int cual = n;
+            this.addRenderableWidget(Button.builder(Component.literal(nombres[n]), b -> this.boton(cual))
+                    .bounds(this.x0 + 6 + n * (bw + 4), by, bw, 18).build());
+        }
+    }
+
+    void boton(int n) {
+        Minecraft mc = Minecraft.getInstance();
+        switch (n) {
+            case 0 -> mc.setScreen(new PoliciaHabScreen());
+            case 1 -> mc.setScreen(new PoliciaMisionesCliente.Diario());
+            case 2 -> mc.setScreen(new PoliciaFaccionesScreen());
+            case 3 -> {
+                if (mc.player != null) {
+                    mc.setScreen(new AdvancementsScreen(mc.player.connection.getAdvancements()));
+                }
             }
-        }).bounds(this.x0 + 10 + 2 * (bw + 4), by, bw, 18).build());
-        this.addRenderableWidget(Button.builder(Component.literal("Cerrar"), b -> this.onClose())
-                .bounds(this.x0 + 10 + 3 * (bw + 4), by, bw, 18).build());
+            default -> this.onClose();
+        }
     }
 
     @Override

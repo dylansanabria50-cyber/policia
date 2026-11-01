@@ -460,6 +460,7 @@ public class PoliciaMazmorra {
             for (ServerPlayer p : sl.getEntitiesOfClass(ServerPlayer.class, w.getBoundingBox().inflate(40))) {
                 PoliciaNivel.dar(p, 300);
                 PoliciaNivel.logro(p, "mazmorra");
+                PoliciaHistoria.contar(p, "guardian");
                 p.connection.send(new ClientboundSetTitlesAnimationPacket(10, 60, 20));
                 p.connection.send(new ClientboundSetTitleTextPacket(Component.literal("§6¡Guardián derrotado!")));
                 p.connection.send(new ClientboundSetSubtitleTextPacket(Component.literal("§7El cofre del tesoro apareció en la tumba · vuelve en 3 días")));

@@ -390,6 +390,7 @@ public class PoliciaClient {
         e.registerAboveAll("policia_reloj", PoliciaViajeScreen::hud);
         e.registerAboveAll("policia_aliento", PoliciaAliento::hud);
         e.registerAboveAll("policia_energia", PoliciaCombateCliente::hud);
+        e.registerAboveAll("policia_historia", PoliciaHistoriaScreen::hud);
     }
 
     static void screenInit(ScreenEvent.Init.Post e) {

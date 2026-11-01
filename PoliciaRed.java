@@ -34,6 +34,9 @@ public class PoliciaRed {
         CH.registerMessage(9, DanoNum.class, DanoNum::enc, DanoNum::dec, DanoNum::handle);
         CH.registerMessage(10, EnergiaSync.class, EnergiaSync::enc, EnergiaSync::dec, EnergiaSync::handle);
         CH.registerMessage(11, QuitarCasillero.class, QuitarCasillero::enc, QuitarCasillero::dec, QuitarCasillero::handle);
+        CH.registerMessage(12, HistoriaDialogo.class, HistoriaDialogo::enc, HistoriaDialogo::dec, HistoriaDialogo::handle);
+        CH.registerMessage(13, HistoriaElegir.class, HistoriaElegir::enc, HistoriaElegir::dec, HistoriaElegir::handle);
+        CH.registerMessage(14, FaccionReclamar.class, FaccionReclamar::enc, FaccionReclamar::dec, FaccionReclamar::handle);
     }
 
     static void toPlayer(ServerPlayer p, Object msg) {
@@ -357,6 +360,92 @@ public class PoliciaRed {
             c.get().enqueueWork(() -> {
                 if (p != null && java.util.Arrays.asList("anillo", "anillo2", "amuleto", "capa", "cinturon").contains(m.slot)) {
                     PoliciaRareza.quitar(p, m.slot);
+                }
+            });
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Historia: lo que dice el NPC (lineas separadas por \n) y las opciones.
+    public static class HistoriaDialogo {
+        int ent;
+        String nombre;
+        String texto;
+        String opciones;
+
+        HistoriaDialogo(int ent, String nombre, String texto, String opciones) {
+            this.ent = ent;
+            this.nombre = nombre;
+            this.texto = texto;
+            this.opciones = opciones;
+        }
+
+        static void enc(HistoriaDialogo m, FriendlyByteBuf b) {
+            b.writeVarInt(m.ent);
+            b.writeUtf(m.nombre);
+            b.writeUtf(m.texto);
+            b.writeUtf(m.opciones);
+        }
+
+        static HistoriaDialogo dec(FriendlyByteBuf b) {
+            return new HistoriaDialogo(b.readVarInt(), b.readUtf(), b.readUtf(), b.readUtf());
+        }
+
+        static void handle(HistoriaDialogo m, Supplier<NetworkEvent.Context> c) {
+            c.get().enqueueWork(() -> net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> PoliciaHistoriaScreen.abrir(m.ent, m.nombre, m.texto, m.opciones)));
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    public static class HistoriaElegir {
+        int op;
+
+        HistoriaElegir(int op) {
+            this.op = op;
+        }
+
+        static void enc(HistoriaElegir m, FriendlyByteBuf b) {
+            b.writeVarInt(m.op);
+        }
+
+        static HistoriaElegir dec(FriendlyByteBuf b) {
+            return new HistoriaElegir(b.readVarInt());
+        }
+
+        static void handle(HistoriaElegir m, Supplier<NetworkEvent.Context> c) {
+            ServerPlayer p = c.get().getSender();
+            c.get().enqueueWork(() -> {
+                if (p != null) {
+                    PoliciaHistoria.elegir(p, m.op);
+                }
+            });
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    public static class FaccionReclamar {
+        String id;
+        int nivel;
+
+        FaccionReclamar(String id, int nivel) {
+            this.id = id;
+            this.nivel = nivel;
+        }
+
+        static void enc(FaccionReclamar m, FriendlyByteBuf b) {
+            b.writeUtf(m.id, 32);
+            b.writeVarInt(m.nivel);
+        }
+
+        static FaccionReclamar dec(FriendlyByteBuf b) {
+            return new FaccionReclamar(b.readUtf(32), b.readVarInt());
+        }
+
+        static void handle(FaccionReclamar m, Supplier<NetworkEvent.Context> c) {
+            ServerPlayer p = c.get().getSender();
+            c.get().enqueueWork(() -> {
+                if (p != null) {
+                    PoliciaFacciones.reclamar(p, m.id, m.nivel);
                 }
             });
             c.get().setPacketHandled(true);

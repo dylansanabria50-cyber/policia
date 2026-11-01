@@ -185,6 +185,7 @@ public class PoliciaDiarias {
                 p.serverLevel().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6f, 1.6f);
                 dar(p, new ItemStack(Items.EMERALD, 3));
                 PoliciaNivel.dar(p, 40);
+                PoliciaFacciones.sumar(p, PoliciaFacciones.deOficio(PoliciaMod.job(p)), 3);
             }
         }
         if (!cambio) {

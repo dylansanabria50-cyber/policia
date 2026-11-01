@@ -162,6 +162,8 @@ public class PoliciaMod {
         PoliciaAlcalde.init();
         PoliciaCombate.init();
         PoliciaBotin.init();
+        PoliciaFacciones.init();
+        PoliciaHistoria.init();
         PoliciaEstacion.init();
         PoliciaConfig.init();
         MinecraftForge.EVENT_BUS.register(this);
