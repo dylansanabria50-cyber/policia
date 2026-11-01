@@ -303,6 +303,12 @@ public class PoliciaHuesos {
         });
     }
 
+    // true si se pudieron leer las caras (si no, se dibuja normal).
+    static boolean listo(ModelPart p) {
+        List<ModelPart.Cube> l = cubos(p);
+        return !l.isEmpty() && caras(l.get(0)).size() >= 6;
+    }
+
     static void miembro(ModelPart part, PoseStack ps, VertexConsumer vc, int luz, int overlay, float r, float g, float b, float a, float doblez) {
         if (!part.visible || part.skipDraw) {
             return;
@@ -392,7 +398,7 @@ public class PoliciaHuesos {
 
         @Override
         public void renderToBuffer(PoseStack ps, VertexConsumer vc, int luz, int overlay, float r, float g, float b, float a) {
-            if (!curActivo || !activo()) {
+            if (!curActivo || !activo() || !listo(this.rightArm)) {
                 super.renderToBuffer(ps, vc, luz, overlay, r, g, b, a);
                 return;
             }

@@ -152,7 +152,7 @@ public class PoliciaHerreroAnim {
         }
 
         boolean doblado() {
-            return PoliciaHuesos.activo() && (this.codoD != 0.0f || this.codoI != 0.0f || this.rodD != 0.0f || this.rodI != 0.0f);
+            return PoliciaHuesos.activo() && PoliciaHuesos.listo(this.rightArm) && (this.codoD != 0.0f || this.codoI != 0.0f || this.rodD != 0.0f || this.rodI != 0.0f);
         }
 
         @Override
