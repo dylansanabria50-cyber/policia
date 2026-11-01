@@ -141,7 +141,9 @@ public class PoliciaHuesos {
             float otra;
             switch (ua) {
                 case BLOCK -> {
-                    usa = -1.35f;
+                    // cubrirse: codo apenas doblado (el escudo no gira con el
+                    // antebrazo, ver AnimModel.translateToHand)
+                    usa = -0.45f;
                     otra = -1.0f;
                 }
                 case EAT, DRINK -> {
@@ -178,6 +180,22 @@ public class PoliciaHuesos {
                 cI = usa;
                 cD = Math.min(cD, otra);
             }
+            // Escudo, ballesta, arco y catalejo: el objeto sigue la mano pero
+            // conserva el angulo normal de Minecraft.
+            boolean fijo = ua == UseAnim.BLOCK || ua == UseAnim.CROSSBOW || ua == UseAnim.BOW || ua == UseAnim.SPYGLASS;
+            m.fijoD = fijo;
+            m.fijoI = fijo;
+        } else {
+            m.fijoD = false;
+            m.fijoI = false;
+        }
+        // Un escudo en la mano nunca gira con el antebrazo.
+        boolean diestro = e.getMainArm() == HumanoidArm.RIGHT;
+        if ((diestro ? e.getMainHandItem() : e.getOffhandItem()).getItem() instanceof net.minecraft.world.item.ShieldItem) {
+            m.fijoD = true;
+        }
+        if ((diestro ? e.getOffhandItem() : e.getMainHandItem()).getItem() instanceof net.minecraft.world.item.ShieldItem) {
+            m.fijoI = true;
         }
         // Al recibir un golpe se cubre: brazos arriba y doblados un instante.
         if (e.hurtTime > 0) {

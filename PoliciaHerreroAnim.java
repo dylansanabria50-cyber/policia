@@ -127,6 +127,9 @@ public class PoliciaHerreroAnim {
         public float codoI;
         public float rodD;
         public float rodI;
+        // el objeto de esa mano no gira con el antebrazo (escudo, arco...)
+        public boolean fijoD;
+        public boolean fijoI;
 
         public AnimModel(ModelPart root, boolean slim) {
             super(root, slim);
@@ -181,12 +184,20 @@ public class PoliciaHerreroAnim {
         @Override
         public void translateToHand(net.minecraft.world.entity.HumanoidArm arm, PoseStack ps) {
             super.translateToHand(arm, ps);
-            float d = arm == net.minecraft.world.entity.HumanoidArm.RIGHT ? this.codoD : this.codoI;
-            if (PoliciaHuesos.activo() && d != 0.0f) {
-                ps.translate(0.0f, 0.25f, 0.0f);
-                ps.mulPose(com.mojang.math.Axis.XP.rotation(d));
-                ps.translate(0.0f, -0.25f, 0.0f);
+            boolean derecha = arm == net.minecraft.world.entity.HumanoidArm.RIGHT;
+            float d = derecha ? this.codoD : this.codoI;
+            if (!PoliciaHuesos.activo() || d == 0.0f) {
+                return;
             }
+            if (derecha ? this.fijoD : this.fijoI) {
+                // solo se mueve a donde quedo la mano, sin girar
+                float largo = 0.375f;
+                ps.translate(0.0f, 0.25f + largo * net.minecraft.util.Mth.cos(d) - 0.625f, largo * net.minecraft.util.Mth.sin(d));
+                return;
+            }
+            ps.translate(0.0f, 0.25f, 0.0f);
+            ps.mulPose(com.mojang.math.Axis.XP.rotation(d));
+            ps.translate(0.0f, -0.25f, 0.0f);
         }
     }
 
