@@ -295,3 +295,13 @@ Diseño, nombres y sonidos propios; solo inspiración.
 - **Etapa 12 — HECHA**: flor de luna (crece de noche), regadera, vínculo con el caballo (comer y cepillar), pesca de la comarca (9 especies, tamaños, colección y récords).
 - **Etapa 13 — HECHA (commit b62d506)**: elección de alcalde cada 7 días (/alcalde candidato, /alcalde votar, /alcalde ley), conteo con título y fuegos artificiales, leyes (comercio, manodura, fiesta, obra), logro Señor alcalde; estaciones visibles (pasto y hojas, pétalos, copos, neblina de mañana; opción estacionesVisuales), clima del día según la estación y cultivos a la mitad en invierno.
 - **Plan de 13 etapas completo.** Quedan como ideas para después: urna y afiches de campaña, nieve en los techos en invierno y motor en bucle del tractor. (Las 5 habilidades de anime aprobadas ya entraron en la etapa 6c.)
+
+## Después del plan de 13 etapas (31/10/2026)
+- Arreglos: cierre al crear el mundo (clases Eventos con el mismo nombre), ficha y habilidades que se pisaban, escudo al cubrirse.
+- Mapa de viaje con terreno real; Analizador como primera habilidad del Herrero.
+- Movimientos pulidos, opciones en el juego (Opciones → Oficios...), vista previa animada de cada habilidad en los árboles.
+- Codos y rodillas (PoliciaHuesos): brazos, piernas, mangas, pantalones y armadura se doblan.
+- Combate: números de daño, barras de vida, esquivar (Alt izq.), parada con escudo, combos, energía, élites.
+- Botín: afijos, segundo anillo, amuleto, capa, cinturón, gemas engarzables, conjuntos Cazador/Coloso, botín por zona.
+- Historia "La campana del alba" (5 capítulos, Celestina la cronista, 3 finales) y facciones (5, con reputación y recompensas).
+- Queda de la lista RPG: especializaciones de clase, grupo y mercenarios, interfaz (seguimiento con flecha, bestiario, barra de pociones), alquimia y cocina.
