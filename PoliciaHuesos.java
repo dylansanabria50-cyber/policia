@@ -231,6 +231,78 @@ public class PoliciaHuesos {
         });
     }
 
+    // Caras de un cubo (posicion y UV de sus 4 vertices + normal). Minecraft
+    // las tiene privadas: se leen una sola vez por reflexion y se guardan.
+    static final class Cara {
+        final float[][] v = new float[4][5];
+        final Vector3f n = new Vector3f();
+    }
+
+    static final Map<ModelPart.Cube, List<Cara>> CARAS = new IdentityHashMap<ModelPart.Cube, List<Cara>>();
+
+    static List<Cara> caras(ModelPart.Cube c) {
+        return CARAS.computeIfAbsent(c, k -> {
+            List<Cara> l = new ArrayList<Cara>();
+            try {
+                Object[] polys = null;
+                for (java.lang.reflect.Field f : ModelPart.Cube.class.getDeclaredFields()) {
+                    if (f.getType().isArray()) {
+                        f.setAccessible(true);
+                        polys = (Object[]) f.get(k);
+                    }
+                }
+                if (polys == null) {
+                    return l;
+                }
+                for (Object p : polys) {
+                    Object[] verts = null;
+                    Vector3f normal = null;
+                    for (java.lang.reflect.Field f : p.getClass().getDeclaredFields()) {
+                        f.setAccessible(true);
+                        if (f.getType().isArray()) {
+                            verts = (Object[]) f.get(p);
+                        } else if (f.getType() == Vector3f.class) {
+                            normal = (Vector3f) f.get(p);
+                        }
+                    }
+                    if (verts == null || verts.length != 4 || normal == null) {
+                        continue;
+                    }
+                    Cara cara = new Cara();
+                    cara.n.set(normal);
+                    for (int i = 0; i < 4; i++) {
+                        Object v = verts[i];
+                        Vector3f pos = null;
+                        float[] uv = new float[2];
+                        int nf = 0;
+                        for (java.lang.reflect.Field f : v.getClass().getDeclaredFields()) {
+                            if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
+                                continue;
+                            }
+                            f.setAccessible(true);
+                            if (f.getType() == Vector3f.class) {
+                                pos = (Vector3f) f.get(v);
+                            } else if (f.getType() == float.class && nf < 2) {
+                                uv[nf++] = f.getFloat(v);
+                            }
+                        }
+                        if (pos == null) {
+                            break;
+                        }
+                        cara.v[i][0] = pos.x();
+                        cara.v[i][1] = pos.y();
+                        cara.v[i][2] = pos.z();
+                        cara.v[i][3] = uv[0];
+                        cara.v[i][4] = uv[1];
+                    }
+                    l.add(cara);
+                }
+            } catch (Throwable ignored) {
+            }
+            return l;
+        });
+    }
+
     static void miembro(ModelPart part, PoseStack ps, VertexConsumer vc, int luz, int overlay, float r, float g, float b, float a, float doblez) {
         if (!part.visible || part.skipDraw) {
             return;
@@ -242,44 +314,44 @@ public class PoliciaHuesos {
         for (ModelPart.Cube c : cubos(part)) {
             float ym = (c.minY + c.maxY) * 0.5f;
             float zc = (c.minZ + c.maxZ) * 0.5f;
-            for (ModelPart.Polygon poly : c.polygons) {
-                ModelPart.Vertex[] vs = poly.vertices;
-                float y0 = vs[0].pos.y();
-                boolean tapa = Math.abs(vs[1].pos.y() - y0) < 0.01f && Math.abs(vs[2].pos.y() - y0) < 0.01f;
+            for (Cara cara : caras(c)) {
+                float[][] vs = cara.v;
+                float y0 = vs[0][1];
+                boolean tapa = Math.abs(vs[1][1] - y0) < 0.01f && Math.abs(vs[2][1] - y0) < 0.01f;
                 if (tapa) {
                     float ang = y0 > ym ? doblez : 0.0f;
                     float[][] q = new float[4][];
                     for (int i = 0; i < 4; i++) {
-                        q[i] = mover(vs[i].pos.x(), vs[i].pos.y(), vs[i].pos.z(), vs[i].u, vs[i].v, ym, zc, ang, y0 > ym ? 2 : 0);
+                        q[i] = mover(vs[i][0], vs[i][1], vs[i][2], vs[i][3], vs[i][4], ym, zc, ang, y0 > ym ? 2 : 0);
                     }
-                    emitir(vc, mat, nor, q, poly.normal, ang, luz, overlay, r, g, b, a);
+                    emitir(vc, mat, nor, q, cara.n, ang, luz, overlay, r, g, b, a);
                     continue;
                 }
                 float[][] arriba = new float[4][];
                 float[][] abajo = new float[4][];
                 for (int i = 0; i < 4; i++) {
-                    ModelPart.Vertex v = vs[i];
-                    ModelPart.Vertex par = v;
-                    for (ModelPart.Vertex w : vs) {
-                        if (w != v && Math.abs(w.pos.x() - v.pos.x()) < 0.01f && Math.abs(w.pos.z() - v.pos.z()) < 0.01f) {
+                    float[] v = vs[i];
+                    float[] par = v;
+                    for (float[] w : vs) {
+                        if (w != v && Math.abs(w[0] - v[0]) < 0.01f && Math.abs(w[2] - v[2]) < 0.01f) {
                             par = w;
                         }
                     }
-                    float dy = par.pos.y() - v.pos.y();
-                    float t = Math.abs(dy) < 1.0E-4f ? 0.0f : (ym - v.pos.y()) / dy;
-                    float mu = v.u + (par.u - v.u) * t;
-                    float mv = v.v + (par.v - v.v) * t;
-                    float[] medio = mover(v.pos.x(), ym, v.pos.z(), mu, mv, ym, zc, doblez, 1);
-                    if (v.pos.y() < ym) {
-                        arriba[i] = mover(v.pos.x(), v.pos.y(), v.pos.z(), v.u, v.v, ym, zc, doblez, 0);
+                    float dy = par[1] - v[1];
+                    float t = Math.abs(dy) < 1.0E-4f ? 0.0f : (ym - v[1]) / dy;
+                    float mu = v[3] + (par[3] - v[3]) * t;
+                    float mv = v[4] + (par[4] - v[4]) * t;
+                    float[] medio = mover(v[0], ym, v[2], mu, mv, ym, zc, doblez, 1);
+                    if (v[1] < ym) {
+                        arriba[i] = mover(v[0], v[1], v[2], v[3], v[4], ym, zc, doblez, 0);
                         abajo[i] = medio;
                     } else {
                         arriba[i] = medio;
-                        abajo[i] = mover(v.pos.x(), v.pos.y(), v.pos.z(), v.u, v.v, ym, zc, doblez, 2);
+                        abajo[i] = mover(v[0], v[1], v[2], v[3], v[4], ym, zc, doblez, 2);
                     }
                 }
-                emitir(vc, mat, nor, arriba, poly.normal, doblez * 0.25f, luz, overlay, r, g, b, a);
-                emitir(vc, mat, nor, abajo, poly.normal, doblez * 0.75f, luz, overlay, r, g, b, a);
+                emitir(vc, mat, nor, arriba, cara.n, doblez * 0.25f, luz, overlay, r, g, b, a);
+                emitir(vc, mat, nor, abajo, cara.n, doblez * 0.75f, luz, overlay, r, g, b, a);
             }
         }
         ps.popPose();
