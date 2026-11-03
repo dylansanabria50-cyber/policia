@@ -116,6 +116,10 @@ public class PoliciaAnimeCliente {
                     PoliciaUICliente.recibir(tipo, d);
                     return;
                 }
+                if (tipo.startsWith("cine_")) {
+                    PoliciaCineCliente.recibir(d);
+                    return;
+                }
                 if (tipo.startsWith("criatura_") || tipo.startsWith("luna_")) {
                     PoliciaCriaturasCliente.recibir(tipo, d);
                     return;

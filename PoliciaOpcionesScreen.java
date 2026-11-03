@@ -72,8 +72,12 @@ public class PoliciaOpcionesScreen extends Screen {
             PoliciaRed.CH.sendToServer(new PoliciaRed.Accion("tutorial_saltar", new net.minecraft.nbt.CompoundTag()));
             b.active = false;
         }).bounds(this.width / 2 + 5, this.height / 6 + 24 + 4 * 24, 150, 20).build()).active = PoliciaTutorialCliente.paso() < PoliciaTutorial.PASOS.length;
+        this.addRenderableWidget(Button.builder(Component.literal("Ver la llegada en carruaje"), b -> {
+            PoliciaRed.CH.sendToServer(new PoliciaRed.Accion("cine_ver", new net.minecraft.nbt.CompoundTag()));
+            Minecraft.getInstance().setScreen(null);
+        }).bounds(this.width / 2 - 155, this.height / 6 + 24 + 5 * 24, 150, 20).build());
         this.addRenderableWidget(Button.builder(Component.literal("Listo"), b -> this.onClose())
-                .bounds(this.width / 2 - 100, this.height / 6 + 24 + 5 * 24 + 16, 200, 20).build());
+                .bounds(this.width / 2 + 5, this.height / 6 + 24 + 5 * 24, 150, 20).build());
     }
 
     @Override

@@ -209,7 +209,11 @@ public class PoliciaCriaturasCliente {
     // (dx, dy, dz, rotX, rotY, rotZ, escX, escY, escZ). Los canales que no
     // vienen valen el reposo.
     static void cargarAnims(Datos d, ResourceManager rm, int tipo, float[][] reposoRot) {
-        ResourceLocation rl = new ResourceLocation("policia", "criaturas/" + PoliciaCriaturas.ARCHIVO[tipo] + ".bin");
+        cargarArchivo(d, rm, PoliciaCriaturas.ARCHIVO[tipo], reposoRot);
+    }
+
+    static void cargarArchivo(Datos d, ResourceManager rm, String archivo, float[][] reposoRot) {
+        ResourceLocation rl = new ResourceLocation("policia", "criaturas/" + archivo + ".bin");
         try (InputStream in = rm.getResource(rl).orElseThrow().open(); DataInputStream ds = new DataInputStream(in)) {
             ds.readInt();
             int nb = ds.readInt();
@@ -537,21 +541,31 @@ public class PoliciaCriaturasCliente {
             base.rotateZYX(s.raiz[5], s.raiz[4], s.raiz[3]);
             base.scale(d.escala);
             base.translate(0, -1.501f, 0);
-            for (int i = desde; i < d.huesos.length; i++) {
-                ModelPart p = m.partes[i];
-                Matrix4f padre = d.padres[i] < 0 ? base : s.mundo[d.padres[i]];
-                Matrix4f mm = s.mundo[i].set(padre);
-                mm.translate(p.x / 16f, p.y / 16f, p.z / 16f);
-                mm.rotateZYX(p.zRot, p.yRot, p.xRot);
-                mm.scale(p.xScale, p.yScale, p.zScale);
-            }
+            huesos(m, d, s, base, desde);
         }
 
-        // Resortes: la punta del hueso se atrasa con la aceleracion y la
-        // gravedad la tira para abajo (igual que en la vista previa).
         void fisica(PoliciaCriaturas.Criatura e, Estado s, float pt, float dt) {
-            Datos d = this.d;
-            this.matrices(e, s, pt, 0);
+            resortes(this.model, this.d, s, desde -> this.matrices(e, s, pt, desde), dt);
+        }
+
+    // Matriz de cada hueso a partir de una base (entidad o carruaje).
+    static void huesos(Modelo m, Datos d, Estado s, Matrix4f base, int desde) {
+        for (int i = desde; i < d.huesos.length; i++) {
+            ModelPart p = m.partes[i];
+            Matrix4f padre = d.padres[i] < 0 ? base : s.mundo[d.padres[i]];
+            Matrix4f mm = s.mundo[i].set(padre);
+            mm.translate(p.x / 16f, p.y / 16f, p.z / 16f);
+            mm.rotateZYX(p.zRot, p.yRot, p.xRot);
+            mm.scale(p.xScale, p.yScale, p.zScale);
+        }
+    }
+
+    // Resortes: la punta del hueso se atrasa con la aceleracion y la
+    // gravedad la tira para abajo (igual que en la vista previa).
+    // "rehacer" recalcula las matrices desde un hueso.
+    static void resortes(Modelo modelo, Datos d, Estado s, java.util.function.IntConsumer rehacer, float dt) {
+        {
+            rehacer.accept(0);
             if (dt <= 0) {
                 return;
             }
@@ -607,16 +621,17 @@ public class PoliciaCriaturasCliente {
                 for (int k = 0; k < 3; k++) {
                     ang[k] = Mth.clamp(ang[k], -r[8], r[8]);
                 }
-                ModelPart p = this.model.partes[h];
+                ModelPart p = modelo.partes[h];
                 p.xRot += ang[0];
                 p.yRot += ang[1];
                 p.zRot += ang[2];
-                this.matrices(e, s, pt, h);
+                rehacer.accept(h);
             }
             if (!s.iniciado) {
                 s.iniciado = true;
             }
         }
+    }
 
         // Estelas: cintas que siguen garras, punos o aguijon durante los ataques.
         void estelas(PoliciaCriaturas.Criatura e, float pt, PoseStack ps, MultiBufferSource buf) {
