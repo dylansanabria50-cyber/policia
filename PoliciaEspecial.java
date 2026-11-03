@@ -123,16 +123,30 @@ public class PoliciaEspecial {
             case "cirujano" -> 2.0;
             default -> 0.0;
         };
-        PoliciaRPG.poner(p, Attributes.MAX_HEALTH, M_VIDA, "espec_vida", vida, AttributeModifier.Operation.ADDITION);
-        PoliciaRPG.poner(p, Attributes.ARMOR, M_ARM, "espec_armadura", e.equals("guardian") ? 4.0 : e.equals("demoledor") ? 2.0 : 0.0, AttributeModifier.Operation.ADDITION);
-        PoliciaRPG.poner(p, Attributes.ARMOR_TOUGHNESS, M_DUR, "espec_dureza", e.equals("guardian") ? 2.0 : 0.0, AttributeModifier.Operation.ADDITION);
-        PoliciaRPG.poner(p, Attributes.KNOCKBACK_RESISTANCE, M_EMP, "espec_empuje", e.equals("guardian") ? 0.3 : 0.0, AttributeModifier.Operation.ADDITION);
-        PoliciaRPG.poner(p, Attributes.MOVEMENT_SPEED, M_VEL, "espec_vel", e.equals("aventurero") ? 0.1 : e.equals("sombra") ? 0.05 : 0.0, AttributeModifier.Operation.MULTIPLY_BASE);
-        PoliciaRPG.poner(p, Attributes.LUCK, M_SUE, "espec_suerte", e.equals("estafador") ? 2.0 : e.equals("ingeniero") || e.equals("magnate") ? 1.0 : 0.0, AttributeModifier.Operation.ADDITION);
-        PoliciaRPG.poner(p, Attributes.ATTACK_SPEED, M_ATV, "espec_atv", e.equals("armero") ? 0.15 : 0.0, AttributeModifier.Operation.MULTIPLY_BASE);
+        poner(p, Attributes.MAX_HEALTH, M_VIDA, "espec_vida", vida, AttributeModifier.Operation.ADDITION);
+        poner(p, Attributes.ARMOR, M_ARM, "espec_armadura", e.equals("guardian") ? 4.0 : e.equals("demoledor") ? 2.0 : 0.0, AttributeModifier.Operation.ADDITION);
+        poner(p, Attributes.ARMOR_TOUGHNESS, M_DUR, "espec_dureza", e.equals("guardian") ? 2.0 : 0.0, AttributeModifier.Operation.ADDITION);
+        poner(p, Attributes.KNOCKBACK_RESISTANCE, M_EMP, "espec_empuje", e.equals("guardian") ? 0.3 : 0.0, AttributeModifier.Operation.ADDITION);
+        poner(p, Attributes.MOVEMENT_SPEED, M_VEL, "espec_vel", e.equals("aventurero") ? 0.1 : e.equals("sombra") ? 0.05 : 0.0, AttributeModifier.Operation.MULTIPLY_BASE);
+        poner(p, Attributes.LUCK, M_SUE, "espec_suerte", e.equals("estafador") ? 2.0 : e.equals("ingeniero") || e.equals("magnate") ? 1.0 : 0.0, AttributeModifier.Operation.ADDITION);
+        poner(p, Attributes.ATTACK_SPEED, M_ATV, "espec_atv", e.equals("armero") ? 0.15 : 0.0, AttributeModifier.Operation.MULTIPLY_BASE);
         if (p.getHealth() > p.getMaxHealth()) {
             p.setHealth(p.getMaxHealth());
         }
+    }
+
+    // Solo toca el modificador si cambio (sacarlo y ponerlo de nuevo podia
+    // recortar la vida un instante).
+    static void poner(ServerPlayer p, net.minecraft.world.entity.ai.attributes.Attribute at, UUID id, String n, double v, AttributeModifier.Operation op) {
+        net.minecraft.world.entity.ai.attributes.AttributeInstance inst = p.getAttribute(at);
+        if (inst == null) {
+            return;
+        }
+        AttributeModifier m = inst.getModifier(id);
+        if (m == null ? v == 0.0 : m.getAmount() == v && m.getOperation() == op) {
+            return;
+        }
+        PoliciaRPG.poner(p, at, id, n, v, op);
     }
 
     // XP extra (lo suma PoliciaNivel).

@@ -211,6 +211,10 @@ public class PoliciaMercenario {
             return this.entityData.get(APUNTA);
         }
 
+        void apuntar(boolean b) {
+            this.entityData.set(APUNTA, b);
+        }
+
         void setClase(int c) {
             this.entityData.set(CLASE_D, c);
         }
@@ -449,7 +453,7 @@ public class PoliciaMercenario {
 
         @Override
         public void stop() {
-            this.m.entityData.set(Merc.APUNTA, false);
+            this.m.apuntar(false);
         }
 
         @Override
@@ -474,7 +478,7 @@ public class PoliciaMercenario {
             } else {
                 this.m.getNavigation().stop();
             }
-            this.m.entityData.set(Merc.APUNTA, ve && d < 400);
+            this.m.apuntar(ve && d < 400);
             if (--this.m.recarga <= 0 && ve && d < 400) {
                 Arrow a = new Arrow(this.m.level(), this.m);
                 double dx = t.getX() - this.m.getX();
