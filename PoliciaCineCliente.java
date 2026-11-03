@@ -298,6 +298,18 @@ public class PoliciaCineCliente {
         return new Vec3[]{ojo, mira};
     }
 
+    // si la toma cae adentro de un cerro o una pared, la camara sube
+    static Vec3 libre(Minecraft mc, Vec3 o) {
+        for (int i = 0; i < 12; i++) {
+            BlockPos b = BlockPos.containing(o);
+            if (mc.level.getBlockState(b).getCollisionShape(mc.level, b).isEmpty() && mc.level.getBlockState(b.below()).getCollisionShape(mc.level, b.below()).isEmpty() || i == 11) {
+                return o;
+            }
+            o = o.add(0, 1, 0);
+        }
+        return o;
+    }
+
     static Vec3 camara(float t) {
         return pose(t)[0];
     }
@@ -335,7 +347,7 @@ public class PoliciaCineCliente {
             saltar = 0;
         }
         // camara: posicion por tick (Minecraft la interpola)
-        Vec3 o = camara(t);
+        Vec3 o = libre(mc, camara(t));
         int k = toma(t);
         cam.xo = cam.getX();
         cam.yo = cam.getY();
