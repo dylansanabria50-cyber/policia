@@ -1,0 +1,15 @@
+{
+ "type": "forge:add_spawns",
+ "biomes": [
+  "minecraft:desert",
+  "minecraft:badlands",
+  "minecraft:wooded_badlands",
+  "minecraft:eroded_badlands"
+ ],
+ "spawners": {
+  "type": "policia:escorpion_gigante",
+  "weight": 12,
+  "minCount": 1,
+  "maxCount": 1
+ }
+}

@@ -59,5 +59,18 @@
  "item.policia.gema_onix": "Ónix",
  "item.policia.gema_topacio": "Topacio",
  "entity.policia.babosa": "Babosa curandera",
- "entity.policia.mercenario": "Mercenario"
+ "entity.policia.mercenario": "Mercenario",
+ "entity.policia.ciervo_espectral": "Ciervo espectral",
+ "entity.policia.escorpion_gigante": "Escorpión gigante",
+ "entity.policia.yeti": "Yeti",
+ "entity.policia.sapo_pantano": "Sapo del pantano",
+ "entity.policia.golem_raices": "Gólem de raíces",
+ "item.policia.esencia_espectral": "Esencia espectral",
+ "item.policia.asta_luminosa": "Asta luminosa",
+ "item.policia.aguijon_escorpion": "Aguijón de escorpión",
+ "item.policia.placa_quitina": "Placa de quitina",
+ "item.policia.pelaje_yeti": "Pelaje de yeti",
+ "item.policia.baba_sapo": "Baba de sapo",
+ "item.policia.ancas_sapo": "Ancas de sapo",
+ "item.policia.corazon_raiz": "Corazón de raíz"
 }

@@ -59,5 +59,18 @@
  "item.policia.gema_onix": "Onyx",
  "item.policia.gema_topacio": "Topaz",
  "entity.policia.babosa": "Healing slime",
- "entity.policia.mercenario": "Mercenary"
+ "entity.policia.mercenario": "Mercenary",
+ "entity.policia.ciervo_espectral": "Spectral Deer",
+ "entity.policia.escorpion_gigante": "Giant Scorpion",
+ "entity.policia.yeti": "Yeti",
+ "entity.policia.sapo_pantano": "Swamp Toad",
+ "entity.policia.golem_raices": "Root Golem",
+ "item.policia.esencia_espectral": "Spectral Essence",
+ "item.policia.asta_luminosa": "Glowing Antler",
+ "item.policia.aguijon_escorpion": "Scorpion Stinger",
+ "item.policia.placa_quitina": "Chitin Plate",
+ "item.policia.pelaje_yeti": "Yeti Fur",
+ "item.policia.baba_sapo": "Toad Slime",
+ "item.policia.ancas_sapo": "Toad Legs",
+ "item.policia.corazon_raiz": "Root Heart"
 }

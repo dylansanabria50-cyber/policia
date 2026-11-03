@@ -1,0 +1,26 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  {
+   "item": "policia:aguijon_escorpion"
+  },
+  {
+   "item": "minecraft:arrow"
+  },
+  {
+   "item": "minecraft:arrow"
+  },
+  {
+   "item": "minecraft:arrow"
+  },
+  {
+   "item": "minecraft:arrow"
+  }
+ ],
+ "result": {
+  "item": "minecraft:tipped_arrow",
+  "count": 4,
+  "nbt": "{Potion:\"minecraft:poison\"}"
+ }
+}

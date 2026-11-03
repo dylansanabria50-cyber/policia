@@ -115,6 +115,11 @@ public class PoliciaBestiarioScreen extends Screen {
             case "piglin", "piglin_brute" -> "El oro los calma (salvo al bruto).";
             case "ghast" -> "Devolvé sus bolas de fuego de un golpe.";
             case "warden" -> "No hagas ruido. Mejor no pelear.";
+            case "ciervo_espectral" -> "Embiste, grita, patea si lo rodeás y su destello te deja ciego. De día está más débil.";
+            case "escorpion_gigante" -> "Aguijón con veneno, pinzas que frenan, se entierra y salta debajo tuyo, y escupe veneno.";
+            case "yeti" -> "Bola de nieve, martillazo con onda y aliento helado. El fuego le hace el doble.";
+            case "sapo_pantano" -> "Te atrae con la lengua, escupe baba que frena y cae de panza. Se infla para aguantar.";
+            case "golem_raices" -> "Jefe errante. Golpe sísmico, raíces del suelo y roca. Las hachas le hacen +50 %.";
             default -> "";
         };
         if (!especial.isEmpty()) {

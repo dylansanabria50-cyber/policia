@@ -34,6 +34,10 @@ public class PoliciaObjetivo {
             }
         } catch (Throwable ignored) {
         }
+        CompoundTag jefe = PoliciaMundo.get(p.server).getSeccion("errante");
+        if (jefe.contains("x")) {
+            l.add(lugar("jefe", "Gólem de raíces (jefe)", jefe.getInt("x"), jefe.getInt("y"), jefe.getInt("z")));
+        }
         CompoundTag par = PoliciaViaje.paradas(p);
         for (String k : par.getAllKeys()) {
             CompoundTag c = par.getCompound(k);

@@ -1,0 +1,19 @@
+{
+ "type": "forge:add_spawns",
+ "biomes": [
+  "minecraft:forest",
+  "minecraft:birch_forest",
+  "minecraft:dark_forest",
+  "minecraft:old_growth_birch_forest",
+  "minecraft:flower_forest",
+  "minecraft:taiga",
+  "minecraft:old_growth_pine_taiga",
+  "minecraft:old_growth_spruce_taiga"
+ ],
+ "spawners": {
+  "type": "policia:ciervo_espectral",
+  "weight": 10,
+  "minCount": 1,
+  "maxCount": 1
+ }
+}

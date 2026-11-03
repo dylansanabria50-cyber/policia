@@ -1,0 +1,10 @@
+{
+ "type": "minecraft:smelting",
+ "category": "food",
+ "ingredient": {
+  "item": "policia:ancas_sapo"
+ },
+ "result": "minecraft:cooked_chicken",
+ "experience": 0.3,
+ "cookingtime": 200
+}

@@ -116,6 +116,9 @@ public class PoliciaBoss {
         for (net.minecraft.world.item.Item it : PoliciaCocina.todos()) {
             out.accept((ItemLike) it);
         }
+        for (net.minecraftforge.registries.RegistryObject<net.minecraft.world.item.Item> it : java.util.List.of(PoliciaCriaturas.ESENCIA, PoliciaCriaturas.ASTA, PoliciaCriaturas.AGUIJON, PoliciaCriaturas.QUITINA, PoliciaCriaturas.PELAJE, PoliciaCriaturas.BABA, PoliciaCriaturas.ANCAS, PoliciaCriaturas.CORAZON)) {
+            out.accept((ItemLike) it.get());
+        }
         out.accept((ItemLike) PoliciaPlaca.BALDE.get());
         out.accept((ItemLike) PoliciaPlaca.GUANTE.get());
         out.accept((ItemLike) PoliciaPlaca.MARTILLO.get());

@@ -168,6 +168,7 @@ public class PoliciaMod {
         PoliciaEspecial.init();
         PoliciaMazmorras.init();
         PoliciaCocina.init();
+        PoliciaCriaturas.init();
         PoliciaMercenario.init();
         PoliciaBestiario.init();
         PoliciaObjetivo.init();

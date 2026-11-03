@@ -1,0 +1,13 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  {
+   "item": "policia:baba_sapo"
+  }
+ ],
+ "result": {
+  "item": "minecraft:slime_ball",
+  "count": 2
+ }
+}

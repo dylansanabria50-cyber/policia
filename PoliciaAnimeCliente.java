@@ -116,6 +116,10 @@ public class PoliciaAnimeCliente {
                     PoliciaUICliente.recibir(tipo, d);
                     return;
                 }
+                if (tipo.startsWith("criatura_") || tipo.startsWith("luna_")) {
+                    PoliciaCriaturasCliente.recibir(tipo, d);
+                    return;
+                }
                 int dur = d.contains("dur") ? d.getInt("dur") : 36;
                 EFS.add(new Ef(tipo, d, t, dur));
             }
@@ -607,7 +611,7 @@ public class PoliciaAnimeCliente {
         Entity obj = mc.level.getEntity(ef.d.getInt("id"));
         Vec3 b = obj != null ? lerpPos(obj, pt).add(0, obj.getBbHeight() * 0.6, 0) : new Vec3(ef.d.getDouble("x"), ef.d.getDouble("y"), ef.d.getDouble("z"));
         float k = Mth.clamp(t / ef.dur, 0, 1);
-        Vec3 pos = a.lerp(b, k);
+        Vec3 pos = a.lerp(b, k).add(0, Math.sin(k * Math.PI) * ef.d.getFloat("arco"), 0);
         if (k >= 1.0f) {
             if (!ef.estallo) {
                 ef.estallo = true;
@@ -625,8 +629,13 @@ public class PoliciaAnimeCliente {
         ps.mulPose(Axis.YP.rotationDegrees(yaw));
         ps.mulPose(Axis.XP.rotationDegrees(-pitch));
         ps.mulPose(Axis.ZP.rotationDegrees(t * 70));
-        ps.scale(0.8f, 0.8f, 0.8f);
-        mc.getItemRenderer().renderStatic(TESOROS[Math.floorMod(ef.d.getInt("item"), TESOROS.length)], ItemDisplayContext.FIXED, 0xF000F0, OverlayTexture.NO_OVERLAY, ps, buf, mc.level, 0);
+        float esc = ef.d.contains("esc") ? ef.d.getFloat("esc") : 0.8f;
+        ps.scale(esc, esc, esc);
+        ItemStack it = TESOROS[Math.floorMod(ef.d.getInt("item"), TESOROS.length)];
+        if (ef.d.contains("it")) {
+            it = new ItemStack(net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new ResourceLocation(ef.d.getString("it"))));
+        }
+        mc.getItemRenderer().renderStatic(it, ItemDisplayContext.FIXED, ef.d.contains("it") ? net.minecraft.client.renderer.LevelRenderer.getLightColor(mc.level, net.minecraft.core.BlockPos.containing(pos)) : 0xF000F0, OverlayTexture.NO_OVERLAY, ps, buf, mc.level, 0);
         ps.popPose();
         if (mc.level.random.nextInt(2) == 0) {
             mc.level.addParticle(ParticleTypes.WAX_OFF, pos.x, pos.y, pos.z, 0, 0, 0);
