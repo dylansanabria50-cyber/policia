@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.StructureTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -61,6 +62,14 @@ public class PoliciaCine {
             centro = p.position();
             nombre = "";
         }
+        empezarEn(p, centro, nombre, false);
+    }
+
+    // Llegada a un lugar (la del principio o la de un viaje).
+    static void empezarEn(ServerPlayer p, Vec3 centro, String nombre, boolean viaje) {
+        ServerLevel sl = p.serverLevel();
+        final int LARGO = viaje ? 40 : PoliciaCine.LARGO;
+        final int INICIO = LARGO + 8;
         // el camino mas prolijo de 8 direcciones: poca pendiente, sin agua ni arboles
         double mejor = Double.MAX_VALUE;
         int[] mejorY = null;
@@ -71,7 +80,7 @@ public class PoliciaCine {
             int[] ys = new int[LARGO + 1];
             double pena = 0;
             for (int i = 0; i <= LARGO; i++) {
-                Vec3 q = centro.add(dir.scale(72 - i));
+                Vec3 q = centro.add(dir.scale(INICIO - i));
                 int x = (int) Math.floor(q.x);
                 int z = (int) Math.floor(q.z);
                 int y = sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
@@ -103,8 +112,8 @@ public class PoliciaCine {
             }
             ys[i] = Math.max(s / n, mejorY[i] - 0.4f);
         }
-        Vec3 ini = centro.add(mejorDir.scale(72));
-        Vec3 fin = centro.add(mejorDir.scale(72 - LARGO));
+        Vec3 ini = centro.add(mejorDir.scale(INICIO));
+        Vec3 fin = centro.add(mejorDir.scale(INICIO - LARGO));
         Vec3 adelante = fin.subtract(ini).normalize();
         Vec3 derecha = new Vec3(-adelante.z, 0, adelante.x);
         // el jugador baja del carruaje: queda al lado de la puerta
@@ -129,11 +138,63 @@ public class PoliciaCine {
         }
         d.putIntArray("ys", yi);
         d.putString("nombre", nombre);
+        d.putBoolean("viaje", viaje);
         d.putDouble("cx", centro.x);
         d.putDouble("cy", centro.y);
         d.putDouble("cz", centro.z);
         PoliciaRed.toPlayer(p, new PoliciaRed.Efecto("cine_llegada", d));
         EN_CURSO.put(p.getUUID(), sl.getGameTime());
+    }
+
+    // Salida de un viaje: el carruaje te levanta en la parada y se va por el
+    // camino; a los 4,7 s (con la pantalla en negro) llegas al destino.
+    static void salida(ServerPlayer p, int x, int y, int z, String nombre) {
+        ServerLevel sl = p.serverLevel();
+        EN_CURSO.put(p.getUUID(), sl.getGameTime());
+        if (!p.isCreative() && !p.isSpectator()) {
+            p.getAbilities().invulnerable = true;
+            p.onUpdateAbilities();
+            p.getPersistentData().putBoolean("cine_inv", true);
+        }
+        Vec3 adelante = Vec3.directionFromRotation(0, p.getYRot());
+        Vec3 derecha = new Vec3(-adelante.z, 0, adelante.x);
+        Vec3 ini = p.position().subtract(derecha.scale(1.9));
+        Vec3 fin = ini.add(adelante.scale(30));
+        int n = 30;
+        int[] ys = new int[n + 1];
+        float prev = (float) p.getY();
+        for (int i = 0; i <= n; i++) {
+            Vec3 q = ini.lerp(fin, i / (double) n);
+            float h = sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(q.x), (int) Math.floor(q.z));
+            if (i == 0) {
+                h = (float) p.getY();
+            }
+            h = Mth.clamp(h, prev - 1.2f, prev + 1.2f);
+            prev = h;
+            ys[i] = Math.round(h * 100);
+        }
+        CompoundTag d = new CompoundTag();
+        d.putDouble("x0", ini.x);
+        d.putDouble("z0", ini.z);
+        d.putDouble("x1", fin.x);
+        d.putDouble("z1", fin.z);
+        d.putIntArray("ys", ys);
+        d.putString("nombre", nombre);
+        PoliciaRed.toPlayer(p, new PoliciaRed.Efecto("cine_salida", d));
+        final java.util.UUID id = p.getUUID();
+        final String fn = nombre;
+        PoliciaHab.tarea(t -> {
+            if (t < 95) {
+                return false;
+            }
+            ServerPlayer q = p.server.getPlayerList().getPlayer(id);
+            if (q != null && q.isAlive()) {
+                EN_CURSO.remove(id);
+                int yy = Math.max(y, q.serverLevel().getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z));
+                empezarEn(q, new Vec3(x + 0.5, yy, z + 0.5), Character.toUpperCase(fn.charAt(0)) + fn.substring(1), true);
+            }
+            return true;
+        });
     }
 
     static void terminar(ServerPlayer p, boolean vista) {

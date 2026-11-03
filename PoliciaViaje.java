@@ -186,6 +186,10 @@ public class PoliciaViaje {
             }
             if (t >= 60) {
                 VIAJANDO.remove(p.getUUID());
+                PoliciaCine.salida(p, fx, fy, fz, n);
+                return true;
+            }
+            if (t >= 99999) {
                 sl.sendParticles(ParticleTypes.CLOUD, p.getX(), p.getY() + 0.5, p.getZ(), 30, 0.6, 0.4, 0.6, 0.05);
                 int yy = Math.max(fy, sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, fx, fz));
                 p.teleportTo(fx + 0.5, yy + 0.1, fz + 0.5);
