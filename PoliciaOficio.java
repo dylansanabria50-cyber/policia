@@ -39,6 +39,9 @@ public class PoliciaOficio {
 
     // Al entrar: los que ya tenian oficio (mundos viejos) no vuelven a ver
     // la ventana; los demas la reciben hasta que elijan.
+    // jugadores a los que ya se les mando la ventana en esta sesion
+    static final java.util.Set<java.util.UUID> MANDADA = new java.util.HashSet<java.util.UUID>();
+
     static void login(ServerPlayer p) {
         PoliciaBook.refresh(p);
         CompoundTag d = p.getPersistentData();
@@ -47,6 +50,13 @@ public class PoliciaOficio {
         }
         if (!PoliciaMod.job(p).isEmpty()) {
             d.putBoolean("pol_chosen", true);
+            return;
+        }
+        // primero la llegada en carruaje; la ventana sale cuando termina
+        if (!PoliciaRPG.datos(p).getBoolean("intro") || PoliciaCine.ocupado(p)) {
+            return;
+        }
+        if (!MANDADA.add(p.getUUID())) {
             return;
         }
         PoliciaMod.NET.send(PacketDistributor.PLAYER.with(() -> p), (Object) new Open());

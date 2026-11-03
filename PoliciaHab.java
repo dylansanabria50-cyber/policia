@@ -298,6 +298,7 @@ public class PoliciaHab {
                     return 0;
                 }
                 p.getPersistentData().putBoolean("pol_chosen", false);
+                PoliciaOficio.MANDADA.remove(p.getUUID());
                 PoliciaOficio.login(p);
                 return 1;
             }));

@@ -95,6 +95,7 @@ public class PoliciaOficioScreen extends Screen {
         this.ticks += 1.0f;
         if (this.picked >= 0 && this.ticks - this.pickedAt >= 10.0f) {
             PoliciaClient.send(70 + this.picked);
+            pending = false;
             this.onClose();
         }
     }

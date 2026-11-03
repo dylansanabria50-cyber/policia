@@ -699,7 +699,7 @@ public class PoliciaClient {
             MORPH.clear();
             return;
         }
-        if (PoliciaOficioScreen.pending && mc.screen == null && mc.level != null) {
+        if (PoliciaOficioScreen.pending && mc.screen == null && mc.level != null && !PoliciaCineCliente.activo) {
             PoliciaOficioScreen.pending = false;
             mc.setScreen(new PoliciaOficioScreen());
         }

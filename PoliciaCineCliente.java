@@ -44,8 +44,11 @@ public class PoliciaCineCliente {
     static final float RADIO_RUEDA = 6f * 1.3f / 16f;
 
     static boolean activo;
-    // 0 = llegada al empezar el mundo, 1 = llegada de un viaje, 2 = salida de un viaje
+    // 0 = llegada al empezar el mundo, 1 = llegada de un viaje, 2 = salida de un viaje, 3 = parada del comienzo
     static int modo;
+    static float sParada;
+    static Vec3 jugadorPos;
+    static boolean subioMandado;
     static int tick;
     static float[] px;
     static float[] py;
@@ -165,13 +168,20 @@ public class PoliciaCineCliente {
         derecha = new Vec3(-adelante.z, 0, adelante.x);
         centro = new Vec3(d.getDouble("cx"), d.getDouble("cy"), d.getDouble("cz"));
         nombre = d.getString("nombre");
-        modo = "cine_salida".equals(tipo) ? 2 : d.getBoolean("viaje") ? 1 : 0;
+        modo = "cine_parada".equals(tipo) ? 3 : "cine_salida".equals(tipo) ? 2 : d.getBoolean("viaje") ? 1 : 0;
+        sParada = d.contains("parada") ? d.getFloat("parada") : largo;
+        jugadorPos = new Vec3(d.getDouble("jx"), d.getDouble("jy"), d.getDouble("jz"));
+        subioMandado = false;
         // llega: 1 s de espera, 1,5 s acelerando, crucero y 3 s frenando
         tLlegada = 1f + 1.5f + Math.max(0, largo - 3.15f - 6.3f) / VEL + 3f;
         tFin = tLlegada + 4.8f;
         if (modo == 2) {
             tLlegada = 99f;
             tFin = 9f;
+        }
+        if (modo == 3) {
+            tLlegada = 17.5f;
+            tFin = 45f;
         }
         tick = 0;
         espera = 0;
@@ -213,6 +223,20 @@ public class PoliciaCineCliente {
     // ---------------- Camino y movimiento ----------------
     // Distancia recorrida por el carruaje en el instante t (segundos).
     static float recorrido(float t) {
+        if (modo == 3) {
+            // llega a la parada frenando, espera y se va con vos adentro
+            if (t < 10f) {
+                return 0;
+            }
+            if (t < 17.5f) {
+                float u = (t - 10f) / 7.5f;
+                return sParada * (1 - (1 - u) * (1 - u));
+            }
+            if (t < 20.5f) {
+                return sParada;
+            }
+            return sParada + 1.4f * (t - 20.5f) * (t - 20.5f);
+        }
         if (modo == 2) {
             // salida: espera parado y arranca acelerando
             return t <= 1.4f ? 0 : 1.4f * (t - 1.4f) * (t - 1.4f);
@@ -279,6 +303,9 @@ public class PoliciaCineCliente {
 
     // ---------------- Tomas ----------------
     static int toma(float t) {
+        if (modo == 3) {
+            return t < 5.5f ? 20 : t < 10f ? 21 : t < 13.5f ? 22 : t < 18f ? 23 : 24;
+        }
         if (modo == 2) {
             return t < 2.2f ? 10 : 11;
         }
@@ -325,6 +352,37 @@ public class PoliciaCineCliente {
                 float su = u * u * (3 - 2 * u);
                 ojo = c.add(adelante.scale(-7 + 1.5 * su)).add(up.scale(2.5 + 11 * su)).add(derecha.scale(-5 - 3 * su));
                 mira = c.lerp(centro.add(0, 2, 0), su * 0.6);
+            }
+            case 20 -> {
+                // grua desde lo alto que baja hasta la parada
+                float u = t / 5.5f;
+                float su = u * u * (3 - 2 * u);
+                ojo = jugadorPos.add(adelante.scale(-13 + 5 * su)).add(derecha.scale(10 - 4 * su)).add(up.scale(13 - 9 * su));
+                mira = jugadorPos.add(up.scale(1.0));
+            }
+            case 21 -> {
+                // plano medio de frente: el personaje esperando
+                float u = (t - 5.5f) / 4.5f;
+                ojo = jugadorPos.add(adelante.scale(-3.4 + 0.9 * u)).add(derecha.scale(-0.7)).add(up.scale(1.55));
+                mira = jugadorPos.add(up.scale(1.5));
+            }
+            case 22 -> {
+                // por encima del hombro, mirando el camino por donde viene
+                ojo = jugadorPos.add(adelante.scale(1.4)).add(derecha.scale(0.6)).add(up.scale(2.0));
+                mira = jugadorPos.add(adelante.scale(-26)).add(derecha.scale(-2)).add(up.scale(0.8));
+            }
+            case 23 -> {
+                // contrapicado al costado del camino: el carruaje llega y frena
+                Vec3 sp = punto(sParada);
+                ojo = sp.add(adelante.scale(4.5)).add(derecha.scale(-3.2)).add(up.scale(0.5));
+                mira = c.add(up.scale(0.2));
+            }
+            case 24 -> {
+                // la puerta: subis y arranca
+                Vec3 sp = punto(sParada);
+                float u = Mth.clamp((t - 18f) / 4f, 0, 1);
+                ojo = sp.add(adelante.scale(-3.8 + 0.8 * u)).add(derecha.scale(4.2)).add(up.scale(1.4 + 0.6 * u));
+                mira = sp.add(derecha.scale(1.0)).add(up.scale(1.0));
             }
             case 10 -> {
                 Vec3 c0 = punto(0).add(0, 1.0, 0);
@@ -396,7 +454,7 @@ public class PoliciaCineCliente {
         float t = tick / 20f;
         if (mc.options.keyJump.isDown()) {
             saltar++;
-            if (saltar == 20 && t < tLlegada && modo != 2) {
+            if (saltar == 20 && t < tLlegada && modo != 2 && modo != 3) {
                 tick = (int) ((tLlegada + 0.6f) * 20);
                 t = tick / 20f;
             }
@@ -443,6 +501,24 @@ public class PoliciaCineCliente {
         }
         if (tick == 30 || tick == (int) ((tLlegada - 2.4f) * 20)) {
             mc.player.playSound(PoliciaSonido.anim("chime").get(), 0.6f, tick == 30 ? 0.8f : 1.1f);
+        }
+        if (modo == 3) {
+            // la parada: hojas que vuela el viento, la puerta y el subir
+            if (tick % 3 == 0 && jugadorPos != null) {
+                double ox = (mc.level.random.nextDouble() - 0.5) * 14;
+                double oz = (mc.level.random.nextDouble() - 0.5) * 14;
+                mc.level.addParticle(ParticleTypes.CHERRY_LEAVES, jugadorPos.x + ox, jugadorPos.y + 4 + mc.level.random.nextDouble() * 3, jugadorPos.z + oz, 0, 0, 0);
+            }
+            if (tick == (int) (19.9f * 20)) {
+                mc.level.playLocalSound(c.x, c.y, c.z, SoundEvents.WOODEN_DOOR_CLOSE, SoundSource.NEUTRAL, 0.9f, 1.0f, false);
+            }
+            if (tick == (int) (20.4f * 20)) {
+                mc.level.playLocalSound(c.x, c.y, c.z, SoundEvents.HORSE_ANGRY, SoundSource.NEUTRAL, 0.5f, 1.1f, false);
+            }
+            if (t >= 22.4f && !subioMandado) {
+                subioMandado = true;
+                PoliciaRed.CH.sendToServer(new PoliciaRed.Accion("cine_subio", new CompoundTag()));
+            }
         }
         if (t >= tFin) {
             despues = 200;
@@ -494,7 +570,8 @@ public class PoliciaCineCliente {
 
     // el jugador no se ve hasta que baja del carruaje
     static void jugador(RenderPlayerEvent.Pre e) {
-        if (activo && e.getEntity() == Minecraft.getInstance().player && tick / 20f < tLlegada + 1.4f) {
+        float tj = tick / 20f;
+        if (activo && e.getEntity() == Minecraft.getInstance().player && (modo == 3 ? tj >= 19.6f : tj < tLlegada + 1.4f)) {
             e.setCanceled(true);
         }
     }
@@ -513,6 +590,9 @@ public class PoliciaCineCliente {
         Minecraft mc = Minecraft.getInstance();
         float pt = e.getPartialTick();
         float t = (tick + pt) / 20f;
+        if (modo == 3 && (t < 9.8f || t > 30f)) {
+            return;
+        }
         float s = recorrido(t);
         float v = velocidad(t);
         Vec3 c = punto(s);
@@ -611,7 +691,7 @@ public class PoliciaCineCliente {
         // fundido desde negro al empezar y a negro al bajarse
         if (tick == 0 && modo != 2) {
             g.fill(0, 0, w, h, 0xFF000000);
-            String s0 = "Preparando el carruaje...";
+            String s0 = modo == 3 ? "..." : "Preparando el carruaje...";
             g.drawString(mc.font, "§7" + s0, w / 2 - mc.font.width(s0) / 2, h / 2, 0xFFFFFF);
             return;
         }
@@ -619,7 +699,9 @@ public class PoliciaCineCliente {
         if (t < 1.4f && modo != 2) {
             negro = 1 - Mth.clamp((t - 0.2f) / 1.2f, 0, 1);
         }
-        if (modo == 2) {
+        if (modo == 3) {
+            negro = Math.max(negro, Mth.clamp((t - 21.3f) / 1.0f, 0, 1));
+        } else if (modo == 2) {
             negro = Mth.clamp((t - 3.9f) / 0.7f, 0, 1);
         } else if (t > tFin - 0.9f) {
             float u = (t - (tFin - 0.9f)) / 0.9f;
@@ -629,7 +711,14 @@ public class PoliciaCineCliente {
             g.fill(0, 0, w, h, ((int) (Mth.clamp(negro, 0, 1) * 255) << 24));
         }
         // titulos
-        if (modo == 0) {
+        if (modo == 3) {
+            titulo(g, mc, "Este es el comienzo...", "", t, 1.2f, 5.2f, w, h, 2.0f);
+            titulo(g, mc, "...de mi nueva vida.", "", t, 6.0f, 10.0f, w, h, 2.0f);
+            if (t > 21.8f) {
+                String s1 = "...";
+                g.drawString(mc.font, "§7" + s1, w / 2 - mc.font.width(s1) / 2, h / 2, 0xFFFFFF);
+            }
+        } else if (modo == 0) {
             titulo(g, mc, "OFICIOS", "Después de muchos días de camino...", t, 1.6f, 5.2f, w, h);
             if (!nombre.isEmpty()) {
                 titulo(g, mc, nombre.toUpperCase(), "Tu nueva vida empieza acá", t, tLlegada - 2.6f, tLlegada + 1.2f, w, h);
@@ -639,13 +728,17 @@ public class PoliciaCineCliente {
         } else {
             titulo(g, mc, "VIAJE A " + nombre.toUpperCase(), "Subís al carruaje y salen al trote", t, 0.4f, 4.0f, w, h);
         }
-        if (t < tLlegada && modo != 2) {
+        if (t < tLlegada && modo != 2 && modo != 3) {
             String s = saltar > 0 ? "Saltando... " + Math.min(100, saltar * 5) + "%" : "Mantené ESPACIO para saltar";
             g.drawString(mc.font, "§7" + s, w - mc.font.width(s) - 10, h - alto + Math.max(2, (alto - 9) / 2), 0xFFFFFF);
         }
     }
 
     static void titulo(GuiGraphics g, Minecraft mc, String grande, String chico, float t, float desde, float hasta, int w, int h) {
+        titulo(g, mc, grande, chico, t, desde, hasta, w, h, 3.0f);
+    }
+
+    static void titulo(GuiGraphics g, Minecraft mc, String grande, String chico, float t, float desde, float hasta, int w, int h, float base) {
         if (t < desde || t > hasta) {
             return;
         }
@@ -657,7 +750,7 @@ public class PoliciaCineCliente {
         PoseStack ps = g.pose();
         ps.pushPose();
         ps.translate(w / 2f, h * 0.38f, 0);
-        float esc = 3.0f + (t - desde) * 0.03f;
+        float esc = base + (t - desde) * 0.03f;
         ps.scale(esc, esc, 1);
         int ancho = mc.font.width(grande);
         g.drawString(mc.font, grande, -ancho / 2, 0, (alfa << 24) | 0xF3E7C9, true);
