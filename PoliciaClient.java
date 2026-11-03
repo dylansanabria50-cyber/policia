@@ -118,6 +118,7 @@ public class PoliciaClient {
         PoliciaMovimiento.init();
         PoliciaAnimCliente.init();
         PoliciaCombateCliente.init();
+        PoliciaClips.init();
         net.minecraftforge.fml.ModLoadingContext.get().registerExtensionPoint(net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory.class,
                 () -> new net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory((mc, padre) -> new PoliciaOpcionesScreen(padre)));
         PoliciaMisionesCliente.init();

@@ -165,7 +165,24 @@ public class PoliciaHabScreen extends Screen {
             }
         }
         Minecraft mc = Minecraft.getInstance();
-        if (mira != null && mira.anim != null && !mira.anim.isEmpty() && mc.player != null) {
+        String clip = mira != null ? PoliciaClips.deHab(mira.anim) : null;
+        if (PoliciaClips.existe(clip)) {
+            // clip grabado de la vista previa 3D
+            int cw = Math.min(208, Math.max(120, this.width - (x + W) - 16));
+            int cx = x + W + 8;
+            if (cx + cw + 4 > this.width) {
+                cw = Math.min(208, this.width / 2 - 10);
+                cx = Math.max(4, Math.min(this.width - cw - 4, mx + 18));
+            }
+            int ch = cw * 10 / 16;
+            int cy = Math.max(16, Math.min(this.height - ch - 6, my - ch / 2));
+            g.pose().pushPose();
+            g.pose().translate(0, 0, 400);
+            PoliciaClips.caja(g, cx, cy, cw, ch, mira.nombre);
+            PoliciaClips.dibujar(g, clip, cx, cy, cw, ch);
+            g.pose().popPose();
+            PoliciaAnimCliente.preview(null);
+        } else if (mira != null && mira.anim != null && !mira.anim.isEmpty() && mc.player != null) {
             int bw = 92;
             int bh = 128;
             int bx = x + W + 6;

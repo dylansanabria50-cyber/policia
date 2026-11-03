@@ -231,6 +231,8 @@ public class PoliciaAlbanilScreen extends Screen {
         }
         int show = hov >= 0 ? hov : sel;
         PoliciaAnimCliente.preview(show >= 0 && show < PREVIEW.length ? PREVIEW[show] : null);
+        // Clip de la habilidad bajo el mouse (como la vista previa 3D).
+        PoliciaClips.pedir(hov >= 0 ? "albanil_" + hov : null);
         int bx0 = rx + 6;
         int by0 = this.py + 258;
         int bx1 = this.px + 460 - 6;
