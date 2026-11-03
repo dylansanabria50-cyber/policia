@@ -93,7 +93,7 @@ public class PoliciaViaje {
         mias.put(clave, par.copy());
         p.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 20));
         p.connection.send(new ClientboundSetTitleTextPacket(Component.literal("§f" + par.getString("n"))));
-        p.connection.send(new ClientboundSetSubtitleTextPacket(Component.literal("§7Parada de carruaje descubierta · tecla M para viajar")));
+        p.connection.send(new ClientboundSetSubtitleTextPacket(Component.literal("§7Parada descubierta · tocá la campana para viajar (M: atlas)")));
         sl.playSound(null, p.blockPosition(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 0.8f, 1.2f);
         PoliciaNivel.dar(p, 20);
         if (mias.size() >= 5) {

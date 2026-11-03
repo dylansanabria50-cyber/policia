@@ -158,6 +158,7 @@ public class PoliciaParadas {
         t.putString("n", nombre);
         registro(sl.getServer()).put(clave(campana), t);
         PoliciaMundo.get(sl.getServer()).setDirty();
+        PoliciaAtlas.marcar(sl.getServer().overworld(), "parada", clave(campana), P, "Parada: " + nombre, null);
     }
 
     // Alturas suavizadas del camino (de -40 a +12 respecto de la parada).

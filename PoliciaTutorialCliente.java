@@ -46,7 +46,7 @@ public class PoliciaTutorialCliente {
                 yield monstruos() - monstruosAntes >= 3;
             }
             case 5 -> PoliciaUICliente.K_CONSUMIR.isDown() && s == null;
-            case 6 -> s instanceof PoliciaViajeScreen;
+            case 6 -> s instanceof PoliciaViajeScreen || s != null && s.getClass().getName().startsWith("folk.sisby.antique_atlas");
             case 7 -> s instanceof PoliciaObjetivosScreen;
             default -> false;
         };

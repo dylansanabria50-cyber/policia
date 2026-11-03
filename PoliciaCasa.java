@@ -142,6 +142,7 @@ public class PoliciaCasa {
             t.put("inv", new ListTag());
             todas.put(p.getUUID().toString(), t);
             PoliciaMundo.get(p.server).setDirty();
+            PoliciaAtlas.marcar(p.serverLevel(), "casa", p.getUUID().toString(), new BlockPos(t.getInt("x"), t.getInt("y"), t.getInt("z")), "Tu casa", p.getUUID());
             if (!p.isCreative()) {
                 ctx.getItemInHand().shrink(1);
             }

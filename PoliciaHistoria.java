@@ -391,6 +391,7 @@ public class PoliciaHistoria {
             w.remove("npc");
         }
         PoliciaMundo.get(p.server).setDirty();
+        PoliciaAtlas.marcar(sl, "celestina", "cronista", pos, "Celestina, la cronista", null);
         asegurarNpc(p.server);
         Villager n = buscarNpc(sl);
         if (n != null) {

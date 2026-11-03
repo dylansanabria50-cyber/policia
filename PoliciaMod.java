@@ -60,6 +60,7 @@ import org.joml.Vector3f;
 @Mod(PoliciaMod.ID)
 public class PoliciaMod {
     public static final String ID = "policia";
+    public static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
     public static final SimpleChannel NET = NetworkRegistry.ChannelBuilder
             .named(new ResourceLocation(ID, "main"))
             .networkProtocolVersion(() -> "1")
@@ -171,6 +172,7 @@ public class PoliciaMod {
         PoliciaCriaturas.init();
         PoliciaCine.init();
         PoliciaParadas.init();
+        PoliciaAtlas.init();
         PoliciaMercenario.init();
         PoliciaBestiario.init();
         PoliciaObjetivo.init();

@@ -756,7 +756,11 @@ public class PoliciaClient {
         }
         while (K_MAPA.consumeClick()) {
             if (!free) continue;
-            mc.setScreen(new PoliciaViajeScreen());
+            // M abre el Antique Atlas (con las paradas y lugares del mod marcados);
+            // Shift+M (o sin Antique Atlas) abre el mapa de viaje propio.
+            if (net.minecraft.client.gui.screens.Screen.hasShiftDown() || !PoliciaAtlas.abrirAtlas()) {
+                mc.setScreen(new PoliciaViajeScreen());
+            }
         }
         while (K_HAB.consumeClick()) {
             if (!free) continue;

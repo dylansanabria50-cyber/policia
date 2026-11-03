@@ -24,7 +24,7 @@ public class PoliciaTutorial {
             "Usá una habilidad con la tecla Z (Mayús + Z la cambia)",
             "Derrotá 3 monstruos (de noche o en cuevas)",
             "Curate al toque con el consumible rápido (tecla V)",
-            "Abrí el mapa de viaje con la tecla M",
+            "Abrí el atlas con la tecla M (Mayús + M: mapa de viaje)",
             "En Ficha → Objetivo, elegí a dónde ir con la brújula"};
 
     static void init() {

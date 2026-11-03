@@ -259,6 +259,7 @@ public class PoliciaStruct {
         PoliciaSchem.paste(sl, x0, g + 1, z0);
         // se anota apenas esta construida: si algo falla despues, no se vuelve a construir otra
         Sites.get(sl).add(0, new BlockPos(x0 + 18, g + 1, z0 + 15));
+        PoliciaAtlas.marcar(sl, "comisaria", (x0 + 18) + "_" + (z0 + 15), new BlockPos(x0 + 18, g + 1, z0 + 15), "Comisaría", null);
         BlockPos home = new BlockPos(x0 + 14, g + 1, z0 + 9);
         try {
             PoliciaStruct.npc(sl, 0, (double) x0 + 24.5, (double) g + 1.0, (double) z0 + 9.5, 180.0f, null, 0);
@@ -326,6 +327,7 @@ public class PoliciaStruct {
         PoliciaStruct.set(sl, x0 + 6, g + 4, z1 - 1, hang);
         PoliciaStruct.npc(sl, PoliciaBoss.HERRERO_BOSS, (double) x0 + 6.5, (double) g + 1.0, (double) z0 + 5.5, 0.0f, null, 0);
         Sites.get(sl).add(7, new BlockPos(x0 + 6, g + 1, z1 + 1));
+        PoliciaAtlas.marcar(sl, "herreria", (x0 + 6) + "_" + (z1 + 1), new BlockPos(x0 + 6, g + 1, z1 + 1), "Herrería", null);
     }
 
     static void obra(ServerLevel sl, int x0, int z0, int g) {
@@ -456,6 +458,7 @@ public class PoliciaStruct {
         PoliciaStruct.chest(sl, x0 + 11, f3 + 1, z0 + 6, "minecraft:chests/simple_dungeon");
         PoliciaStruct.chest(sl, x0 + 7, f3 + 1, z0 + 11, "minecraft:chests/buried_treasure");
         Sites.get(sl).add(2, new BlockPos(x0 + 6, g + 1, z1 + 1));
+        PoliciaAtlas.marcar(sl, "casino", (x0 + 6) + "_" + (z1 + 1), new BlockPos(x0 + 6, g + 1, z1 + 1), "Casino", null);
     }
 
     // Distancia mínima entre dos estructuras del MISMO tipo (el casino es
