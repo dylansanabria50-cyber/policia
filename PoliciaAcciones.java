@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class PoliciaAcciones {
     static void recibir(ServerPlayer p, String tipo, CompoundTag d) {
         switch (tipo) {
+            case "espec" -> PoliciaEspecial.elegir(p, d.getString("id"));
             default -> {
             }
         }

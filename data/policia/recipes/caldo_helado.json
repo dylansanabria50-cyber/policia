@@ -1,0 +1,22 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  {
+   "item": "minecraft:bowl"
+  },
+  {
+   "item": "minecraft:snowball"
+  },
+  {
+   "item": "minecraft:dried_kelp"
+  },
+  {
+   "item": "minecraft:cooked_salmon"
+  }
+ ],
+ "result": {
+  "item": "policia:caldo_helado",
+  "count": 1
+ }
+}

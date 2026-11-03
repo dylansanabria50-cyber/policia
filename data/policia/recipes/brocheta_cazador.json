@@ -1,0 +1,19 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  {
+   "item": "minecraft:stick"
+  },
+  {
+   "item": "minecraft:cooked_porkchop"
+  },
+  {
+   "item": "minecraft:cooked_mutton"
+  }
+ ],
+ "result": {
+  "item": "policia:brocheta_cazador",
+  "count": 1
+ }
+}

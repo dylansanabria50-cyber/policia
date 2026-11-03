@@ -113,6 +113,9 @@ public class PoliciaBoss {
         for (int g = 0; g < PoliciaBotin.GEMAS.length; g++) {
             out.accept((ItemLike) PoliciaBotin.gema(g));
         }
+        for (net.minecraft.world.item.Item it : PoliciaCocina.todos()) {
+            out.accept((ItemLike) it);
+        }
         out.accept((ItemLike) PoliciaPlaca.BALDE.get());
         out.accept((ItemLike) PoliciaPlaca.GUANTE.get());
         out.accept((ItemLike) PoliciaPlaca.MARTILLO.get());

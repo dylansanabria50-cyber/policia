@@ -1,0 +1,25 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  {
+   "item": "minecraft:bowl"
+  },
+  {
+   "item": "minecraft:carrot"
+  },
+  {
+   "item": "minecraft:potato"
+  },
+  {
+   "item": "minecraft:cooked_beef"
+  },
+  {
+   "item": "minecraft:brown_mushroom"
+  }
+ ],
+ "result": {
+  "item": "policia:guiso_campo",
+  "count": 1
+ }
+}
