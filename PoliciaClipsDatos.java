@@ -115,9 +115,9 @@ public class PoliciaClipsDatos {
         PoliciaClips.NOMBRE.put("medico_6", "Mortero de hierbas");
         PoliciaClips.INFO.put("medico_7", new int[]{40, 8, 160, 100, 3});
         PoliciaClips.NOMBRE.put("medico_7", "Lazo vital");
-        PoliciaClips.INFO.put("medico_8", new int[]{44, 8, 160, 100, 3});
+        PoliciaClips.INFO.put("medico_8", new int[]{50, 8, 160, 100, 3});
         PoliciaClips.NOMBRE.put("medico_8", "Babosa curandera");
-        PoliciaClips.INFO.put("medico_9", new int[]{45, 8, 160, 100, 3});
+        PoliciaClips.INFO.put("medico_9", new int[]{56, 8, 160, 100, 3});
         PoliciaClips.NOMBRE.put("medico_9", "Píldora monstruo");
         PoliciaClips.INFO.put("mercader_0", new int[]{40, 8, 160, 100, 3});
         PoliciaClips.NOMBRE.put("mercader_0", "Puesto instantáneo");
