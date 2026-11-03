@@ -89,8 +89,8 @@ public class PoliciaHabOficios {
             case "reanimar" -> reanimar(p);
             case "hospital" -> hospital(p);
             case "lazo" -> lazo(p);
-            case "babosa" -> babosa(p);
-            case "pildora" -> pildora(p);
+            case "babosa" -> PoliciaAnime.babosa(p);
+            case "pildora" -> PoliciaAnime.pildora(p);
             case "puesto" -> puesto(p);
             case "balanza" -> balanza(p);
             case "regateo" -> regateo(p);
@@ -99,9 +99,9 @@ public class PoliciaHabOficios {
             case "monedas" -> monedas(p);
             case "contrato" -> contrato(p);
             case "propina" -> propina(p);
-            case "cartas" -> cartas(p);
-            case "tesoro" -> tesoro(p);
-            case "tienda" -> tienda(p);
+            case "cartas" -> PoliciaAnime.cartas(p);
+            case "tesoro" -> PoliciaAnime.tesoro(p);
+            case "tienda" -> PoliciaAnime.tienda(p);
             default -> false;
         };
     }

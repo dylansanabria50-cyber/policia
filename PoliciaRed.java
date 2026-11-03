@@ -37,6 +37,8 @@ public class PoliciaRed {
         CH.registerMessage(12, HistoriaDialogo.class, HistoriaDialogo::enc, HistoriaDialogo::dec, HistoriaDialogo::handle);
         CH.registerMessage(13, HistoriaElegir.class, HistoriaElegir::enc, HistoriaElegir::dec, HistoriaElegir::handle);
         CH.registerMessage(14, FaccionReclamar.class, FaccionReclamar::enc, FaccionReclamar::dec, FaccionReclamar::handle);
+        CH.registerMessage(15, Efecto.class, Efecto::enc, Efecto::dec, Efecto::handle);
+        CH.registerMessage(16, Accion.class, Accion::enc, Accion::dec, Accion::handle);
     }
 
     static void toPlayer(ServerPlayer p, Object msg) {
@@ -446,6 +448,67 @@ public class PoliciaRed {
             c.get().enqueueWork(() -> {
                 if (p != null) {
                     PoliciaFacciones.reclamar(p, m.id, m.nivel);
+                }
+            });
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Servidor -> cliente: algo para mostrar o actualizar (efectos visuales,
+    // formas, datos de pantallas). Lo reparte PoliciaAnimeCliente.recibir.
+    public static class Efecto {
+        String tipo;
+        CompoundTag d;
+
+        public Efecto(String tipo, CompoundTag d) {
+            this.tipo = tipo;
+            this.d = d;
+        }
+
+        static void enc(Efecto m, FriendlyByteBuf b) {
+            b.writeUtf(m.tipo, 64);
+            b.writeNbt(m.d);
+        }
+
+        static Efecto dec(FriendlyByteBuf b) {
+            String t = b.readUtf(64);
+            CompoundTag d = b.readNbt();
+            return new Efecto(t, d == null ? new CompoundTag() : d);
+        }
+
+        static void handle(Efecto m, Supplier<NetworkEvent.Context> c) {
+            c.get().enqueueWork(() -> net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> PoliciaAnimeCliente.recibir(m.tipo, m.d)));
+            c.get().setPacketHandled(true);
+        }
+    }
+
+    // Cliente -> servidor: un pedido desde una pantalla (especializacion,
+    // mercenarios, bestiario...). Lo reparte PoliciaAcciones.recibir.
+    public static class Accion {
+        String tipo;
+        CompoundTag d;
+
+        public Accion(String tipo, CompoundTag d) {
+            this.tipo = tipo;
+            this.d = d;
+        }
+
+        static void enc(Accion m, FriendlyByteBuf b) {
+            b.writeUtf(m.tipo, 64);
+            b.writeNbt(m.d);
+        }
+
+        static Accion dec(FriendlyByteBuf b) {
+            String t = b.readUtf(64);
+            CompoundTag d = b.readNbt();
+            return new Accion(t, d == null ? new CompoundTag() : d);
+        }
+
+        static void handle(Accion m, Supplier<NetworkEvent.Context> c) {
+            ServerPlayer p = c.get().getSender();
+            c.get().enqueueWork(() -> {
+                if (p != null) {
+                    PoliciaAcciones.recibir(p, m.tipo, m.d);
                 }
             });
             c.get().setPacketHandled(true);

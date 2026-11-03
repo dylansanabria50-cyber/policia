@@ -57,5 +57,6 @@
  "item.policia.gema_ambar": "Amber",
  "item.policia.gema_amatista": "Amethyst Gem",
  "item.policia.gema_onix": "Onyx",
- "item.policia.gema_topacio": "Topaz"
+ "item.policia.gema_topacio": "Topaz",
+ "entity.policia.babosa": "Healing slime"
 }
