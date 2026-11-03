@@ -248,6 +248,206 @@ public class PoliciaStruct {
     }
 
 
+    static void comisaria(ServerLevel sl, int x0, int z0, int g) {
+        PoliciaStruct.prepareH(sl, x0 - 1, z0 - 1, 33, 25, g, 24);
+        PoliciaStruct.fill(sl, x0 + 8, g, z0 + 2, x0 + 28, g, z0 + 12, Blocks.STONE_BRICKS);
+        PoliciaSchem.paste(sl, x0, g + 1, z0);
+        BlockPos home = new BlockPos(x0 + 14, g + 1, z0 + 9);
+        PoliciaStruct.npc(sl, 0, (double) x0 + 24.5, (double) g + 1.0, (double) z0 + 9.5, 180.0f, null, 0);
+        for (int i = 0; i < AGX.length; ++i) {
+            PoliciaStruct.npc(sl, 5, (double) (x0 + AGX[i]) + 0.5, g + 1, (double) (z0 + AGZ[i]) + 0.5, 0.0f, home, 24);
+        }
+        Sites.get(sl).add(0, new BlockPos(x0 + 18, g + 1, z0 + 15));
+    }
+
+    // Herreria del Maestro herrero: taller de piedra con el frente abierto,
+    // forja con lava, yunques, mesa de herreria y un mostrador detras del
+    // cual atiende el jefe del oficio.
+    static void herreria(ServerLevel sl, int x0, int z0, int g) {
+        PoliciaStruct.prepare(sl, x0 - 1, z0 - 1, 15, 13, g);
+        int x1 = x0 + 12;
+        int z1 = z0 + 10;
+        PoliciaStruct.fill(sl, x0, g, z0, x1, g, z1, Blocks.POLISHED_ANDESITE);
+        for (int x = x0; x <= x1; x += 2) {
+            for (int z = z0 + (x & 2) / 2; z <= z1; z += 2) {
+                PoliciaStruct.set(sl, x, g, z, Blocks.STONE_BRICKS);
+            }
+        }
+        // Paredes: fondo y costados (el frente queda abierto con dos postes).
+        PoliciaStruct.fill(sl, x0, g + 1, z0, x1, g + 4, z0, Blocks.STONE_BRICKS);
+        PoliciaStruct.fill(sl, x0, g + 1, z0, x0, g + 4, z1 - 3, Blocks.STONE_BRICKS);
+        PoliciaStruct.fill(sl, x1, g + 1, z0, x1, g + 4, z1 - 3, Blocks.STONE_BRICKS);
+        PoliciaStruct.fill(sl, x0, g + 1, z1, x0, g + 4, z1, Blocks.STRIPPED_SPRUCE_LOG);
+        PoliciaStruct.fill(sl, x1, g + 1, z1, x1, g + 4, z1, Blocks.STRIPPED_SPRUCE_LOG);
+        PoliciaStruct.fill(sl, x0 + 3, g + 2, z0, x0 + 4, g + 3, z0, Blocks.IRON_BARS);
+        PoliciaStruct.fill(sl, x1 - 4, g + 2, z0, x1 - 3, g + 3, z0, Blocks.IRON_BARS);
+        PoliciaStruct.fill(sl, x0, g + 2, z0 + 4, x0, g + 3, z0 + 5, Blocks.IRON_BARS);
+        // Techo con borde de madera oscura.
+        PoliciaStruct.fill(sl, x0 - 1, g + 5, z0 - 1, x1 + 1, g + 5, z1 + 1, Blocks.DARK_OAK_PLANKS);
+        PoliciaStruct.fill(sl, x0, g + 5, z0, x1, g + 5, z1, Blocks.DEEPSLATE_TILES);
+        // Forja: chimenea de ladrillos con lava y altos hornos.
+        PoliciaStruct.fill(sl, x0 + 1, g + 1, z0 + 1, x0 + 3, g + 1, z0 + 2, Blocks.BRICKS);
+        PoliciaStruct.set(sl, x0 + 2, g + 1, z0 + 1, Blocks.LAVA_CAULDRON);
+        PoliciaStruct.fill(sl, x0 + 1, g + 2, z0 + 1, x0 + 3, g + 4, z0 + 1, Blocks.BRICKS);
+        PoliciaStruct.fill(sl, x0 + 1, g + 5, z0 + 1, x0 + 3, g + 8, z0 + 2, Blocks.BRICKS);
+        PoliciaStruct.set(sl, x0 + 2, g + 8, z0 + 1, Blocks.CAMPFIRE);
+        PoliciaStruct.set(sl, x0 + 1, g + 2, z0 + 2, Blocks.BLAST_FURNACE.defaultBlockState().setValue(net.minecraft.world.level.block.FurnaceBlock.FACING, net.minecraft.core.Direction.SOUTH));
+        PoliciaStruct.set(sl, x0 + 3, g + 2, z0 + 2, Blocks.BLAST_FURNACE.defaultBlockState().setValue(net.minecraft.world.level.block.FurnaceBlock.FACING, net.minecraft.core.Direction.SOUTH));
+        // Mesas de trabajo al fondo a la derecha.
+        PoliciaStruct.set(sl, x1 - 1, g + 1, z0 + 1, Blocks.SMITHING_TABLE);
+        PoliciaStruct.set(sl, x1 - 2, g + 1, z0 + 1, Blocks.GRINDSTONE.defaultBlockState().setValue(net.minecraft.world.level.block.GrindstoneBlock.FACE, net.minecraft.world.level.block.state.properties.AttachFace.FLOOR));
+        PoliciaStruct.set(sl, x1 - 3, g + 1, z0 + 1, Blocks.CRAFTING_TABLE);
+        PoliciaStruct.chest(sl, x1 - 1, g + 1, z0 + 3, "minecraft:chests/village/village_weaponsmith");
+        PoliciaStruct.set(sl, x1 - 1, g + 1, z0 + 4, Blocks.BARREL);
+        // Yunques del taller.
+        PoliciaStruct.set(sl, x0 + 4, g + 1, z0 + 4, Blocks.ANVIL);
+        PoliciaStruct.set(sl, x1 - 4, g + 1, z0 + 4, Blocks.CHIPPED_ANVIL);
+        // Mostrador: el maestro atiende detras.
+        for (int x = x0 + 3; x <= x1 - 3; ++x) {
+            if (x == x0 + 6) continue;
+            PoliciaStruct.set(sl, x, g + 1, z0 + 7, Blocks.SPRUCE_PLANKS);
+        }
+        PoliciaStruct.set(sl, x0 + 4, g + 2, z0 + 7, Blocks.IRON_BLOCK);
+        PoliciaStruct.set(sl, x1 - 4, g + 2, z0 + 7, Blocks.LANTERN);
+        // Faroles colgando del techo.
+        BlockState hang = Blocks.LANTERN.defaultBlockState().setValue(net.minecraft.world.level.block.LanternBlock.HANGING, true);
+        PoliciaStruct.set(sl, x0 + 3, g + 4, z0 + 5, hang);
+        PoliciaStruct.set(sl, x1 - 3, g + 4, z0 + 5, hang);
+        PoliciaStruct.set(sl, x0 + 6, g + 4, z1 - 1, hang);
+        PoliciaStruct.npc(sl, PoliciaBoss.HERRERO_BOSS, (double) x0 + 6.5, (double) g + 1.0, (double) z0 + 5.5, 0.0f, null, 0);
+        Sites.get(sl).add(7, new BlockPos(x0 + 6, g + 1, z1 + 1));
+    }
+
+    static void obra(ServerLevel sl, int x0, int z0, int g) {
+        int x;
+        PoliciaStruct.prepare(sl, x0 - 1, z0 - 1, 19, 15, g);
+        int x1 = x0 + 16;
+        int z1 = z0 + 12;
+        PoliciaStruct.fill(sl, x0, g, z0, x1, g, z1, Blocks.DIRT_PATH);
+        for (x = x0; x <= x1; x += 2) {
+            for (int z = z0; z <= z1; z += 3) {
+                PoliciaStruct.set(sl, x, g, z, Blocks.COARSE_DIRT);
+            }
+        }
+        for (x = x0; x <= x1; ++x) {
+            if (x < x0 + 7 || x > x0 + 9) {
+                sl.setBlock(new BlockPos(x, g + 1, z1), Blocks.COBBLESTONE_WALL.defaultBlockState(), 3);
+            }
+            sl.setBlock(new BlockPos(x, g + 1, z0), Blocks.COBBLESTONE_WALL.defaultBlockState(), 3);
+        }
+        for (int z = z0; z <= z1; ++z) {
+            sl.setBlock(new BlockPos(x0, g + 1, z), Blocks.COBBLESTONE_WALL.defaultBlockState(), 3);
+            sl.setBlock(new BlockPos(x1, g + 1, z), Blocks.COBBLESTONE_WALL.defaultBlockState(), 3);
+        }
+        PoliciaStruct.fill(sl, x0 + 2, g + 1, z0 + 2, x0 + 6, g + 3, z0 + 6, Blocks.SPRUCE_LOG);
+        PoliciaStruct.fill(sl, x0 + 3, g + 1, z0 + 3, x0 + 5, g + 3, z0 + 5, Blocks.AIR);
+        PoliciaStruct.fill(sl, x0 + 2, g + 4, z0 + 2, x0 + 6, g + 4, z0 + 6, Blocks.OAK_PLANKS);
+        PoliciaStruct.fill(sl, x0 + 4, g + 1, z0 + 6, x0 + 4, g + 2, z0 + 6, Blocks.AIR);
+        PoliciaStruct.set(sl, x0 + 3, g + 2, z0 + 2, Blocks.GLASS_PANE);
+        PoliciaStruct.set(sl, x0 + 5, g + 2, z0 + 2, Blocks.GLASS_PANE);
+        PoliciaStruct.set(sl, x0 + 2, g + 2, z0 + 4, Blocks.GLASS_PANE);
+        PoliciaStruct.set(sl, x0 + 4, g + 3, z0 + 4, Blocks.LANTERN);
+        PoliciaStruct.set(sl, x0 + 3, g + 1, z0 + 3, Blocks.OAK_DOOR);
+        PoliciaStruct.set(sl, x0 + 5, g + 1, z0 + 3, Blocks.SPRUCE_PLANKS);
+        int bx = x0 + 9;
+        int bz = z0 + 2;
+        for (int[] c : new int[][]{{0, 0}, {6, 0}, {0, 6}, {6, 6}}) {
+            PoliciaStruct.fill(sl, bx + c[0], g + 1, bz + c[1], bx + c[0], g + 5, bz + c[1], Blocks.SPRUCE_FENCE);
+        }
+        PoliciaStruct.fill(sl, bx, g, bz, bx + 6, g, bz + 6, Blocks.STONE_BRICKS);
+        PoliciaStruct.fill(sl, bx, g + 1, bz, bx + 6, g + 2, bz, Blocks.SPRUCE_FENCE);
+        PoliciaStruct.fill(sl, bx, g + 1, bz, bx, g + 2, bz + 6, Blocks.SPRUCE_FENCE);
+        PoliciaStruct.fill(sl, bx + 6, g + 1, bz + 3, bx + 6, g + 1, bz + 6, Blocks.SPRUCE_FENCE);
+        PoliciaStruct.fill(sl, bx + 1, g + 6, bz, bx + 5, g + 6, bz, Blocks.SCAFFOLDING);
+        for (int y = g + 1; y <= g + 7; ++y) {
+            PoliciaStruct.set(sl, bx + 7, y, bz + 1, Blocks.OAK_FENCE);
+            PoliciaStruct.set(sl, bx + 7, y, bz + 5, Blocks.OAK_FENCE);
+        }
+        PoliciaStruct.fill(sl, bx + 7, g + 7, bz + 1, bx + 7, g + 7, bz + 5, Blocks.OAK_FENCE);
+        PoliciaStruct.chest(sl, x0 + 1, g + 1, z0 + 9, "minecraft:chests/village/village_mason");
+        PoliciaStruct.chest(sl, x0 + 2, g + 1, z0 + 9, "minecraft:chests/village/village_toolsmith");
+        PoliciaStruct.fill(sl, x0 + 4, g + 1, z0 + 10, x0 + 5, g + 2, z0 + 10, Blocks.SPRUCE_LOG);
+        PoliciaStruct.set(sl, x0 + 7, g + 1, z0 + 10, Blocks.SPRUCE_PLANKS);
+        PoliciaStruct.set(sl, x0 + 14, g + 1, z0 + 10, Blocks.STONE_BRICKS);
+        PoliciaStruct.set(sl, x0 + 14, g + 1, z0 + 11, Blocks.STONE_BRICKS);
+        BlockPos home = new BlockPos(x0 + 8, g + 1, z0 + 7);
+        PoliciaStruct.npc(sl, 1, (double) x0 + 4.5, g + 1, (double) z0 + 4.5, 0.0f, null, 0);
+        PoliciaStruct.npc(sl, 6, (double) x0 + 11.5, g + 1, (double) z0 + 9.5, 0.0f, home, 8);
+        PoliciaStruct.npc(sl, 6, (double) x0 + 13.5, g + 1, (double) z0 + 8.5, 0.0f, home, 8);
+        PoliciaStruct.npc(sl, 6, (double) x0 + 8.5, g + 1, (double) z0 + 10.5, 0.0f, home, 8);
+        Sites.get(sl).add(1, new BlockPos(x0 + 8, g + 1, z1));
+    }
+
+    static void casino(ServerLevel sl, int x0, int z0, int g) {
+        PoliciaStruct.prepare(sl, x0 - 1, z0 - 1, 15, 15, g);
+        int x1 = x0 + 12;
+        int z1 = z0 + 12;
+        PoliciaStruct.fill(sl, x0, g - 18, z0, x1, g + 5, z1, Blocks.STONE_BRICKS);
+        for (int k = 0; k < 4; ++k) {
+            int fy = g - 6 * k;
+            PoliciaStruct.fill(sl, x0 + 1, fy + 1, z0 + 1, x1 - 1, fy + 4, z1 - 1, Blocks.AIR);
+            Block carpet = k == 3 ? Blocks.BLACK_CARPET : Blocks.RED_CARPET;
+            PoliciaStruct.fill(sl, x0 + 1, fy + 1, z0 + 1, x1 - 1, fy + 1, z1 - 1, carpet);
+            for (int lx : new int[]{4, 8}) {
+                for (int lz : new int[]{4, 8}) {
+                    PoliciaStruct.set(sl, x0 + lx, fy + 4, z0 + lz, Blocks.SEA_LANTERN);
+                }
+            }
+            if (k >= 3) continue;
+            PoliciaStruct.fill(sl, x0 + 5, fy + 1, z0 + 5, x0 + 7, fy + 1, z0 + 7, Blocks.GREEN_CARPET);
+            PoliciaStruct.set(sl, x0 + 6, fy + 1, z0 + 6, Blocks.SMOOTH_STONE);
+        }
+        for (int[] c : new int[][]{{0, 0}, {12, 0}, {0, 12}, {12, 12}}) {
+            PoliciaStruct.fill(sl, x0 + c[0], g + 1, z0 + c[1], x0 + c[0], g + 4, z0 + c[1], Blocks.SMOOTH_STONE);
+        }
+        PoliciaStruct.fill(sl, x0 + 5, g + 1, z1, x0 + 7, g + 3, z1, Blocks.AIR);
+        PoliciaStruct.set(sl, x0 + 4, g + 3, z1 + 1, Blocks.LANTERN);
+        PoliciaStruct.set(sl, x0 + 8, g + 3, z1 + 1, Blocks.LANTERN);
+        PoliciaStruct.fill(sl, x0 + 4, g + 4, z1, x0 + 8, g + 4, z1, Blocks.SMOOTH_STONE);
+        BlockState lad = Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.EAST);
+        for (int y = g - 17; y <= g + 4; ++y) {
+            PoliciaStruct.set(sl, x0 + 1, y, z0 + 1, lad);
+        }
+        int f1 = g - 6;
+        PoliciaStruct.chest(sl, x0 + 3, f1 + 1, z0 + 9, "minecraft:chests/village/village_toolsmith");
+        PoliciaStruct.chest(sl, x0 + 9, f1 + 1, z0 + 3, "minecraft:chests/village/village_toolsmith");
+        PoliciaStruct.chest(sl, x0 + 10, f1 + 1, z0 + 10, "minecraft:chests/village/village_weaponsmith");
+        int f2 = g - 12;
+        BlockPos h2 = new BlockPos(x0 + 6, f2 + 1, z0 + 6);
+        PoliciaStruct.npc(sl, 4, (double) x0 + 3.5, f2 + 1, (double) z0 + 8.5, 0.0f, h2, 6);
+        PoliciaStruct.npc(sl, 4, (double) x0 + 9.5, f2 + 1, (double) z0 + 4.5, 90.0f, h2, 6);
+        PoliciaStruct.npc(sl, 4, (double) x0 + 8.5, f2 + 1, (double) z0 + 9.5, 180.0f, h2, 6);
+        PoliciaStruct.chest(sl, x0 + 2, f2 + 1, z0 + 10, "minecraft:chests/simple_dungeon");
+        PoliciaStruct.chest(sl, x0 + 10, f2 + 1, z0 + 2, "minecraft:chests/simple_dungeon");
+        int f3 = g - 18;
+        PoliciaStruct.set(sl, x0 + 10, f3 + 1, z0 + 10, Blocks.EMERALD_BLOCK);
+        PoliciaStruct.set(sl, x0 + 9, f3 + 1, z0 + 11, Blocks.SMOOTH_STONE);
+        PoliciaStruct.set(sl, x0 + 11, f3 + 1, z0 + 11, Blocks.SMOOTH_STONE);
+        BlockPos h3 = new BlockPos(x0 + 9, f3 + 1, z0 + 9);
+        PoliciaStruct.npc(sl, 2, (double) x0 + 10.5, (double) f3 + 1.5, (double) z0 + 10.5, 135.0f, null, 0);
+        PoliciaStruct.npc(sl, 4, (double) x0 + 8.5, f3 + 1, (double) z0 + 10.5, 135.0f, h3, 4);
+        PoliciaStruct.npc(sl, 4, (double) x0 + 10.5, f3 + 1, (double) z0 + 8.5, 135.0f, h3, 4);
+        PoliciaStruct.set(sl, x0 + 9, f3 + 1, z0 + 2, Blocks.SPRUCE_PLANKS);
+        PoliciaStruct.npc(sl, 3, (double) x0 + 10.5, f3 + 1, (double) z0 + 2.5, 90.0f, null, 0);
+        for (int x = x0 + 2; x <= x0 + 6; ++x) {
+            if (x == x0 + 4) continue;
+            PoliciaStruct.set(sl, x, f3 + 1, z0 + 9, Blocks.IRON_BARS);
+            PoliciaStruct.set(sl, x, f3 + 2, z0 + 9, Blocks.IRON_BARS);
+        }
+        for (int z = z0 + 10; z <= z0 + 11; ++z) {
+            for (int y = f3 + 1; y <= f3 + 2; ++y) {
+                PoliciaStruct.set(sl, x0 + 2, y, z, Blocks.IRON_BARS);
+                PoliciaStruct.set(sl, x0 + 6, y, z, Blocks.IRON_BARS);
+            }
+        }
+        PoliciaStruct.captive(sl, (double) x0 + 3.5, f3 + 1, (double) z0 + 10.5);
+        PoliciaStruct.captive(sl, (double) x0 + 5.5, f3 + 1, (double) z0 + 10.5);
+        PoliciaStruct.chest(sl, x0 + 11, f3 + 1, z0 + 5, "minecraft:chests/buried_treasure");
+        PoliciaStruct.chest(sl, x0 + 11, f3 + 1, z0 + 6, "minecraft:chests/simple_dungeon");
+        PoliciaStruct.chest(sl, x0 + 7, f3 + 1, z0 + 11, "minecraft:chests/buried_treasure");
+        Sites.get(sl).add(2, new BlockPos(x0 + 6, g + 1, z1 + 1));
+    }
+
     // Distancia mínima entre dos estructuras del MISMO tipo (el casino es
     // el más espaciado) y entre estructuras de cualquier tipo.
     static final int[] SAME = new int[]{120, 600, 1200, 700, 700, 700, 700, 120};
