@@ -73,6 +73,7 @@ public class PoliciaAnimeCliente {
 
     static void renderers(EntityRenderersEvent.RegisterRenderers e) {
         e.registerEntityRenderer(PoliciaAnime.BABOSA.get(), BabosaRender::new);
+        e.registerEntityRenderer(PoliciaMercenario.MERC.get(), PoliciaMercenarioRender::new);
     }
 
     static long ahora() {

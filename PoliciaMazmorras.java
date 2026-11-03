@@ -369,7 +369,7 @@ public class PoliciaMazmorras {
         }
         int jugadores = Math.max(1, sl.getEntitiesOfClass(ServerPlayer.class, new AABB(bx, y0 - 2, z - 12, bx + 22, y0 + 11, z + 12)).size());
         double base = i == 0 ? 280 : i == 1 ? 420 : 520;
-        m.getAttribute(Attributes.MAX_HEALTH).setBaseValue(base * (1 + 0.5 * (jugadores - 1)));
+        m.getAttribute(Attributes.MAX_HEALTH).setBaseValue(base * (1 + 0.5 * (jugadores - 1)) * PoliciaBalance.v(PoliciaBalance.VIDA_JEFES));
         if (m.getAttribute(Attributes.ATTACK_DAMAGE) != null) {
             m.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(i == 1 ? 14 : 9);
         }
@@ -614,7 +614,7 @@ public class PoliciaMazmorras {
                         return false;
                     }
                     sl.sendParticles(ParticleTypes.FALLING_WATER, q.x, q.y + 3, q.z, 80, 0.5, 2.5, 0.5, 0);
-                    sl.playSound(null, BlockPos.containing(q), SoundEvents.GENERIC_SPLASH, SoundSource.HOSTILE, 1.5f, 0.6f);
+                    sl.playSound(null, BlockPos.containing(q), PoliciaSonido.anim("geiser").get(), SoundSource.HOSTILE, 1.5f, 1.0f);
                     for (ServerPlayer o : cerca) {
                         if (o.position().distanceTo(q) < 1.8) {
                             o.hurt(m.damageSources().indirectMagic(m, m), 4.0f);

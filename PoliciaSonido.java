@@ -28,7 +28,7 @@ public class PoliciaSonido {
 
     // Etapa 3c: sonidos de las animaciones, grabados del sintetizador de la
     // vista previa (assets/policia/sounds/anim/*.ogg).
-    static final String[] ANIM_NOMBRES = new String[]{"bark", "beep", "brick", "chain", "chime", "clang", "click", "crank", "crumble", "hiss", "hydraulic", "ignite", "magic", "puff", "pulse", "radio", "roar", "scan", "shield", "thud", "warp", "whistle", "whistle2", "whoosh", "zap"};
+    static final String[] ANIM_NOMBRES = new String[]{"bark", "beep", "brick", "chain", "chime", "clang", "click", "crank", "crumble", "hiss", "hydraulic", "ignite", "magic", "puff", "pulse", "radio", "roar", "scan", "shield", "thud", "warp", "whistle", "whistle2", "whoosh", "zap", "boing", "rugido", "carta", "portal", "geiser"};
     static final java.util.Map<String, RegistryObject<SoundEvent>> ANIM = new java.util.HashMap<String, RegistryObject<SoundEvent>>();
 
     static {

@@ -281,7 +281,7 @@ public class PoliciaAnime {
                     this.setDeltaMovement(0, 0.3, 0);
                 }
                 this.hasImpulse = true;
-                sl.playSound(null, this.blockPosition(), this.tam() > 1 ? SoundEvents.SLIME_JUMP : SoundEvents.SLIME_JUMP_SMALL, SoundSource.PLAYERS, 0.5f, 1.2f + this.random.nextFloat() * 0.3f);
+                sl.playSound(null, this.blockPosition(), PoliciaSonido.anim("boing").get(), SoundSource.PLAYERS, 0.45f, (this.tam() > 1 ? 0.85f : 1.25f) + this.random.nextFloat() * 0.2f);
                 this.salto = this.tam() > 1 ? 14 : 8 + this.random.nextInt(4);
             }
             if (this.madre && this.vida % 20 == 0) {
@@ -366,10 +366,10 @@ public class PoliciaAnime {
             }
             if (t == 6) {
                 sl.sendParticles(ParticleTypes.LARGE_SMOKE, q.getX(), q.getY() + 1, q.getZ(), 30, 0.5, 0.8, 0.5, 0.05);
-                sl.playSound(null, q.blockPosition(), SoundEvents.RAVAGER_ROAR, SoundSource.PLAYERS, 1.2f, 1.25f);
+                sl.playSound(null, q.blockPosition(), PoliciaSonido.anim("rugido").get(), SoundSource.PLAYERS, 1.4f, 1.0f);
             }
             if (t == 14) {
-                sl.playSound(null, q.blockPosition(), SoundEvents.POLAR_BEAR_WARNING, SoundSource.PLAYERS, 1.0f, 0.7f);
+                sl.playSound(null, q.blockPosition(), PoliciaSonido.anim("rugido").get(), SoundSource.PLAYERS, 0.8f, 0.75f);
             }
             if (t > 20 && t % 9 == 0 && q.onGround() && q.getDeltaMovement().horizontalDistanceSqr() > 0.003) {
                 sl.playSound(null, q.blockPosition(), SoundEvents.RAVAGER_STEP, SoundSource.PLAYERS, 0.35f, 1.3f);
@@ -406,14 +406,14 @@ public class PoliciaAnime {
         d.putIntArray("tipos", tipos);
         d.putInt("obj", hayEnemigo ? obj.getId() : -1);
         efecto(p, "cartas", d);
-        sl.playSound(null, p.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1.0f, 1.4f);
+        sl.playSound(null, p.blockPosition(), PoliciaSonido.anim("carta").get(), SoundSource.PLAYERS, 1.0f, 1.0f);
         final LivingEntity fobj = hayEnemigo ? obj : null;
         PoliciaHab.tarea(t -> {
             if (!p.isAlive() || p.hasDisconnected()) {
                 return true;
             }
             if (t == 8) {
-                sl.playSound(null, p.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 0.8f, 1.8f);
+                sl.playSound(null, p.blockPosition(), PoliciaSonido.anim("carta").get(), SoundSource.PLAYERS, 0.8f, 1.3f);
             }
             if (t == 22) {
                 sl.playSound(null, p.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 0.7f, 1.6f);
@@ -463,7 +463,7 @@ public class PoliciaAnime {
         d.putInt("ent", p.getId());
         d.putInt("dur", 80);
         efecto(p, "tesoro", d);
-        sl.playSound(null, p.blockPosition(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0f, 1.6f);
+        sl.playSound(null, p.blockPosition(), PoliciaSonido.anim("portal").get(), SoundSource.PLAYERS, 1.0f, 1.4f);
         final List<LivingEntity> pendientes = new ArrayList<LivingEntity>();
         PoliciaHab.tarea(t -> {
             if (!p.isAlive() || p.hasDisconnected()) {
@@ -533,7 +533,7 @@ public class PoliciaAnime {
         d.putFloat("yaw", p.getYRot() + 180);
         d.putInt("dur", 60);
         efecto(p, "portal", d);
-        sl.playSound(null, BlockPos.containing(c), SoundEvents.PORTAL_TRIGGER, SoundSource.PLAYERS, 0.5f, 1.6f);
+        sl.playSound(null, BlockPos.containing(c), PoliciaSonido.anim("portal").get(), SoundSource.PLAYERS, 1.0f, 0.8f);
         final WanderingTrader[] w = new WanderingTrader[1];
         PoliciaHab.tarea(t -> {
             if (t == 18) {

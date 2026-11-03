@@ -168,6 +168,12 @@ public class PoliciaMod {
         PoliciaEspecial.init();
         PoliciaMazmorras.init();
         PoliciaCocina.init();
+        PoliciaMercenario.init();
+        PoliciaBestiario.init();
+        PoliciaObjetivo.init();
+        PoliciaTutorial.init();
+        PoliciaEconomia.init();
+        PoliciaBalance.init();
         PoliciaEstacion.init();
         PoliciaConfig.init();
         MinecraftForge.EVENT_BUS.register(this);

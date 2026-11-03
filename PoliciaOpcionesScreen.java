@@ -68,6 +68,10 @@ public class PoliciaOpcionesScreen extends Screen {
         this.toggle(6, "Misiones diarias", PoliciaConfig.HUD_DIARIAS, PoliciaConfig::hudDiarias);
         this.toggle(7, "Reloj en pantalla", PoliciaConfig.HUD_RELOJ, PoliciaConfig::hudReloj);
         this.toggle(8, "Codos y rodillas", PoliciaConfig.ARTICULACIONES, PoliciaConfig::articulaciones);
+        this.addRenderableWidget(Button.builder(Component.literal("Ocultar tutorial"), b -> {
+            PoliciaRed.CH.sendToServer(new PoliciaRed.Accion("tutorial_saltar", new net.minecraft.nbt.CompoundTag()));
+            b.active = false;
+        }).bounds(this.width / 2 + 5, this.height / 6 + 24 + 4 * 24, 150, 20).build()).active = PoliciaTutorialCliente.paso() < PoliciaTutorial.PASOS.length;
         this.addRenderableWidget(Button.builder(Component.literal("Listo"), b -> this.onClose())
                 .bounds(this.width / 2 - 100, this.height / 6 + 24 + 5 * 24 + 16, 200, 20).build());
     }

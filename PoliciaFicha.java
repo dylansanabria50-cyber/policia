@@ -13,7 +13,7 @@ import net.minecraftforge.client.gui.overlay.ForgeGui;
 // Lee la copia de datos RPG que manda el servidor (PoliciaRPG.CLIENTE).
 public class PoliciaFicha extends Screen {
     static final int W = 300;
-    static final int H = 252;
+    static final int H = 276;
     static final int[] COLOR = {0xFFE0563B, 0xFF4CC274, 0xFF47A8E5, 0xFFE7B84A, 0xFFA77BE8};
     static final String[] EFECTO = {
             "+2 % de daño cuerpo a cuerpo por punto",
@@ -46,12 +46,35 @@ public class PoliciaFicha extends Screen {
                     .bounds(this.x0 + W - 30, this.y0 + 74 + i * 24, 18, 16).build());
         }
         int bw = 54;
-        int by = this.y0 + H - 26;
+        int by = this.y0 + H - 50;
         String[] nombres = {"Habilidades", "Misiones", "Facciones", "Logros", "Cerrar"};
         for (int n = 0; n < nombres.length; n++) {
             final int cual = n;
             this.addRenderableWidget(Button.builder(Component.literal(nombres[n]), b -> this.boton(cual))
                     .bounds(this.x0 + 6 + n * (bw + 4), by, bw, 18).build());
+        }
+        this.botonesExtra();
+    }
+
+    void botonesExtra() {
+        int bw = 54;
+        int by = this.y0 + H - 26;
+        String[] nombres = {"Especialidad", "Bestiario", "Mercenarios", "Objetivo", "Opciones"};
+        for (int n = 0; n < nombres.length; n++) {
+            final int cual = n;
+            this.addRenderableWidget(Button.builder(Component.literal(nombres[n]), b -> this.botonExtra(cual))
+                    .bounds(this.x0 + 6 + n * (bw + 4), by, bw, 18).build());
+        }
+    }
+
+    void botonExtra(int n) {
+        Minecraft mc = Minecraft.getInstance();
+        switch (n) {
+            case 0 -> mc.setScreen(new PoliciaEspecialScreen(this));
+            case 1 -> mc.setScreen(new PoliciaBestiarioScreen(this));
+            case 2 -> mc.setScreen(new PoliciaMercenarioScreen(this));
+            case 3 -> mc.setScreen(new PoliciaObjetivosScreen(this));
+            default -> mc.setScreen(new PoliciaOpcionesScreen(this));
         }
     }
 
@@ -137,7 +160,9 @@ public class PoliciaFicha extends Screen {
         Minecraft mc = Minecraft.getInstance();
         String nombre = mc.player != null ? mc.player.getName().getString() : "";
         int nivel = Math.max(1, d.getInt("nivel"));
-        g.drawString(this.font, "§f" + nombre + " §7· " + oficio(d.getString("oficio")), x + 12, y + 28, 0xFFFFFF);
+        String[] esp = PoliciaEspecial.fila(d.getString("espec"));
+        String espTxt = esp != null && esp[1].equals(d.getString("oficio")) ? " §6★ " + esp[2] : "";
+        g.drawString(this.font, "§f" + nombre + " §7· " + oficio(d.getString("oficio")) + espTxt, x + 12, y + 28, 0xFFFFFF);
         g.drawString(this.font, "§6Nivel " + nivel, x + W - 12 - this.font.width("Nivel " + nivel), y + 28, 0xFFFFFF);
         // barra de XP
         int xp = d.getInt("xp");
@@ -198,8 +223,8 @@ public class PoliciaFicha extends Screen {
         int in = d.getInt("ingenio") - PoliciaRPG.BASE_ATRIBUTO;
         CompoundTag c = d.getCompound("cont");
         String st = "§7Vida §f+" + vi * 0.5f + "❤  §7Daño §f+" + fu * 2 + "%  §7Vel. §f+" + ag * 0.5f + "%  §7Crít. §f" + de + "%  §7XP §f+" + Math.max(0, in) * 2 + "%";
-        g.drawCenteredString(this.font, st, x + W / 2, y + H - 52, 0xFFFFFF);
-        g.drawCenteredString(this.font, "§8Habilidades usadas: " + c.getInt("habilidades") + " · Enemigos: " + c.getInt("muertes") + " · Menas: " + c.getInt("menas"), x + W / 2, y + H - 40, 0xFFFFFF);
+        g.drawCenteredString(this.font, st, x + W / 2, y + H - 76, 0xFFFFFF);
+        g.drawCenteredString(this.font, "§8Habilidades usadas: " + c.getInt("habilidades") + " · Enemigos: " + c.getInt("muertes") + " · Menas: " + c.getInt("menas"), x + W / 2, y + H - 64, 0xFFFFFF);
         super.render(g, mx, my, pt);
         if (tip != null) {
             java.util.List<Component> l = new java.util.ArrayList<Component>(net.minecraft.client.gui.screens.Screen.getTooltipFromItem(Minecraft.getInstance(), tip));
