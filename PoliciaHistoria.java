@@ -344,7 +344,7 @@ public class PoliciaHistoria {
 
     static BlockPos lugarNpc(MinecraftServer s) {
         CompoundTag w = PoliciaMundo.get(s).getSeccion("historia");
-        if (w.contains("x")) {
+        if (w.contains("x") && w.getBoolean("pueblo")) {
             return new BlockPos(w.getInt("x"), w.getInt("y"), w.getInt("z"));
         }
         ServerLevel ow = s.overworld();
@@ -355,18 +355,56 @@ public class PoliciaHistoria {
             base = new BlockPos(t.getInt("x") + 4, 0, t.getInt("z") + 4);
             break;
         }
+        // todavia no se mudo a un pueblo: lugar provisorio (no se guarda)
         int y = ow.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, base.getX(), base.getZ());
-        BlockPos pos = new BlockPos(base.getX(), y, base.getZ());
+        return new BlockPos(base.getX(), y, base.getZ());
+    }
+
+    // Celestina se muda al pueblo donde esta el jugador (el que lo dejo el
+    // carruaje la primera vez). Si ya existia en otro lado, se la lleva.
+    static void mudar(ServerPlayer p) {
+        ServerLevel sl = p.serverLevel();
+        CompoundTag w = PoliciaMundo.get(p.server).getSeccion("historia");
+        net.minecraft.world.phys.Vec3 lado = net.minecraft.world.phys.Vec3.directionFromRotation(0, p.getYRot() + 70).scale(3.5);
+        BlockPos pos = null;
+        for (int i = 0; i < 8 && pos == null; i++) {
+            net.minecraft.world.phys.Vec3 v = lado.yRot((float) (i * Math.PI / 4));
+            int x = (int) Math.floor(p.getX() + v.x);
+            int z = (int) Math.floor(p.getZ() + v.z);
+            int y = sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+            BlockPos q = new BlockPos(x, y, z);
+            if (Math.abs(y - p.getY()) <= 2 && sl.getBlockState(q.below()).getFluidState().isEmpty()) {
+                pos = q;
+            }
+        }
+        if (pos == null) {
+            pos = p.blockPosition();
+        }
         w.putInt("x", pos.getX());
         w.putInt("y", pos.getY());
         w.putInt("z", pos.getZ());
-        PoliciaMundo.get(s).setDirty();
-        return pos;
+        w.putBoolean("pueblo", true);
+        Villager v = buscarNpc(sl);
+        if (v != null) {
+            v.teleportTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+        } else {
+            w.remove("npc");
+        }
+        PoliciaMundo.get(p.server).setDirty();
+        asegurarNpc(p.server);
+        Villager n = buscarNpc(sl);
+        if (n != null) {
+            n.lookAt(p, 360, 360);
+            n.setYHeadRot(n.getYRot());
+        }
     }
 
     // Aparece si no esta (solo cuando su chunk esta cargado).
     static void asegurarNpc(MinecraftServer s) {
         ServerLevel ow = s.overworld();
+        if (!PoliciaMundo.get(s).getSeccion("historia").getBoolean("pueblo")) {
+            return;
+        }
         BlockPos pos = lugarNpc(s);
         if (!ow.isLoaded(pos) || buscarNpc(ow) != null) {
             return;
@@ -467,8 +505,22 @@ public class PoliciaHistoria {
                 return;
             }
             CompoundTag h = datos(p);
-            if (p.tickCount % 400 == 13) {
-                asegurarNpc(p.server);
+            if (p.tickCount % 80 == 13 && PoliciaRPG.datos(p).getBoolean("intro") && !PoliciaCine.ocupado(p)) {
+                CompoundTag w = PoliciaMundo.get(p.server).getSeccion("historia");
+                if (!w.getBoolean("pueblo")) {
+                    net.minecraft.world.level.levelgen.structure.StructureStart s = p.serverLevel().structureManager().getStructureWithPieceAt(p.blockPosition(), net.minecraft.tags.StructureTags.VILLAGE);
+                    if (s != null && s.isValid() && p.serverLevel().dimension() == net.minecraft.world.level.Level.OVERWORLD) {
+                        mudar(p);
+                    }
+                } else if (p.tickCount % 400 == 13) {
+                    asegurarNpc(p.server);
+                    // si quedo una Celestina vieja de antes de mudarse, se va
+                    for (Villager v : p.serverLevel().getEntitiesOfClass(Villager.class, p.getBoundingBox().inflate(64), x -> x.getPersistentData().getBoolean(NPC))) {
+                        if (!w.hasUUID("npc") || !v.getUUID().equals(w.getUUID("npc"))) {
+                            v.discard();
+                        }
+                    }
+                }
             }
             // aviso para empezar (una vez, al llegar a nivel 2)
             if (h.getInt("cap") == 0 && !h.getBoolean("aviso") && PoliciaRPG.nivel(p) >= 2) {

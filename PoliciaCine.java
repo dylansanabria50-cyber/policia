@@ -71,6 +71,9 @@ public class PoliciaCine {
 
     // El cliente avisa que el jugador subio al carruaje de la parada.
     static void subio(ServerPlayer p) {
+        if (PoliciaParadas.subir(p)) {
+            return;
+        }
         CompoundTag d = LISTA.remove(p.getUUID());
         if (d == null) {
             d = buscarYPreparar(p);
@@ -259,110 +262,18 @@ public class PoliciaCine {
         net.minecraft.core.Direction R = D.getClockWise();
         int y0 = altura(sl, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, base.getX(), base.getZ());
         BlockPos P = new BlockPos(base.getX(), y0, base.getZ());
-        net.minecraft.world.level.block.state.BlockState tabla = net.minecraft.world.level.block.Blocks.SPRUCE_PLANKS.defaultBlockState();
-        net.minecraft.world.level.block.state.BlockState poste = net.minecraft.world.level.block.Blocks.SPRUCE_FENCE.defaultBlockState();
-        net.minecraft.world.level.block.state.BlockState losa = net.minecraft.world.level.block.Blocks.SPRUCE_SLAB.defaultBlockState();
         if (construir) {
-        // piso, aire adentro y techo
-        for (int a = -3; a <= 3; a++) {
-            for (int b = -1; b <= 3; b++) {
-                BlockPos q = P.relative(D, a).relative(R, b);
-                boolean adentro = Math.abs(a) <= 2 && b >= 0 && b <= 2;
-                if (adentro) {
-                    sl.setBlock(q.below(), tabla, 3);
-                    for (int h = 0; h < 3; h++) {
-                        sl.setBlock(q.above(h), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
-                    }
-                }
-                sl.setBlock(q.above(3), losa, 3);
-            }
-        }
-        for (int a : new int[]{-2, 2}) {
-            for (int b : new int[]{0, 2}) {
-                for (int h = 0; h < 3; h++) {
-                    sl.setBlock(P.relative(D, a).relative(R, b).above(h), poste, 3);
-                }
-            }
-        }
-        // banco mirando al camino
-        for (int a = -1; a <= 1; a++) {
-            sl.setBlock(P.relative(D, a).relative(R, 2), net.minecraft.world.level.block.Blocks.SPRUCE_STAIRS.defaultBlockState().setValue(net.minecraft.world.level.block.StairBlock.FACING, R), 3);
-        }
-        sl.setBlock(P.relative(R, 1).above(2), net.minecraft.world.level.block.Blocks.LANTERN.defaultBlockState().setValue(net.minecraft.world.level.block.LanternBlock.HANGING, true), 3);
-        // valija al lado del jugador
-        sl.setBlock(P.relative(D, -2).relative(R, 1), net.minecraft.world.level.block.Blocks.BARREL.defaultBlockState(), 3);
-        // cartel
-        BlockPos cartel = P.relative(D, -4);
-        int yc = altura(sl, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, cartel.getX(), cartel.getZ());
-        cartel = new BlockPos(cartel.getX(), yc, cartel.getZ());
-        int rot = Math.floorMod(Math.round((R.getOpposite().toYRot()) / 22.5f), 16);
-        sl.setBlock(cartel, net.minecraft.world.level.block.Blocks.SPRUCE_SIGN.defaultBlockState().setValue(net.minecraft.world.level.block.StandingSignBlock.ROTATION, rot), 3);
-        if (sl.getBlockEntity(cartel) instanceof net.minecraft.world.level.block.entity.SignBlockEntity sb) {
-            net.minecraft.world.level.block.entity.SignText tx = new net.minecraft.world.level.block.entity.SignText()
-                    .setMessage(0, net.minecraft.network.chat.Component.literal("~ Parada ~"))
-                    .setMessage(1, net.minecraft.network.chat.Component.literal("del Comienzo"))
-                    .setMessage(3, net.minecraft.network.chat.Component.literal("Carruaje diario"));
-            sb.setText(tx, true);
-            sb.setChanged();
-        }
-        }
-        // camino de tierra
-        int[] ys = new int[53];
-        for (int i = -40; i <= 12; i++) {
-            for (int w = -1; w <= 1; w++) {
-                BlockPos q = P.relative(R, -2 + w).relative(D, i);
-                int y = altura(sl, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, q.getX(), q.getZ());
-                BlockPos suelo = new BlockPos(q.getX(), y - 1, q.getZ());
-                net.minecraft.world.level.block.state.BlockState bs = sl.getBlockState(suelo);
-                if (construir && (bs.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK) || bs.is(net.minecraft.world.level.block.Blocks.DIRT) || bs.is(net.minecraft.world.level.block.Blocks.PODZOL) || bs.is(net.minecraft.world.level.block.Blocks.COARSE_DIRT))) {
-                    sl.setBlock(suelo, net.minecraft.world.level.block.Blocks.DIRT_PATH.defaultBlockState(), 3);
-                }
-                for (int h = 0; h < 3; h++) {
-                    BlockPos arriba = suelo.above(1 + h);
-                    if (construir && sl.getBlockState(arriba).canBeReplaced()) {
-                        sl.setBlock(arriba, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
-                    }
-                }
-                if (w == 0) {
-                    ys[i + 40] = y;
-                }
-            }
-        }
-        float[] suaves = new float[53];
-        for (int i = 0; i < 53; i++) {
-            float acc = 0;
-            int n = 0;
-            for (int j = Math.max(0, i - 3); j <= Math.min(52, i + 3); j++) {
-                acc += ys[j];
-                n++;
-            }
-            suaves[i] = Math.max(acc / n, ys[i] - 0.4f);
+            BlockPos campana = PoliciaParadas.construir(sl, P, D, "del Comienzo", 40, 12);
+            PoliciaParadas.registrar(sl, campana, P, D, "Parada del Comienzo");
         }
         // el jugador espera parado bajo el techo, mirando hacia donde viene el carruaje
         float yaw = D.getOpposite().toYRot();
         p.teleportTo(sl, P.getX() + 0.5, y0, P.getZ() + 0.5, yaw, 0);
         p.setDeltaMovement(Vec3.ZERO);
-        BlockPos S = P.relative(R, -2);
-        CompoundTag d = new CompoundTag();
-        d.putDouble("x0", S.getX() + 0.5 - D.getStepX() * 40);
-        d.putDouble("z0", S.getZ() + 0.5 - D.getStepZ() * 40);
-        d.putDouble("x1", S.getX() + 0.5 + D.getStepX() * 12);
-        d.putDouble("z1", S.getZ() + 0.5 + D.getStepZ() * 12);
-        int[] yi = new int[53];
-        for (int i = 0; i < 53; i++) {
-            yi[i] = Math.round(suaves[i] * 100);
-        }
-        d.putIntArray("ys", yi);
-        d.putFloat("parada", 40f);
-        d.putDouble("jx", P.getX() + 0.5);
-        d.putDouble("jy", y0);
-        d.putDouble("jz", P.getZ() + 0.5);
-        d.putString("nombre", "");
+        CompoundTag d = PoliciaParadas.datosCine(sl, P, D, "");
         PoliciaRed.toPlayer(p, new PoliciaRed.Efecto("cine_parada", d));
     }
 
-    // Salida de un viaje: el carruaje te levanta en la parada y se va por el
-    // camino; a los 4,7 s (con la pantalla en negro) llegas al destino.
     static void salida(ServerPlayer p, int x, int y, int z, String nombre) {
         ServerLevel sl = p.serverLevel();
         EN_CURSO.put(p.getUUID(), sl.getGameTime());
@@ -422,8 +333,13 @@ public class PoliciaCine {
             }
         }
         LISTA.remove(p.getUUID());
+        PoliciaParadas.cancelar(p);
         if (vista && estaba) {
+            boolean primera = !PoliciaRPG.datos(p).getBoolean("intro");
             PoliciaRPG.datos(p).putBoolean("intro", true);
+            if (primera && !PoliciaMundo.get(p.server).getSeccion("historia").getBoolean("pueblo") && p.serverLevel().dimension() == Level.OVERWORLD) {
+                PoliciaHistoria.mudar(p);
+            }
             PoliciaViaje.revisar(p);
             PoliciaRPG.sync(p);
             PoliciaOficio.login(p);
@@ -472,7 +388,7 @@ public class PoliciaCine {
                 ServerPlayer p = e.getServer().getPlayerList().getPlayer(u);
                 if (p == null) {
                     EN_CURSO.remove(u);
-                } else if (ahora - EN_CURSO.get(u) > 900) {
+                } else if (ahora - EN_CURSO.get(u) > (PoliciaParadas.LLAMANDO.containsKey(u) ? 6000 : 900)) {
                     terminar(p, true);
                 }
             }

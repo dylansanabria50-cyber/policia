@@ -66,6 +66,12 @@ public class PoliciaViaje {
             m.setDirty();
             PoliciaBanco.donaRosa(sl, glob.getInt("x") + 2, glob.getInt("y"), glob.getInt("z") + 2);
         }
+        // cada aldea tiene su parada de carruaje con campana
+        if (!glob.isEmpty() && !glob.contains("est")) {
+            glob.putBoolean("est", true);
+            m.setDirty();
+            PoliciaParadas.enAldea(sl, s, glob);
+        }
         if (mias.contains(clave)) {
             return;
         }
@@ -106,7 +112,7 @@ public class PoliciaViaje {
                 return true;
             }
         }
-        return PoliciaCasa.enSuCasa(p);
+        return PoliciaCasa.enSuCasa(p) || PoliciaParadas.distanciaParada(p.server, p.getX(), p.getZ()) < 12;
     }
 
     static int costo(ServerPlayer p, int x, int z) {

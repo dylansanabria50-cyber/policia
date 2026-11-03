@@ -31,6 +31,8 @@ public class PoliciaAcciones {
             case "consumir" -> consumir(p);
             case "cine_fin" -> PoliciaCine.terminar(p, true);
             case "cine_subio" -> PoliciaCine.subio(p);
+            case "viaje_elegir" -> PoliciaParadas.elegir(p, d.getString("k"));
+            case "viaje_cancelar" -> PoliciaParadas.cancelar(p);
             case "cine_ver" -> PoliciaCine.empezar(p);
             case "tutorial_saltar" -> PoliciaTutorial.saltar(p);
             case "tut_ok" -> PoliciaTutorial.ok(p, d.getInt("paso"));

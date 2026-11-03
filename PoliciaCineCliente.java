@@ -49,6 +49,16 @@ public class PoliciaCineCliente {
     static float sParada;
     static Vec3 jugadorPos;
     static boolean subioMandado;
+    // llamada desde una campana: arranca a mitad de la escena de la parada,
+    // frena con la puerta abierta y el cochero pregunta a donde vas
+    static boolean llamada;
+    static boolean elegido;
+    static boolean cancelado;
+    static boolean pausa;
+    static int esperaRespuesta;
+    static int tick0;
+    static net.minecraft.nbt.ListTag destinos = new net.minecraft.nbt.ListTag();
+    static boolean empujado;
     static int tick;
     static float[] px;
     static float[] py;
@@ -85,6 +95,7 @@ public class PoliciaCineCliente {
         MinecraftForge.EVENT_BUS.addListener(PoliciaCineCliente::ocultarHud);
         MinecraftForge.EVENT_BUS.addListener(PoliciaCineCliente::mano);
         MinecraftForge.EVENT_BUS.addListener(PoliciaCineCliente::jugador);
+        MinecraftForge.EVENT_BUS.addListener(PoliciaCineCliente::jugadorFin);
         MinecraftForge.EVENT_BUS.addListener(PoliciaCineCliente::quieto);
     }
 
@@ -145,6 +156,18 @@ public class PoliciaCineCliente {
             terminar(mc, false);
             return;
         }
+        if ("cine_seguir".equals(tipo)) {
+            elegido = true;
+            pausa = false;
+            return;
+        }
+        if ("cine_reabrir".equals(tipo)) {
+            if (activo && llamada) {
+                esperaRespuesta = 0;
+                mc.setScreen(new PoliciaDestinoScreen(destinos, nombre));
+            }
+            return;
+        }
         cargarModelo(mc);
         if (datos.anims == null) {
             terminar(mc, true);
@@ -172,6 +195,12 @@ public class PoliciaCineCliente {
         sParada = d.contains("parada") ? d.getFloat("parada") : largo;
         jugadorPos = new Vec3(d.getDouble("jx"), d.getDouble("jy"), d.getDouble("jz"));
         subioMandado = false;
+        llamada = modo == 3 && d.getBoolean("llamada");
+        destinos = d.getList("dest", 10);
+        elegido = !llamada;
+        cancelado = false;
+        pausa = false;
+        esperaRespuesta = 0;
         // llega: 1 s de espera, 1,5 s acelerando, crucero y 3 s frenando
         tLlegada = 1f + 1.5f + Math.max(0, largo - 3.15f - 6.3f) / VEL + 3f;
         tFin = tLlegada + 4.8f;
@@ -183,7 +212,8 @@ public class PoliciaCineCliente {
             tLlegada = 17.5f;
             tFin = 45f;
         }
-        tick = 0;
+        tick0 = llamada ? 200 : 0;
+        tick = tick0;
         espera = 0;
         saltar = 0;
         tomaAntes = -1;
@@ -442,7 +472,7 @@ public class PoliciaCineCliente {
             return;
         }
         // antes de arrancar, esperar a que el mundo del camino este cargado
-        if (tick == 0 && !cargado(mc)) {
+        if (tick == tick0 && !cargado(mc)) {
             espera++;
             if (espera > 500) {
                 // el terreno no llego: mejor no mostrar el vacio
@@ -450,8 +480,29 @@ public class PoliciaCineCliente {
             }
             return;
         }
+        // el carruaje espera con la puerta abierta hasta que elijas destino
+        if (modo == 3 && llamada && !elegido && tick >= 368) {
+            if (!pausa) {
+                pausa = true;
+                esperaRespuesta = 0;
+                mc.setScreen(new PoliciaDestinoScreen(destinos, nombre));
+            } else if (mc.screen == null) {
+                esperaRespuesta++;
+                if (esperaRespuesta > 200) {
+                    // el servidor no contesto: se cancela
+                    cancelar(mc);
+                }
+            }
+            return;
+        }
         tick++;
         float t = tick / 20f;
+        if (modo == 0 || modo == 1) {
+            float tb = t - tLlegada - 1.4f;
+            if (tb >= 0 && tb < 1.2f) {
+                mc.player.walkAnimation.update(0.8f, 0.5f);
+            }
+        }
         if (mc.options.keyJump.isDown()) {
             saltar++;
             if (saltar == 20 && t < tLlegada && modo != 2 && modo != 3) {
@@ -504,7 +555,7 @@ public class PoliciaCineCliente {
         }
         if (modo == 3) {
             // la parada: hojas que vuela el viento, la puerta y el subir
-            if (tick % 3 == 0 && jugadorPos != null) {
+            if (tick % 3 == 0 && jugadorPos != null && !llamada) {
                 double ox = (mc.level.random.nextDouble() - 0.5) * 14;
                 double oz = (mc.level.random.nextDouble() - 0.5) * 14;
                 mc.level.addParticle(ParticleTypes.CHERRY_LEAVES, jugadorPos.x + ox, jugadorPos.y + 4 + mc.level.random.nextDouble() * 3, jugadorPos.z + oz, 0, 0, 0);
@@ -517,6 +568,10 @@ public class PoliciaCineCliente {
             }
             if (t >= 22.4f && !subioMandado) {
                 subioMandado = true;
+                if (cancelado) {
+                    terminar(mc, true);
+                    return;
+                }
                 PoliciaRed.CH.sendToServer(new PoliciaRed.Accion("cine_subio", new CompoundTag()));
             }
         }
@@ -571,8 +626,33 @@ public class PoliciaCineCliente {
     // el jugador no se ve hasta que baja del carruaje
     static void jugador(RenderPlayerEvent.Pre e) {
         float tj = tick / 20f;
-        if (activo && e.getEntity() == Minecraft.getInstance().player && (modo == 3 ? tj >= 19.6f : tj < tLlegada + 1.4f)) {
+        if (activo && e.getEntity() == Minecraft.getInstance().player && (modo == 3 ? tj >= 19.6f && !cancelado : tj < tLlegada + 1.4f)) {
             e.setCanceled(true);
+            return;
+        }
+        // al llegar: el personaje se baja del carruaje y camina hasta su lugar
+        empujado = false;
+        if (activo && (modo == 0 || modo == 1) && e.getEntity() == Minecraft.getInstance().player) {
+            float tf = (tick + e.getPartialTick()) / 20f;
+            float u = (tf - tLlegada - 1.4f) / 1.2f;
+            if (u >= 0 && u < 1) {
+                Vec3 puerta = punto(largo).add(derecha.scale(0.9)).add(0, 0.55, 0);
+                Vec3 yo = e.getEntity().getPosition(e.getPartialTick());
+                Vec3 off = puerta.subtract(yo);
+                float su = u * u * (3 - 2 * u);
+                double salto = u < 0.35f ? Math.sin(u / 0.35f * Math.PI) * 0.25 : 0;
+                Vec3 m = off.scale(1 - su);
+                e.getPoseStack().pushPose();
+                e.getPoseStack().translate(m.x, m.y * (1 - su) + salto, m.z);
+                empujado = true;
+            }
+        }
+    }
+
+    static void jugadorFin(RenderPlayerEvent.Post e) {
+        if (empujado && e.getEntity() == Minecraft.getInstance().player) {
+            empujado = false;
+            e.getPoseStack().popPose();
         }
     }
 
@@ -689,18 +769,21 @@ public class PoliciaCineCliente {
         g.fill(0, 0, w, alto, 0xFF000000);
         g.fill(0, h - alto, w, h, 0xFF000000);
         // fundido desde negro al empezar y a negro al bajarse
-        if (tick == 0 && modo != 2) {
+        if (tick == tick0 && modo != 2) {
             g.fill(0, 0, w, h, 0xFF000000);
             String s0 = modo == 3 ? "..." : "Preparando el carruaje...";
             g.drawString(mc.font, "§7" + s0, w / 2 - mc.font.width(s0) / 2, h / 2, 0xFFFFFF);
             return;
         }
         float negro = 0;
-        if (t < 1.4f && modo != 2) {
-            negro = 1 - Mth.clamp((t - 0.2f) / 1.2f, 0, 1);
+        float t0 = tick0 / 20f;
+        if (t - t0 < 1.4f && modo != 2) {
+            negro = 1 - Mth.clamp((t - t0 - 0.2f) / 1.2f, 0, 1);
         }
         if (modo == 3) {
-            negro = Math.max(negro, Mth.clamp((t - 21.3f) / 1.0f, 0, 1));
+            if (!cancelado) {
+                negro = Math.max(negro, Mth.clamp((t - 21.3f) / 1.0f, 0, 1));
+            }
         } else if (modo == 2) {
             negro = Mth.clamp((t - 3.9f) / 0.7f, 0, 1);
         } else if (t > tFin - 0.9f) {
@@ -711,7 +794,13 @@ public class PoliciaCineCliente {
             g.fill(0, 0, w, h, ((int) (Mth.clamp(negro, 0, 1) * 255) << 24));
         }
         // titulos
-        if (modo == 3) {
+        if (modo == 3 && llamada) {
+            titulo(g, mc, nombre, "Tocaste la campana: el carruaje ya viene", t, 10.0f, 14.0f, w, h, 2.0f);
+            if (t > 21.8f && !cancelado) {
+                String s1 = "...";
+                g.drawString(mc.font, "§7" + s1, w / 2 - mc.font.width(s1) / 2, h / 2, 0xFFFFFF);
+            }
+        } else if (modo == 3) {
             titulo(g, mc, "Este es el comienzo...", "", t, 1.2f, 5.2f, w, h, 2.0f);
             titulo(g, mc, "...de mi nueva vida.", "", t, 6.0f, 10.0f, w, h, 2.0f);
             if (t > 21.8f) {
@@ -732,6 +821,17 @@ public class PoliciaCineCliente {
             String s = saltar > 0 ? "Saltando... " + Math.min(100, saltar * 5) + "%" : "Mantené ESPACIO para saltar";
             g.drawString(mc.font, "§7" + s, w - mc.font.width(s) - 10, h - alto + Math.max(2, (alto - 9) / 2), 0xFFFFFF);
         }
+    }
+
+    // El jugador cerro el menu del cochero sin elegir: el carruaje se va solo.
+    static void cancelar(Minecraft mc) {
+        if (!activo || !llamada || elegido) {
+            return;
+        }
+        cancelado = true;
+        elegido = true;
+        pausa = false;
+        PoliciaRed.CH.sendToServer(new PoliciaRed.Accion("viaje_cancelar", new CompoundTag()));
     }
 
     static void titulo(GuiGraphics g, Minecraft mc, String grande, String chico, float t, float desde, float hasta, int w, int h) {
