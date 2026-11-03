@@ -31,6 +31,13 @@ public class PoliciaCine {
         MinecraftForge.EVENT_BUS.register(new EventosCine());
     }
 
+    // Altura del suelo cargando el chunk antes: si no esta cargado,
+    // Minecraft devuelve el fondo del mundo (y = -64).
+    static int altura(ServerLevel sl, Heightmap.Types tipo, int x, int z) {
+        sl.getChunk(x >> 4, z >> 4);
+        return sl.getHeight(tipo, x, z);
+    }
+
     static void empezar(ServerPlayer p) {
         ServerLevel sl = p.serverLevel();
         if (sl.dimension() != Level.OVERWORLD || EN_CURSO.containsKey(p.getUUID())) {
@@ -45,13 +52,13 @@ public class PoliciaCine {
         Vec3 centro;
         String nombre;
         if (v != null) {
-            int y = sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, v.getX(), v.getZ());
+            int y = altura(sl, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, v.getX(), v.getZ());
             StructureStart st = sl.structureManager().getStructureWithPieceAt(new BlockPos(v.getX(), y - 1, v.getZ()), StructureTags.VILLAGE);
             String clave;
             if (st != null && st.isValid()) {
                 BlockPos c = st.getBoundingBox().getCenter();
                 clave = "v_" + st.getChunkPos().x + "_" + st.getChunkPos().z;
-                centro = new Vec3(c.getX() + 0.5, sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, c.getX(), c.getZ()), c.getZ() + 0.5);
+                centro = new Vec3(c.getX() + 0.5, altura(sl, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, c.getX(), c.getZ()), c.getZ() + 0.5);
             } else {
                 clave = "v_" + (v.getX() >> 4) + "_" + (v.getZ() >> 4);
                 centro = new Vec3(v.getX() + 0.5, y, v.getZ() + 0.5);
@@ -83,7 +90,7 @@ public class PoliciaCine {
                 Vec3 q = centro.add(dir.scale(INICIO - i));
                 int x = (int) Math.floor(q.x);
                 int z = (int) Math.floor(q.z);
-                int y = sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+                int y = altura(sl, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
                 ys[i] = y;
                 if (i > 0) {
                     pena += Math.abs(y - ys[i - 1]) * 3;
@@ -91,7 +98,7 @@ public class PoliciaCine {
                 if (!sl.getBlockState(new BlockPos(x, y - 1, z)).getFluidState().isEmpty()) {
                     pena += 8;
                 }
-                if (sl.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) > y + 1) {
+                if (altura(sl, Heightmap.Types.MOTION_BLOCKING, x, z) > y + 1) {
                     pena += 2;
                 }
             }
@@ -118,8 +125,17 @@ public class PoliciaCine {
         Vec3 derecha = new Vec3(-adelante.z, 0, adelante.x);
         // el jugador baja del carruaje: queda al lado de la puerta
         Vec3 bajada = fin.add(derecha.scale(1.9));
-        int yb = sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(bajada.x), (int) Math.floor(bajada.z));
+        int yb = altura(sl, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(bajada.x), (int) Math.floor(bajada.z));
         float yaw = (float) (Math.atan2(-(centro.x - bajada.x), centro.z - bajada.z) * 180 / Math.PI);
+        if (yb <= sl.getMinBuildHeight() + 2 || mejorY[LARGO] <= sl.getMinBuildHeight() + 2) {
+            // sin suelo seguro: no hay escena y el jugador no se mueve
+            if (viaje) {
+                p.displayClientMessage(net.minecraft.network.chat.Component.literal("§cEl carruaje no encontró camino. Probá de nuevo."), false);
+            }
+            terminar(p, false);
+            PoliciaRed.toPlayer(p, new PoliciaRed.Efecto("cine_cancelar", new CompoundTag()));
+            return;
+        }
         p.teleportTo(sl, bajada.x, yb, bajada.z, yaw, 0);
         p.setDeltaMovement(Vec3.ZERO);
         if (!p.isCreative() && !p.isSpectator()) {
@@ -165,7 +181,7 @@ public class PoliciaCine {
         float prev = (float) p.getY();
         for (int i = 0; i <= n; i++) {
             Vec3 q = ini.lerp(fin, i / (double) n);
-            float h = sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(q.x), (int) Math.floor(q.z));
+            float h = altura(sl, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(q.x), (int) Math.floor(q.z));
             if (i == 0) {
                 h = (float) p.getY();
             }
@@ -190,7 +206,7 @@ public class PoliciaCine {
             ServerPlayer q = p.server.getPlayerList().getPlayer(id);
             if (q != null && q.isAlive()) {
                 EN_CURSO.remove(id);
-                int yy = Math.max(y, q.serverLevel().getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z));
+                int yy = Math.max(y, altura(q.serverLevel(), Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z));
                 empezarEn(q, new Vec3(x + 0.5, yy, z + 0.5), Character.toUpperCase(fn.charAt(0)) + fn.substring(1), true);
             }
             return true;

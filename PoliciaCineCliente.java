@@ -60,6 +60,8 @@ public class PoliciaCineCliente {
     static Marker cam;
     static CameraType camaraAntes;
     static int saltar;
+    // ticks esperando que lleguen los chunks del camino (pantalla en negro)
+    static int espera;
     static int tomaAntes = -1;
     static boolean partido;
     static int despues;
@@ -136,6 +138,10 @@ public class PoliciaCineCliente {
         if (mc.level == null || mc.player == null) {
             return;
         }
+        if ("cine_cancelar".equals(tipo)) {
+            terminar(mc, false);
+            return;
+        }
         cargarModelo(mc);
         if (datos.anims == null) {
             terminar(mc, true);
@@ -168,6 +174,7 @@ public class PoliciaCineCliente {
             tFin = 9f;
         }
         tick = 0;
+        espera = 0;
         saltar = 0;
         tomaAntes = -1;
         relojAnim = 0;
@@ -232,6 +239,16 @@ public class PoliciaCineCliente {
         // despues de bajarte, el carruaje sigue viaje
         float z = t - tFin;
         return largo + 0.6f * z * z;
+    }
+
+    static boolean cargado(Minecraft mc) {
+        int n = px.length - 1;
+        for (int i : new int[]{0, n / 2, n}) {
+            if (!mc.level.hasChunkAt(BlockPos.containing(px[i], py[i], pz[i]))) {
+                return false;
+            }
+        }
+        return espera > 25;
     }
 
     static float velocidad(float t) {
@@ -359,6 +376,11 @@ public class PoliciaCineCliente {
             return;
         }
         if (mc.isPaused()) {
+            return;
+        }
+        // antes de arrancar, esperar a que el mundo del camino este cargado
+        if (tick == 0 && espera < 120 && !cargado(mc)) {
+            espera++;
             return;
         }
         tick++;
@@ -578,6 +600,12 @@ public class PoliciaCineCliente {
         g.fill(0, 0, w, alto, 0xFF000000);
         g.fill(0, h - alto, w, h, 0xFF000000);
         // fundido desde negro al empezar y a negro al bajarse
+        if (tick == 0 && modo != 2) {
+            g.fill(0, 0, w, h, 0xFF000000);
+            String s0 = "Preparando el carruaje...";
+            g.drawString(mc.font, "§7" + s0, w / 2 - mc.font.width(s0) / 2, h / 2, 0xFFFFFF);
+            return;
+        }
         float negro = 0;
         if (t < 1.4f && modo != 2) {
             negro = 1 - Mth.clamp((t - 0.2f) / 1.2f, 0, 1);
