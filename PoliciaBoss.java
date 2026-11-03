@@ -720,7 +720,7 @@ public class PoliciaBoss {
         }
 
         static AttributeSupplier.Builder attrs() {
-            return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 30.0).add(Attributes.MOVEMENT_SPEED, 0.25).add(Attributes.KNOCKBACK_RESISTANCE, 5.0).add(Attributes.FOLLOW_RANGE, 24.0);
+            return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 30.0).add(Attributes.MOVEMENT_SPEED, 0.25).add(Attributes.KNOCKBACK_RESISTANCE, 5.0).add(Attributes.FOLLOW_RANGE, 24.0).add(Attributes.ATTACK_DAMAGE, 3.0);
         }
 
         @Override
@@ -763,16 +763,16 @@ public class PoliciaBoss {
                 this.setDropChance(EquipmentSlot.MAINHAND, 0.0f);
             }
             if (k == 4) {
-                this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(34.0);
-                this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(4.0);
+                base(Attributes.MAX_HEALTH, 34.0);
+                base(Attributes.ATTACK_DAMAGE, 4.0);
                 this.setHealth(34.0f);
                 this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack((ItemLike) Items.IRON_SWORD));
                 this.setDropChance(EquipmentSlot.MAINHAND, 0.0f);
             } else if (k == 5) {
-                this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(40.0);
-                this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(6.0);
-                this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(32.0);
-                this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.3);
+                base(Attributes.MAX_HEALTH, 40.0);
+                base(Attributes.ATTACK_DAMAGE, 6.0);
+                base(Attributes.FOLLOW_RANGE, 32.0);
+                base(Attributes.MOVEMENT_SPEED, 0.3);
                 this.setHealth(40.0f);
                 this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack((ItemLike) Items.IRON_SWORD));
                 this.setDropChance(EquipmentSlot.MAINHAND, 0.0f);
@@ -782,6 +782,13 @@ public class PoliciaBoss {
             }
             if (k == 0 || k == 2) {
                 this.setSitting(true);
+            }
+        }
+
+        void base(net.minecraft.world.entity.ai.attributes.Attribute a, double v) {
+            net.minecraft.world.entity.ai.attributes.AttributeInstance ai = this.getAttribute(a);
+            if (ai != null) {
+                ai.setBaseValue(v);
             }
         }
 

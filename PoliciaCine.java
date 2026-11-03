@@ -235,6 +235,22 @@ public class PoliciaCine {
     // y un camino de tierra por donde llega el carruaje.
     static void parada(ServerPlayer p, boolean construir) {
         ServerLevel sl = p.serverLevel();
+        // multijugador: si ya hay una Parada del Comienzo cerca (la de otro
+        // jugador), se usa esa en vez de construir otra encima
+        CompoundTag reg = PoliciaParadas.registro(p.server);
+        for (String k : reg.getAllKeys()) {
+            CompoundTag t = reg.getCompound(k);
+            double dx = t.getInt("x") + 0.5 - p.getX();
+            double dz = t.getInt("z") + 0.5 - p.getZ();
+            if ("Parada del Comienzo".equals(t.getString("n")) && dx * dx + dz * dz < 160 * 160) {
+                BlockPos P = new BlockPos(t.getInt("x"), t.getInt("y"), t.getInt("z"));
+                net.minecraft.core.Direction D = net.minecraft.core.Direction.from2DDataValue(t.getInt("d"));
+                p.teleportTo(sl, P.getX() + 0.5, P.getY(), P.getZ() + 0.5, D.getOpposite().toYRot(), 0);
+                p.setDeltaMovement(Vec3.ZERO);
+                PoliciaRed.toPlayer(p, new PoliciaRed.Efecto("cine_parada", PoliciaParadas.datosCine(sl, P, D, "")));
+                return;
+            }
+        }
         BlockPos base = p.blockPosition();
         net.minecraft.core.Direction mejorD = net.minecraft.core.Direction.SOUTH;
         double mejor = Double.MAX_VALUE;

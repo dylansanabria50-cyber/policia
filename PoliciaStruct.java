@@ -239,9 +239,14 @@ public class PoliciaStruct {
             int cz = v.getZ() + (int) (Math.sin(ang) * dd);
             int x0 = cx - W[k] / 2;
             int z0 = cz - D[k] / 2;
-            if (!PoliciaStruct.natural(sl, x0 - 1, z0 - 1, W[k] + 2, D[k] + 2) || !PoliciaStruct.clear(sl, k, cx, cz, true) || !PoliciaStruct.place(sl, k, cx, cz, false)) continue;
+            if (!PoliciaStruct.natural(sl, x0 - 1, z0 - 1, W[k] + 2, D[k] + 2) || !PoliciaStruct.clear(sl, k, cx, cz, true)) continue;
+            // se marca ANTES de construir: aunque la construccion falle a mitad, nunca se repite
             hechas.putBoolean(clave, true);
             PoliciaMundo.get(sl.getServer()).setDirty();
+            if (!PoliciaStruct.place(sl, k, cx, cz, false)) {
+                hechas.remove(clave);
+                continue;
+            }
             return true;
         }
         return false;
@@ -252,12 +257,17 @@ public class PoliciaStruct {
         PoliciaStruct.prepareH(sl, x0 - 1, z0 - 1, 33, 25, g, 24);
         PoliciaStruct.fill(sl, x0 + 8, g, z0 + 2, x0 + 28, g, z0 + 12, Blocks.STONE_BRICKS);
         PoliciaSchem.paste(sl, x0, g + 1, z0);
-        BlockPos home = new BlockPos(x0 + 14, g + 1, z0 + 9);
-        PoliciaStruct.npc(sl, 0, (double) x0 + 24.5, (double) g + 1.0, (double) z0 + 9.5, 180.0f, null, 0);
-        for (int i = 0; i < AGX.length; ++i) {
-            PoliciaStruct.npc(sl, 5, (double) (x0 + AGX[i]) + 0.5, g + 1, (double) (z0 + AGZ[i]) + 0.5, 0.0f, home, 24);
-        }
+        // se anota apenas esta construida: si algo falla despues, no se vuelve a construir otra
         Sites.get(sl).add(0, new BlockPos(x0 + 18, g + 1, z0 + 15));
+        BlockPos home = new BlockPos(x0 + 14, g + 1, z0 + 9);
+        try {
+            PoliciaStruct.npc(sl, 0, (double) x0 + 24.5, (double) g + 1.0, (double) z0 + 9.5, 180.0f, null, 0);
+            for (int i = 0; i < AGX.length; ++i) {
+                PoliciaStruct.npc(sl, 5, (double) (x0 + AGX[i]) + 0.5, g + 1, (double) (z0 + AGZ[i]) + 0.5, 0.0f, home, 24);
+            }
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+        }
     }
 
     // Herreria del Maestro herrero: taller de piedra con el frente abierto,

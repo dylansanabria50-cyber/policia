@@ -474,11 +474,17 @@ public class PoliciaCineCliente {
         // antes de arrancar, esperar a que el mundo del camino este cargado
         if (tick == tick0 && !cargado(mc)) {
             espera++;
-            if (espera > 500) {
-                // el terreno no llego: mejor no mostrar el vacio
-                terminar(mc, true);
+            // en multijugador (o con PC lenta) el terreno tarda mas: despues de
+            // 30 s arranca igual si al menos lo de alrededor del jugador esta listo
+            BlockPos aca = mc.player.blockPosition();
+            boolean cerca = mc.level.hasChunkAt(aca) && mc.levelRenderer.isChunkCompiled(aca);
+            if (!(espera > 600 && cerca)) {
+                if (espera > 1500) {
+                    // el terreno no llego: mejor no mostrar el vacio
+                    terminar(mc, true);
+                }
+                return;
             }
-            return;
         }
         // el carruaje espera con la puerta abierta hasta que elijas destino
         if (modo == 3 && llamada && !elegido && tick >= 368) {
