@@ -242,13 +242,18 @@ public class PoliciaCineCliente {
     }
 
     static boolean cargado(Minecraft mc) {
+        if (espera < 10) {
+            return false;
+        }
         int n = px.length - 1;
-        for (int i : new int[]{0, n / 2, n}) {
-            if (!mc.level.hasChunkAt(BlockPos.containing(px[i], py[i], pz[i]))) {
+        for (int i = 0; i <= n; i += 6) {
+            BlockPos b = BlockPos.containing(px[i], py[i], pz[i]);
+            if (!mc.level.hasChunkAt(b) || !mc.levelRenderer.isChunkCompiled(b)) {
                 return false;
             }
         }
-        return espera > 25;
+        BlockPos fin = BlockPos.containing(px[n], py[n], pz[n]);
+        return mc.level.hasChunkAt(fin) && mc.levelRenderer.isChunkCompiled(fin);
     }
 
     static float velocidad(float t) {
@@ -379,8 +384,12 @@ public class PoliciaCineCliente {
             return;
         }
         // antes de arrancar, esperar a que el mundo del camino este cargado
-        if (tick == 0 && espera < 120 && !cargado(mc)) {
+        if (tick == 0 && !cargado(mc)) {
             espera++;
+            if (espera > 500) {
+                // el terreno no llego: mejor no mostrar el vacio
+                terminar(mc, true);
+            }
             return;
         }
         tick++;

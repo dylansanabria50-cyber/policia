@@ -97,6 +97,9 @@ public class PoliciaUICliente {
         if (mc.player == null || mc.options.hideGui || mc.screen != null && !(mc.screen instanceof net.minecraft.client.gui.screens.ChatScreen)) {
             return;
         }
+        if (PoliciaCineCliente.activo) {
+            return;
+        }
         GuiGraphics g = e.getGuiGraphics();
         int w = g.guiWidth();
         int h = g.guiHeight();

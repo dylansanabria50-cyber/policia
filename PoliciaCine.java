@@ -46,7 +46,7 @@ public class PoliciaCine {
         BlockPos base = p.blockPosition();
         BlockPos v = null;
         try {
-            v = sl.findNearestMapStructure(StructureTags.VILLAGE, base, 40, false);
+            v = sl.findNearestMapStructure(StructureTags.VILLAGE, base, 24, false);
         } catch (Throwable ignored) {
         }
         Vec3 centro;
@@ -81,8 +81,9 @@ public class PoliciaCine {
         double mejor = Double.MAX_VALUE;
         int[] mejorY = null;
         Vec3 mejorDir = null;
-        for (int k = 0; k < 8; k++) {
-            double a = k * Math.PI / 4;
+        double giro = sl.random.nextDouble() * Math.PI / 2;
+        for (int k = 0; k < 4; k++) {
+            double a = giro + k * Math.PI / 2;
             Vec3 dir = new Vec3(Math.cos(a), 0, Math.sin(a));
             int[] ys = new int[LARGO + 1];
             double pena = 0;
